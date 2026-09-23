@@ -21,7 +21,7 @@ Set the Robonautshop document shell and a store layout that can hold the navbar 
 
 1. Inspect the current `app/` tree and existing layout components.
 2. Reuse existing fonts and global CSS. Do not restyle the whole app.
-3. Run `npm run lint` and `npm run typecheck`.
+3. Run `pnpm lint` and `pnpm typecheck`.
 4. Stop. Do not start task 05.
 
 ## Done when

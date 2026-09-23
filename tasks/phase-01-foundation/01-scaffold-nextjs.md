@@ -12,7 +12,7 @@ Create the Robonautshop Next.js application in the current empty folder.
 - ESLint
 - Import alias `@/*`
 - App code at the repo root (`app/`, not `src/`)
-- npm as the package manager
+- pnpm as the package manager
 - `git init` if the folder is not already a git repository
 
 ## Out of scope
@@ -24,14 +24,14 @@ Create the Robonautshop Next.js application in the current empty folder.
 ## Steps
 
 1. Inspect the current folder. If a Next.js app already exists, do not recreate it.
-2. Scaffold with `create-next-app` using TypeScript, Tailwind, ESLint, App Router, npm, and no `src/` directory.
+2. Scaffold with `create-next-app` using TypeScript, Tailwind, ESLint, App Router, pnpm, and no `src/` directory.
 3. Confirm `tsconfig.json` has `"strict": true` and the `@/*` path alias.
 4. Initialize git if needed. Do not commit unless asked.
-5. Run `npm run lint`.
+5. Run `pnpm lint`.
 6. Stop. Do not start task 02.
 
 ## Done when
 
 - `package.json`, `tsconfig.json`, `app/`, Tailwind, and ESLint config exist
-- `npm run lint` passes
+- `pnpm lint` passes
 - No store features have been added yet

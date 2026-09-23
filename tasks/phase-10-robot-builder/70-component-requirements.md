@@ -20,7 +20,7 @@ Show required, optional, and recommended components with quantity.
 
 1. Inspect the current project and this task's dependencies.
 2. Implement only this task.
-3. Run `npm run lint` and `npm run typecheck`.
+3. Run `pnpm lint` and `pnpm typecheck`.
 4. Fix errors.
 5. Stop. Do not start the next task.
 

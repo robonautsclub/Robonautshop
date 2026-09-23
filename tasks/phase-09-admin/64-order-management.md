@@ -20,7 +20,7 @@ Add the admin order list if task 58 did not already provide it. Do not duplicate
 
 1. Inspect the current project and this task's dependencies.
 2. Implement only this task.
-3. Run `npm run lint` and `npm run typecheck`.
+3. Run `pnpm lint` and `pnpm typecheck`.
 4. Fix errors.
 5. Stop. Do not start the next task.
 

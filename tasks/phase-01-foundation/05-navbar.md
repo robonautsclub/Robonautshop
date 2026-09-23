@@ -23,7 +23,7 @@ Add a responsive store navbar.
 
 1. Inspect the store layout and shadcn components already installed.
 2. Add only the navbar. Routes may 404 until task 07; that is expected.
-3. Run `npm run lint` and `npm run typecheck`.
+3. Run `pnpm lint` and `pnpm typecheck`.
 4. Stop. Do not start task 06.
 
 ## Done when

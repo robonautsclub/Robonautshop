@@ -21,7 +21,7 @@ Add a simple footer that matches the navbar.
 ## Steps
 
 1. Inspect the navbar and store layout. Reuse the same link list if one already exists.
-2. Run `npm run lint` and `npm run typecheck`.
+2. Run `pnpm lint` and `pnpm typecheck`.
 3. Stop. Do not start task 07.
 
 ## Done when

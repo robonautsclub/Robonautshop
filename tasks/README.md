@@ -12,7 +12,7 @@ Small, independent prompts for building the robotics parts store. Give an agent 
 4. Use TypeScript. Keep components reusable. Avoid extra dependencies.
 5. Never hard-code secrets. Use environment variables.
 6. Never create fake functionality that looks like it works.
-7. Run `npm run lint` and `npm run typecheck` when the project exists.
+7. Run `pnpm lint` and `pnpm typecheck` when the project exists. Use pnpm for installs.
 8. Fix errors before finishing.
 9. Stop and report. Do not continue to the next task.
 

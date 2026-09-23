@@ -33,7 +33,7 @@ PAYMENT_API_KEY=
 
 1. Inspect existing `.gitignore` and `package.json`.
 2. Add only the items above. Do not commit secrets.
-3. Run `npm run lint` and `npm run typecheck`.
+3. Run `pnpm lint` and `pnpm typecheck`.
 4. Stop. Do not start task 03.
 
 ## Done when

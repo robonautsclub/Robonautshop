@@ -5,8 +5,8 @@ Robotics parts, kits, and project guides for builders in Bangladesh. The catalog
 ## Run locally
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
@@ -14,8 +14,8 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Checks
 
 ```bash
-npm run lint
-npm run typecheck
+pnpm lint
+pnpm typecheck
 ```
 
 Copy `.env.example` to `.env.local` when a later task needs secrets. Do not commit `.env.local`.

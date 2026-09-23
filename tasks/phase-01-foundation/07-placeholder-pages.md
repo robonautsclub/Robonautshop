@@ -28,7 +28,7 @@ Add empty public routes so navigation does not 404.
 ## Steps
 
 1. Inspect existing pages so you do not duplicate routes.
-2. Run `npm run lint` and `npm run typecheck`.
+2. Run `pnpm lint` and `pnpm typecheck`.
 3. Stop. Do not start task 08 beyond what this task requires. Task 08 owns the README.
 
 ## Done when
