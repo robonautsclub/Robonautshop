@@ -1,5 +1,7 @@
 # Task 34 — Sorting
 
+- [ ] Implemented
+
 ## Goal
 
 Add sorting to the product listing without changing filter behavior.

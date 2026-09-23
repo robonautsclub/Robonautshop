@@ -1,5 +1,7 @@
 # Task 66 — Kit management
 
+- [ ] Implemented
+
 ## Goal
 
 Let an admin create kits and attach component products.

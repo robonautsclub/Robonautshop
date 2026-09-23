@@ -1,5 +1,7 @@
 # Task 86 — Email notifications
 
+- [ ] Implemented
+
 ## Goal
 
 Send transactional email through a Resend-compatible interface using RESEND_API_KEY.

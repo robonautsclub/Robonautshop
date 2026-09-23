@@ -1,5 +1,7 @@
 # Task 41 — Customer registration
 
+- [ ] Implemented
+
 ## Goal
 
 Add email and password registration with Better Auth or the already chosen auth library. Hash passwords through that library.

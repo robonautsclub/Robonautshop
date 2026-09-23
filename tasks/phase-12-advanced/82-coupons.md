@@ -1,5 +1,7 @@
 # Task 82 — Coupons
 
+- [ ] Implemented
+
 ## Goal
 
 Add coupons. The server must calculate the discount. Never trust a client total.

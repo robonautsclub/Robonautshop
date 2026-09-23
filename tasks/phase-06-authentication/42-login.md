@@ -1,5 +1,7 @@
 # Task 42 — Login
 
+- [ ] Implemented
+
 ## Goal
 
 Add email and password login and logout. Protect nothing beyond the session cookie setup this task requires.

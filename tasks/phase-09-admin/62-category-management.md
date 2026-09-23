@@ -1,5 +1,7 @@
 # Task 62 — Category management
 
+- [ ] Implemented
+
 ## Goal
 
 Let an admin create and edit categories.

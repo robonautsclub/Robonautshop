@@ -1,5 +1,7 @@
 # Task 36 — Cart
 
+- [ ] Implemented
+
 ## Goal
 
 Add the cart page and cart state. Do not trust client prices.

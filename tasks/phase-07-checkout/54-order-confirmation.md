@@ -1,5 +1,7 @@
 # Task 54 — Order confirmation
 
+- [ ] Implemented
+
 ## Goal
 
 Show an order confirmation page for an order the current customer owns.

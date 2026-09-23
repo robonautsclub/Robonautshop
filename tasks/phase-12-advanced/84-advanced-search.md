@@ -1,5 +1,7 @@
 # Task 84 — Advanced search
 
+- [ ] Implemented
+
 ## Goal
 
 Extend the search interface. Add Meilisearch or Typesense only behind that interface if credentials exist.

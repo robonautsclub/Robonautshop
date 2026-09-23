@@ -1,5 +1,7 @@
 # Task 65 — Customer management
 
+- [ ] Implemented
+
 ## Goal
 
 Let an admin view customers. Do not expose password hashes.

@@ -1,5 +1,7 @@
 # Task 33 — Filters
 
+- [ ] Implemented
+
 ## Goal
 
 Add catalog filters on top of the existing listing. Do not add a new search engine.

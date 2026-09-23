@@ -1,5 +1,7 @@
 # Task 74 — Customize kit
 
+- [ ] Implemented
+
 ## Goal
 
 Let the customer swap compatible components and add the selection to the cart.

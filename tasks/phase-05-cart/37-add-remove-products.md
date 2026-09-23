@@ -1,5 +1,7 @@
 # Task 37 — Add and remove products
 
+- [ ] Implemented
+
 ## Goal
 
 Allow adding and removing real catalog items. Do not fake stock.

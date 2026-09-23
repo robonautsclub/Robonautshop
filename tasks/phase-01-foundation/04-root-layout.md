@@ -1,5 +1,7 @@
 # Task 04 — Root layout
 
+- [x] Implemented
+
 ## Goal
 
 Set the Robonautshop document shell and a store layout that can hold the navbar and footer.

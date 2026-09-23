@@ -1,5 +1,7 @@
 # Task 31 — Product detail
 
+- [ ] Implemented
+
 ## Goal
 
 Add /products/[slug] with images, price, stock, SKU, description, and specifications. Public URLs must use slugs, not ids.

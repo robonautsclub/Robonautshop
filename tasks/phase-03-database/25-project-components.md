@@ -1,5 +1,7 @@
 # Task 25 — Project components
 
+- [ ] Implemented
+
 ## Goal
 
 Relate a robot project to products with quantity and required, optional, or recommended role.

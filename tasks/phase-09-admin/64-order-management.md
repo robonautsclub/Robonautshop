@@ -1,5 +1,7 @@
 # Task 64 — Order management
 
+- [ ] Implemented
+
 ## Goal
 
 Add the admin order list if task 58 did not already provide it. Do not duplicate a second order model.

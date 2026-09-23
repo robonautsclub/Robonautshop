@@ -1,5 +1,7 @@
 # Task 30 — Category pages
 
+- [ ] Implemented
+
 ## Goal
 
 Add /categories and /categories/[slug] from the database.

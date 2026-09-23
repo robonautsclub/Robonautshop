@@ -1,5 +1,7 @@
 # Task 71 — Automatic price calculation
 
+- [ ] Implemented
+
 ## Goal
 
 Sum the current product prices for the selected components on the server.

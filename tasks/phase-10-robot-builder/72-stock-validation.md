@@ -1,5 +1,7 @@
 # Task 72 — Stock validation
 
+- [ ] Implemented
+
 ## Goal
 
 Show stock status and block selections that exceed available stock.

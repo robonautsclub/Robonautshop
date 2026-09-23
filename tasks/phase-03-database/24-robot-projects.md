@@ -1,5 +1,7 @@
 # Task 24 — Robot projects
 
+- [ ] Implemented
+
 ## Goal
 
 Add robot projects as buildable robots, separate from products. Do not build the robot builder UI.

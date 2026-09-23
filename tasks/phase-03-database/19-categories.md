@@ -1,5 +1,7 @@
 # Task 19 — Categories
 
+- [ ] Implemented
+
 ## Goal
 
 Add categories with slug-based identity. Do not build category pages.

@@ -1,5 +1,7 @@
 # Task 22 — Inventory
 
+- [ ] Implemented
+
 ## Goal
 
 Add stock, reserved stock, low-stock threshold, SKU, and warehouse location. Available stock must be derived, not stored as the source of truth.

@@ -1,5 +1,7 @@
 # Task 21 — Product variants
 
+- [ ] Implemented
+
 ## Goal
 
 Add product variants as sellable versions of a product. Do not merge variants into the product row.

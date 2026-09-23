@@ -1,5 +1,7 @@
 # Task 70 — Component requirements
 
+- [ ] Implemented
+
 ## Goal
 
 Show required, optional, and recommended components with quantity.

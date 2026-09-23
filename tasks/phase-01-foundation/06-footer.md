@@ -1,5 +1,7 @@
 # Task 06 — Footer
 
+- [x] Implemented
+
 ## Goal
 
 Add a simple footer that matches the navbar.

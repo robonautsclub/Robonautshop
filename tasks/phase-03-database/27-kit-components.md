@@ -1,5 +1,7 @@
 # Task 27 — Kit components
 
+- [ ] Implemented
+
 ## Goal
 
 Relate a kit to its component products and quantities.

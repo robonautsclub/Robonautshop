@@ -1,5 +1,7 @@
 # Task 35 — Related products
 
+- [ ] Implemented
+
 ## Goal
 
 Show related products on the product page from real relationships only.

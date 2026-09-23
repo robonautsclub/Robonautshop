@@ -1,5 +1,7 @@
 # Task 40 — Persistent cart
 
+- [ ] Implemented
+
 ## Goal
 
 Persist the cart for guests and signed-in customers without creating orders.

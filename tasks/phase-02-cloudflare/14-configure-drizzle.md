@@ -1,5 +1,7 @@
 # Task 14 — Configure Drizzle
 
+- [ ] Implemented
+
 ## Goal
 
 Install and configure Drizzle ORM for D1. Do not define the full catalog schema yet.

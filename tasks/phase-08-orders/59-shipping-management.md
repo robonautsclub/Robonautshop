@@ -1,5 +1,7 @@
 # Task 59 — Shipping management
 
+- [ ] Implemented
+
 ## Goal
 
 Record shipment details through the shipping abstraction. Do not call a single courier directly from the order service.

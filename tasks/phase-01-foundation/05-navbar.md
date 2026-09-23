@@ -1,5 +1,7 @@
 # Task 05 — Navbar
 
+- [x] Implemented
+
 ## Goal
 
 Add a responsive store navbar.

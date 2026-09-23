@@ -1,5 +1,7 @@
 # Task 20 — Products
 
+- [ ] Implemented
+
 ## Goal
 
 Add the product table with flexible specifications, slug, and pricing fields. Do not hard-code spec columns. Do not seed fake products.

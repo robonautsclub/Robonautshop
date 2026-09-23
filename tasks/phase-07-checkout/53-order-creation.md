@@ -1,5 +1,7 @@
 # Task 53 — Order creation
 
+- [ ] Implemented
+
 ## Goal
 
 Create orders with separate order status and payment status. Reserve stock. The server calculates every amount.

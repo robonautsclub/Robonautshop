@@ -1,5 +1,7 @@
 # Task 76 — Robot guides
 
+- [ ] Implemented
+
 ## Goal
 
 Attach guides to robot projects.

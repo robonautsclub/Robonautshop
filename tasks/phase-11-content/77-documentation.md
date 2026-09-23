@@ -1,5 +1,7 @@
 # Task 77 — Documentation
 
+- [ ] Implemented
+
 ## Goal
 
 Add documentation pages for components and projects.

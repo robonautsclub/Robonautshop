@@ -1,5 +1,7 @@
 # Task 29 — Product listing
 
+- [ ] Implemented
+
 ## Goal
 
 List published products at /products using server-rendered data.

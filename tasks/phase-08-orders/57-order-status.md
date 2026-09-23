@@ -1,5 +1,7 @@
 # Task 57 — Order status
 
+- [ ] Implemented
+
 ## Goal
 
 Implement the order lifecycle transitions and the reserved-stock rules for pay, cancel, and refund.

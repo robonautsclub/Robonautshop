@@ -1,5 +1,7 @@
 # Task 28 — Homepage
 
+- [ ] Implemented
+
 ## Goal
 
 Replace the home placeholder with a real storefront home that uses live data only. Do not invent products.

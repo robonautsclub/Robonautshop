@@ -1,5 +1,7 @@
 # Task 11 — Configure Cloudflare
 
+- [ ] Implemented
+
 ## Goal
 
 Add the Cloudflare project configuration needed to deploy this app later. Do not deploy to production.

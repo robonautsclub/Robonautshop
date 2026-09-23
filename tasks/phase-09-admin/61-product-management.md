@@ -1,5 +1,7 @@
 # Task 61 — Product management
 
+- [ ] Implemented
+
 ## Goal
 
 Let an admin create and edit products.

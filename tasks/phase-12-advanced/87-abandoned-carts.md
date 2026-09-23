@@ -1,5 +1,7 @@
 # Task 87 — Abandoned carts
 
+- [ ] Implemented
+
 ## Goal
 
 Detect abandoned carts and record them. Do not send email unless task 86 is already in place.

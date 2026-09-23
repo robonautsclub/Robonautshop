@@ -1,5 +1,7 @@
 # Task 02 — Environment and gitignore
 
+- [x] Implemented
+
 ## Goal
 
 Add a secret-safe environment template and a typecheck script.

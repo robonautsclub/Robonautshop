@@ -1,5 +1,7 @@
 # Task 52 — Online payment integration
 
+- [ ] Implemented
+
 ## Goal
 
 Add one online provider behind the abstraction, with webhook verification. Credentials come from the environment.

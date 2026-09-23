@@ -1,5 +1,7 @@
 # Task 13 — Configure D1
 
+- [ ] Implemented
+
 ## Goal
 
 Add a Cloudflare D1 database binding and local config. Do not create product tables yet.

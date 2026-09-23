@@ -1,5 +1,7 @@
 # Task 75 — Tutorials
 
+- [ ] Implemented
+
 ## Goal
 
 Add tutorials as content records and public pages. Do not paste copyrighted manuals.

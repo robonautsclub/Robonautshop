@@ -1,5 +1,7 @@
 # Task 49 — Shipping calculation
 
+- [ ] Implemented
+
 ## Goal
 
 Add a shipping abstraction. Do not couple orders to Pathao, Steadfast, or RedX.

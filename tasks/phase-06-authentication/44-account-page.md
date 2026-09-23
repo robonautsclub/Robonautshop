@@ -1,5 +1,7 @@
 # Task 44 — Account page
 
+- [ ] Implemented
+
 ## Goal
 
 Replace the account placeholder with a real profile page for the signed-in customer.

@@ -1,5 +1,7 @@
 # Task 69 — Project detail
 
+- [ ] Implemented
+
 ## Goal
 
 Add /projects/[slug] for one robot project.

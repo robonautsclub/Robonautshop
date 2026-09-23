@@ -1,5 +1,7 @@
 # Task 78 — Datasheets
 
+- [ ] Implemented
+
 ## Goal
 
 Attach datasheet files stored in R2. Validate uploads.

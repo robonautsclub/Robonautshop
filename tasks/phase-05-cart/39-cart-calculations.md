@@ -1,5 +1,7 @@
 # Task 39 — Cart calculations
 
+- [ ] Implemented
+
 ## Goal
 
 Calculate line totals and cart total on the server from current product prices.

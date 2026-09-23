@@ -1,5 +1,7 @@
 # Task 73 — Complete kit
 
+- [ ] Implemented
+
 ## Goal
 
 Let the customer add the linked complete kit when one exists.

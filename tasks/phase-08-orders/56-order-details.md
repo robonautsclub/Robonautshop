@@ -1,5 +1,7 @@
 # Task 56 — Order details
 
+- [ ] Implemented
+
 ## Goal
 
 Show one order, its items, payment status, and order status.

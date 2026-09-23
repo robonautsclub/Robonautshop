@@ -1,5 +1,7 @@
 # Task 43 — Google login
 
+- [ ] Implemented
+
 ## Goal
 
 Add Google login using environment variables. Do not hard-code client secrets.

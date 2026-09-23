@@ -1,5 +1,7 @@
 # Task 81 — Wishlist
 
+- [ ] Implemented
+
 ## Goal
 
 Add a per-customer wishlist. Do not add items to the cart automatically.

@@ -1,5 +1,7 @@
 # Task 79 — Code examples
 
+- [ ] Implemented
+
 ## Goal
 
 Add code examples linked to projects. Store them as project content, not as executable admin scripts.

@@ -1,5 +1,7 @@
 # Task 85 — Analytics
 
+- [ ] Implemented
+
 ## Goal
 
 Add privacy-conscious store analytics. Do not send secrets to a third party without an env-configured provider.

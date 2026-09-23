@@ -1,5 +1,7 @@
 # Task 07 — Placeholder pages
 
+- [x] Implemented
+
 ## Goal
 
 Add empty public routes so navigation does not 404.

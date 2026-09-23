@@ -1,5 +1,7 @@
 # Task 51 — Cash on delivery
 
+- [ ] Implemented
+
 ## Goal
 
 Implement cash on delivery through the payment abstraction.

@@ -1,5 +1,7 @@
 # Task 32 — Search
 
+- [ ] Implemented
+
 ## Goal
 
 Add database search with an interface that can later be replaced by Meilisearch or Typesense.

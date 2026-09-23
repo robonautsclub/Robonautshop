@@ -1,5 +1,7 @@
 # Task 88 — Inventory alerts
 
+- [ ] Implemented
+
 ## Goal
 
 Alert when available stock falls below the low-stock threshold.

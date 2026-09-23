@@ -1,5 +1,7 @@
 # Task 47 — Checkout
 
+- [ ] Implemented
+
 ## Goal
 
 Add the checkout page shell that reads the server cart. Do not charge a card.

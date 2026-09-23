@@ -1,5 +1,7 @@
 # Task 15 — Create first migration
 
+- [ ] Implemented
+
 ## Goal
 
 Create the first Drizzle migration with a minimal schema smoke table or empty baseline the project requires. Do not add the full domain model.

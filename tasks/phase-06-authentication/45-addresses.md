@@ -1,5 +1,7 @@
 # Task 45 — Addresses
 
+- [ ] Implemented
+
 ## Goal
 
 Let a customer save delivery addresses. Do not build checkout.

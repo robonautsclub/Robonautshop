@@ -1,5 +1,7 @@
 # Task 58 — Admin order management
 
+- [ ] Implemented
+
 ## Goal
 
 Let an admin update order status. Enforce the admin role on the server.

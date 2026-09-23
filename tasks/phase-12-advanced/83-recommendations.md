@@ -1,5 +1,7 @@
 # Task 83 — Recommendations
 
+- [ ] Implemented
+
 ## Goal
 
 Recommend products from real catalog relationships only.

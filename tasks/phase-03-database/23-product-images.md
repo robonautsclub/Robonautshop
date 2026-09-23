@@ -1,5 +1,7 @@
 # Task 23 — Product images
 
+- [ ] Implemented
+
 ## Goal
 
 Add product image records that point at R2 object keys. Do not upload files in this task.

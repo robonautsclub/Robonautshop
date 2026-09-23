@@ -1,5 +1,7 @@
 # Task 63 — Inventory management
 
+- [ ] Implemented
+
 ## Goal
 
 Let an admin adjust stock without bypassing reserved stock.

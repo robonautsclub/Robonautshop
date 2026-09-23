@@ -1,5 +1,7 @@
 # Task 60 — Admin dashboard
 
+- [ ] Implemented
+
 ## Goal
 
 Add a minimal admin home protected on the server. Do not build every admin screen.

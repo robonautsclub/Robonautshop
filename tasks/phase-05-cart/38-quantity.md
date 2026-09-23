@@ -1,5 +1,7 @@
 # Task 38 — Quantity
 
+- [ ] Implemented
+
 ## Goal
 
 Allow quantity changes and block quantities above available stock.

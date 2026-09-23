@@ -1,5 +1,7 @@
 # Task 68 — Project listing
 
+- [ ] Implemented
+
 ## Goal
 
 List robot projects at /projects from the database.

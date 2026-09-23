@@ -1,5 +1,7 @@
 # Task 48 — Address selection
 
+- [ ] Implemented
+
 ## Goal
 
 Let checkout use a saved address or a new one.

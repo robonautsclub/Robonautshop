@@ -1,5 +1,7 @@
 # Task 46 — Authentication protection
 
+- [ ] Implemented
+
 ## Goal
 
 Enforce authorization on the server. Never rely only on hiding links.

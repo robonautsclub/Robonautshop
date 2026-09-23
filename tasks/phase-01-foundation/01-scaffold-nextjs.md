@@ -1,5 +1,7 @@
 # Task 01 — Scaffold Next.js
 
+- [x] Implemented
+
 ## Goal
 
 Create the Robonautshop Next.js application in the current empty folder.

@@ -1,5 +1,7 @@
 # Task 17 — Configure R2
 
+- [ ] Implemented
+
 ## Goal
 
 Add an R2 storage abstraction and binding for images and documents. Do not upload real assets or hard-code credentials.

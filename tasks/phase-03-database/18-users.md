@@ -1,5 +1,7 @@
 # Task 18 — Users
 
+- [ ] Implemented
+
 ## Goal
 
 Add the users schema and role field for CUSTOMER and ADMIN, with room for future roles. Enforce nothing in the UI yet.

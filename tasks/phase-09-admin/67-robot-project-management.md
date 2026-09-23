@@ -1,5 +1,7 @@
 # Task 67 — Robot project management
 
+- [ ] Implemented
+
 ## Goal
 
 Let an admin create robot projects and project components.

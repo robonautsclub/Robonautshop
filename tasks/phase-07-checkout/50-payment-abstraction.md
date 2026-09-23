@@ -1,5 +1,7 @@
 # Task 50 — Payment abstraction
 
+- [ ] Implemented
+
 ## Goal
 
 Add a payment provider interface. Do not hard-code bKash, Nagad, or SSLCOMMERZ into the order model.

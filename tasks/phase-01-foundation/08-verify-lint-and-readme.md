@@ -1,5 +1,7 @@
 # Task 08 — Verify, lint, and README
 
+- [x] Implemented
+
 ## Goal
 
 Confirm the foundation and document how to run it.

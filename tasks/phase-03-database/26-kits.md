@@ -1,5 +1,7 @@
 # Task 26 — Kits
 
+- [ ] Implemented
+
 ## Goal
 
 Add kits as sellable collections, separate from robot projects. Do not treat a kit as a single unstructured product blob.

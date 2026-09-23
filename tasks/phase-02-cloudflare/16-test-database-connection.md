@@ -1,5 +1,7 @@
 # Task 16 — Test database connection
 
+- [ ] Implemented
+
 ## Goal
 
 Prove the app can reach the local D1 database through Drizzle. Do not seed a catalog.

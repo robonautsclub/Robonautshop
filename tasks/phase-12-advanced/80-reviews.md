@@ -1,5 +1,7 @@
 # Task 80 — Reviews
 
+- [ ] Implemented
+
 ## Goal
 
 Add product reviews for verified buyers only if order data can prove a purchase. Otherwise stop and report the missing dependency.

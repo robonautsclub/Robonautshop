@@ -1,5 +1,7 @@
 # Task 12 — Configure Workers
 
+- [ ] Implemented
+
 ## Goal
 
 Set up the Cloudflare Workers + Hono TypeScript API entry so later routes can live there. Do not implement business routes.

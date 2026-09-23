@@ -1,5 +1,7 @@
 # Task 03 — shadcn/ui and Lucide
 
+- [x] Implemented
+
 ## Goal
 
 Configure shadcn/ui and Lucide so later UI can reuse them.
