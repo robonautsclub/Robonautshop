@@ -1,13 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import {
-  Lock,
-  Mail,
-  MapPin,
-  Phone,
-  ShieldCheck,
-  Truck,
-} from "lucide-react";
+import { Lock, Mail, MapPin, Phone } from "lucide-react";
 
 import { SiteLogo } from "@/components/brand/site-logo";
 import { PageContainer } from "@/components/layout/page-container";
@@ -47,24 +40,6 @@ const paymentMethods = [
   },
 ] as const;
 
-const trustPoints = [
-  {
-    icon: ShieldCheck,
-    title: "Secure checkout",
-    detail: "Payment details stay on trusted gateways — never stored by us.",
-  },
-  {
-    icon: Lock,
-    title: "Encrypted sessions",
-    detail: "HTTPS / SSL for every storefront and account request.",
-  },
-  {
-    icon: Truck,
-    title: "BD delivery",
-    detail: "Courier-ready packing for Dhaka and nationwide shipping.",
-  },
-] as const;
-
 function FooterLink({
   href,
   children,
@@ -92,26 +67,25 @@ export function Footer() {
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,oklch(0.94_0.02_250),transparent_50%),linear-gradient(180deg,oklch(0.985_0.008_240),oklch(0.97_0.01_240))]"
       />
 
-      <PageContainer className="relative flex flex-col gap-12 py-14 sm:py-16">
-        <div className="grid gap-10 lg:grid-cols-[1.35fr_repeat(3,minmax(0,1fr))]">
-          <div className="max-w-md space-y-4">
-            <SiteLogo href="/" size="lg" />
-            <p className="text-sm leading-relaxed text-muted-foreground">
+      <PageContainer className="relative flex flex-col gap-6 py-8 sm:py-10">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(2,minmax(0,1fr))]">
+          <div className="max-w-md space-y-2.5 sm:col-span-2 lg:col-span-1">
+            <SiteLogo href="/" size="md" />
+            <p className="text-sm leading-snug text-muted-foreground">
               Robotics parts, kits, and guided builds for students, makers, and
-              competition teams across Bangladesh — designed to scale beyond
-              borders later.
+              competition teams across Bangladesh.
             </p>
-            <ul className="space-y-2.5 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2.5">
+            <ul className="space-y-1.5 text-sm text-muted-foreground">
+              <li className="flex items-center gap-2">
                 <MapPin
-                  className="mt-0.5 size-4 shrink-0 text-foreground/70"
+                  className="size-3.5 shrink-0 text-foreground/70"
                   aria-hidden
                 />
                 <span>Dhaka, Bangladesh · Nationwide courier delivery</span>
               </li>
-              <li className="flex items-start gap-2.5">
+              <li className="flex items-center gap-2">
                 <Phone
-                  className="mt-0.5 size-4 shrink-0 text-foreground/70"
+                  className="size-3.5 shrink-0 text-foreground/70"
                   aria-hidden
                 />
                 <a
@@ -121,9 +95,9 @@ export function Footer() {
                   +880 1700-000000
                 </a>
               </li>
-              <li className="flex items-start gap-2.5">
+              <li className="flex items-center gap-2">
                 <Mail
-                  className="mt-0.5 size-4 shrink-0 text-foreground/70"
+                  className="size-3.5 shrink-0 text-foreground/70"
                   aria-hidden
                 />
                 <a
@@ -136,11 +110,11 @@ export function Footer() {
             </ul>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             <p className="text-xs font-semibold tracking-[0.14em] text-foreground/80 uppercase">
               Shop
             </p>
-            <nav className="flex flex-col gap-2" aria-label="Shop">
+            <nav className="flex flex-col gap-1" aria-label="Shop">
               {storeNavLinks.map((link) => (
                 <FooterLink key={link.href} href={link.href}>
                   {link.label}
@@ -149,11 +123,11 @@ export function Footer() {
             </nav>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             <p className="text-xs font-semibold tracking-[0.14em] text-foreground/80 uppercase">
               Help
             </p>
-            <nav className="flex flex-col gap-2" aria-label="Help">
+            <nav className="flex flex-col gap-1" aria-label="Help">
               {helpLinks.map((link) => (
                 <FooterLink key={link.href} href={link.href}>
                   {link.label}
@@ -161,40 +135,16 @@ export function Footer() {
               ))}
             </nav>
           </div>
-
-          <div className="space-y-3">
-            <p className="text-xs font-semibold tracking-[0.14em] text-foreground/80 uppercase">
-              Why shop here
-            </p>
-            <ul className="space-y-3">
-              {trustPoints.map((point) => (
-                <li key={point.title} className="flex gap-3">
-                  <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg border bg-background/80">
-                    <point.icon className="size-3.5" aria-hidden />
-                  </span>
-                  <div>
-                    <p className="text-sm font-medium tracking-tight">
-                      {point.title}
-                    </p>
-                    <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
-                      {point.detail}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
 
-        <div className="space-y-4 rounded-2xl border bg-background/70 p-5 shadow-[0_1px_0_oklch(1_0_0_/_0.6)_inset] backdrop-blur-sm sm:p-6">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div className="space-y-2.5 rounded-xl border bg-background/70 p-3.5 sm:p-4">
+          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs font-semibold tracking-[0.14em] text-foreground/80 uppercase">
                 Payment methods
               </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Pay the way you prefer — mobile wallets, cash on delivery, or
-                card via SSLCOMMERZ when live payments are enabled.
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                bKash, Nagad, Cash on Delivery, or SSLCOMMERZ when live.
               </p>
             </div>
             <p className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
@@ -203,12 +153,12 @@ export function Footer() {
             </p>
           </div>
 
-          <ul className="flex flex-wrap gap-2.5" aria-label="Accepted payments">
+          <ul className="flex flex-wrap gap-2" aria-label="Accepted payments">
             {paymentMethods.map((method) => (
               <li key={method.id}>
                 <span
                   className={cn(
-                    "inline-flex h-10 items-center rounded-xl border px-3.5 text-sm font-semibold tracking-tight",
+                    "inline-flex h-8 items-center rounded-lg border px-2.5 text-xs font-semibold tracking-tight",
                     method.className,
                   )}
                 >
@@ -219,14 +169,9 @@ export function Footer() {
           </ul>
         </div>
 
-        <div className="flex flex-col gap-3 border-t pt-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-1">
-            <p>© {year} Robonautshop. Built for robotics builders.</p>
-            <p className="text-xs sm:text-sm">
-              Prices in BDT · Secure checkout · Inventory reserved server-side
-            </p>
-          </div>
-          <p className="text-sm sm:text-right">
+        <div className="flex flex-col gap-1.5 border-t pt-4 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <p>© {year} Robonautshop</p>
+          <p className="sm:text-right">
             Developed by{" "}
             <a
               href="https://github.com/salahakramfuad"
