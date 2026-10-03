@@ -127,6 +127,13 @@ Professional e-commerce admin layout. Same width as the public store (`PageConta
 - [x] 08 [Kits + projects restyle](dashboard-design/08-kits-projects.md)
 - [x] 09 [Responsive / mobile dashboard polish](dashboard-design/09-responsive-polish.md)
 - [x] 10 [Lint, typecheck, visual QA](dashboard-design/10-verify.md)
+- [ ] 11 [Create / Edit dialogs (shared modal)](dashboard-design/11-create-edit-dialogs.md)
+- [ ] 12 [Create / Edit dialogs for all admin entities](dashboard-design/12-dialogs-all-entities.md)
+- [ ] 13 [Admin table pagination + page size](dashboard-design/13-table-pagination.md)
+- [ ] 14 [Admin chrome: no logout button](dashboard-design/14-no-admin-logout.md)
+- [ ] 15 [Users tab + role matrix (UI shell)](dashboard-design/15-users-roles-shell.md)
+- [ ] 16 [Inventory booking UI](dashboard-design/16-inventory-booking-ui.md)
+- [ ] 17 [Cancelled order releases booked stock](dashboard-design/17-cancel-releases-stock.md)
 
 See also [dashboard-design/README.md](dashboard-design/README.md).
 
