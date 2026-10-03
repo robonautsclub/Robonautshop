@@ -1,6 +1,6 @@
 # Task 16 — Product listing
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

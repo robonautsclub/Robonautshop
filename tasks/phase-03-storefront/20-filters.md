@@ -1,6 +1,6 @@
 # Task 20 — Filters
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

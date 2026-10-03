@@ -1,6 +1,6 @@
 # Task 18 — Product detail
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

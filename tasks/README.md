@@ -44,15 +44,15 @@ Mock/faker data here is explicit development fixture data so the UI can be built
 
 ## Phase 3 — Storefront
 
-- [ ] 14 [Product UI components](phase-03-storefront/14-product-ui-components.md)
-- [ ] 15 [Homepage](phase-03-storefront/15-homepage.md)
-- [ ] 16 [Product listing](phase-03-storefront/16-product-listing.md)
-- [ ] 17 [Category pages](phase-03-storefront/17-category-pages.md)
-- [ ] 18 [Product detail](phase-03-storefront/18-product-detail.md)
-- [ ] 19 [Search](phase-03-storefront/19-search.md)
-- [ ] 20 [Filters](phase-03-storefront/20-filters.md)
-- [ ] 21 [Sorting](phase-03-storefront/21-sorting.md)
-- [ ] 22 [Related products](phase-03-storefront/22-related-products.md)
+- [x] 14 [Product UI components](phase-03-storefront/14-product-ui-components.md)
+- [x] 15 [Homepage](phase-03-storefront/15-homepage.md)
+- [x] 16 [Product listing](phase-03-storefront/16-product-listing.md)
+- [x] 17 [Category pages](phase-03-storefront/17-category-pages.md)
+- [x] 18 [Product detail](phase-03-storefront/18-product-detail.md)
+- [x] 19 [Search](phase-03-storefront/19-search.md)
+- [x] 20 [Filters](phase-03-storefront/20-filters.md)
+- [x] 21 [Sorting](phase-03-storefront/21-sorting.md)
+- [x] 22 [Related products](phase-03-storefront/22-related-products.md)
 
 ## Phase 4 — Kits and projects
 

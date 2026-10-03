@@ -283,3 +283,27 @@ export function getInventoryForProduct(productId: string): InventorySummary[] {
 export function getInventoryForSku(sku: string): InventorySummary | null {
   return mockInventory.find((row) => row.sku === sku) ?? null;
 }
+
+export type ProductCardModel = {
+  product: Product;
+  imageUrl: string | null;
+  imageAlt: string;
+  availableQuantity: number;
+};
+
+export function toProductCardModel(product: Product): ProductCardModel {
+  const images = getImagesForProduct(product.id);
+  const inventory = getInventoryForProduct(product.id);
+  const availableQuantity = inventory.reduce(
+    (sum, row) => sum + getAvailableQuantity(row),
+    0,
+  );
+  const primaryImage = images[0];
+
+  return {
+    product,
+    imageUrl: primaryImage?.url ?? null,
+    imageAlt: primaryImage?.alt ?? product.name,
+    availableQuantity,
+  };
+}

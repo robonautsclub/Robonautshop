@@ -21,9 +21,11 @@ export type {
 } from "@/lib/catalog/types";
 
 export { getAvailableQuantity } from "@/lib/catalog/types";
+export { formatBdt } from "@/lib/catalog/money";
 
 export type {
   GetProductsOptions,
+  ProductCardModel,
   ProductSort,
   ProductWithRelations,
 } from "@/lib/catalog/queries";
@@ -46,4 +48,5 @@ export {
   getRelatedProducts,
   getVariantsForProduct,
   searchProducts,
+  toProductCardModel,
 } from "@/lib/catalog/queries";

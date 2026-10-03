@@ -1,6 +1,6 @@
 # Task 17 — Category pages
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

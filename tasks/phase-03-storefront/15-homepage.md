@@ -1,6 +1,6 @@
 # Task 15 — Homepage
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

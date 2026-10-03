@@ -1,6 +1,6 @@
 # Task 22 — Related products
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

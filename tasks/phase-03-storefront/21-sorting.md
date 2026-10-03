@@ -1,6 +1,6 @@
 # Task 21 — Sorting
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

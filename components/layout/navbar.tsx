@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, ShoppingCart, UserRound } from "lucide-react";
 
+import { NavbarSearch } from "@/components/layout/navbar-search";
 import { storeNavLinks } from "@/components/layout/nav-links";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -60,6 +61,29 @@ export function Navbar() {
                 </SheetClose>
               ))}
             </nav>
+            <form
+              action="/products"
+              method="get"
+              className="mt-4 space-y-2 px-4"
+              role="search"
+            >
+              <label htmlFor="mobile-search" className="text-xs font-medium">
+                Search products
+              </label>
+              <input
+                id="mobile-search"
+                name="q"
+                type="search"
+                placeholder="Name, SKU…"
+                className="h-9 w-full rounded-lg border bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+              />
+              <button
+                type="submit"
+                className="inline-flex h-9 w-full items-center justify-center rounded-lg bg-primary text-sm font-medium text-primary-foreground"
+              >
+                Search
+              </button>
+            </form>
           </SheetContent>
         </Sheet>
 
@@ -85,6 +109,7 @@ export function Navbar() {
         </nav>
 
         <div className="ml-auto flex items-center gap-1">
+          <NavbarSearch />
           <Link
             href="/cart"
             aria-label="Cart"

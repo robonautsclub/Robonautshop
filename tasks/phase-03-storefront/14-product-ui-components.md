@@ -1,6 +1,6 @@
 # Task 14 — Product UI components
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

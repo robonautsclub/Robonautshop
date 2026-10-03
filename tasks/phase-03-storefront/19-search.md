@@ -1,6 +1,6 @@
 # Task 19 — Search
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 
