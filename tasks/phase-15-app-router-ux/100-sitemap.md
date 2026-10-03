@@ -1,6 +1,6 @@
 # Task 100 — Sitemap and robots
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

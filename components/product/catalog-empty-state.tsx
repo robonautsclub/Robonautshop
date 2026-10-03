@@ -1,7 +1,4 @@
-import Link from "next/link";
-
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { StatusPage } from "@/components/shared/status-page";
 
 type CatalogEmptyStateProps = {
   title: string;
@@ -19,22 +16,16 @@ export function CatalogEmptyState({
   className,
 }: CatalogEmptyStateProps) {
   return (
-    <div
-      className={cn(
-        "flex flex-col items-start gap-3 rounded-xl border border-dashed px-6 py-12",
-        className,
-      )}
-    >
-      <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
-      <p className="max-w-md text-sm text-muted-foreground">{description}</p>
-      {actionHref && actionLabel ? (
-        <Link
-          href={actionHref}
-          className={cn(buttonVariants({ variant: "outline" }), "mt-1")}
-        >
-          {actionLabel}
-        </Link>
-      ) : null}
-    </div>
+    <StatusPage
+      title={title}
+      titleAs="h2"
+      description={description}
+      primaryAction={
+        actionHref && actionLabel
+          ? { href: actionHref, label: actionLabel, variant: "outline" }
+          : undefined
+      }
+      className={className}
+    />
   );
 }

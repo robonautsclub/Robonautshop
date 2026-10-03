@@ -144,13 +144,13 @@ See also [dashboard-design/README.md](dashboard-design/README.md).
 
 Next.js special files for loading, errors, auth status pages, and sitemap. UI shells only until Phase 12 wires real auth.
 
-- [ ] 94 [Custom not-found page](phase-15-app-router-ux/94-not-found.md)
-- [ ] 95 [Segment error pages](phase-15-app-router-ux/95-error.md)
-- [ ] 96 [Root global-error page](phase-15-app-router-ux/96-global-error.md)
-- [ ] 97 [Route loading UI](phase-15-app-router-ux/97-loading.md)
-- [ ] 98 [Forbidden (403) page](phase-15-app-router-ux/98-forbidden.md)
-- [ ] 99 [Unauthorized (401) page](phase-15-app-router-ux/99-unauthorized.md)
-- [ ] 100 [Sitemap and robots](phase-15-app-router-ux/100-sitemap.md)
+- [x] 94 [Custom not-found page](phase-15-app-router-ux/94-not-found.md)
+- [x] 95 [Segment error pages](phase-15-app-router-ux/95-error.md)
+- [x] 96 [Root global-error page](phase-15-app-router-ux/96-global-error.md)
+- [x] 97 [Route loading UI](phase-15-app-router-ux/97-loading.md)
+- [x] 98 [Forbidden (403) page](phase-15-app-router-ux/98-forbidden.md)
+- [x] 99 [Unauthorized (401) page](phase-15-app-router-ux/99-unauthorized.md)
+- [x] 100 [Sitemap and robots](phase-15-app-router-ux/100-sitemap.md)
 
 ---
 

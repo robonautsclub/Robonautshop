@@ -1,6 +1,6 @@
 # Task 99 — Unauthorized (401) page
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

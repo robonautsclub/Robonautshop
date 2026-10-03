@@ -1,6 +1,6 @@
 # Task 95 — Segment error pages
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

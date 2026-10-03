@@ -1,6 +1,6 @@
 # Task 94 — Custom not-found page
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

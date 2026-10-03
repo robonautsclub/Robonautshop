@@ -1,6 +1,6 @@
 # Task 98 — Forbidden (403) page
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

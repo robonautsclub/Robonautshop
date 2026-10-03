@@ -1,6 +1,6 @@
 # Task 97 — Route loading UI
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

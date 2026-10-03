@@ -1,6 +1,6 @@
 # Task 96 — Root global-error page
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 
