@@ -134,6 +134,9 @@ Professional e-commerce admin layout. Same width as the public store (`PageConta
 - [ ] 15 [Users tab + role matrix (UI shell)](dashboard-design/15-users-roles-shell.md)
 - [ ] 16 [Inventory booking UI](dashboard-design/16-inventory-booking-ui.md)
 - [ ] 17 [Cancelled order releases booked stock](dashboard-design/17-cancel-releases-stock.md)
+- [ ] 18 [Admin kit BOM from stock](dashboard-design/18-admin-kit-bom-from-stock.md)
+- [ ] 19 [Custom kit quantities](dashboard-design/19-custom-kit-quantities.md)
+- [ ] 20 [Kit cart expands to stock components](dashboard-design/20-kit-cart-expands-components.md)
 
 See also [dashboard-design/README.md](dashboard-design/README.md).
 

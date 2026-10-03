@@ -31,6 +31,9 @@ professional ops dashboard (commerce-console density, still Robonautshop-branded
 - **Lists:** paginated (20 / 30 / 50 per page)
 - **Users:** SUPER_ADMIN · ADMIN · STORE_MANAGER (shopkeeper) · SHOPPER
 - **Stock:** available = stock − booked; cancel releases booked units
+- **Kits:** Products first, then Kits search/attach those products into the BOM
+  (never create parts inside the kit editor); buy kit → cart gets those
+  components (not new SKUs)
 - **Not:** restyling the public storefront in this folder
 
 ## Tasks
@@ -52,3 +55,6 @@ professional ops dashboard (commerce-console density, still Robonautshop-branded
 - [ ] 15 [Users tab + role matrix (UI shell)](15-users-roles-shell.md)
 - [ ] 16 [Inventory booking UI (stock vs booked vs available)](16-inventory-booking-ui.md)
 - [ ] 17 [Cancelled order releases booked stock (UI shell)](17-cancel-releases-stock.md)
+- [ ] 18 [Admin kit BOM: pick components from stock](18-admin-kit-bom-from-stock.md)
+- [ ] 19 [Custom kit quantities (storefront / builder shell)](19-custom-kit-quantities.md)
+- [ ] 20 [Buying a kit expands cart from stock components](20-kit-cart-expands-components.md)
