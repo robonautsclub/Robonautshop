@@ -1,6 +1,6 @@
 # Task 52 — Admin categories shell
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

@@ -104,14 +104,14 @@ No real payments or order persistence.
 
 UI shells over mock/static data. Real ADMIN auth comes in Phase 12.
 
-- [ ] 50 [Admin layout and dashboard shell](phase-09-admin-shells/50-admin-layout.md)
-- [ ] 51 [Admin products shell](phase-09-admin-shells/51-admin-products-shell.md)
-- [ ] 52 [Admin categories shell](phase-09-admin-shells/52-admin-categories-shell.md)
-- [ ] 53 [Admin inventory shell](phase-09-admin-shells/53-admin-inventory-shell.md)
-- [ ] 54 [Admin orders shell](phase-09-admin-shells/54-admin-orders-shell.md)
-- [ ] 55 [Admin customers shell](phase-09-admin-shells/55-admin-customers-shell.md)
-- [ ] 56 [Admin kits shell](phase-09-admin-shells/56-admin-kits-shell.md)
-- [ ] 57 [Admin robot projects shell](phase-09-admin-shells/57-admin-projects-shell.md)
+- [x] 50 [Admin layout and dashboard shell](phase-09-admin-shells/50-admin-layout.md)
+- [x] 51 [Admin products shell](phase-09-admin-shells/51-admin-products-shell.md)
+- [x] 52 [Admin categories shell](phase-09-admin-shells/52-admin-categories-shell.md)
+- [x] 53 [Admin inventory shell](phase-09-admin-shells/53-admin-inventory-shell.md)
+- [x] 54 [Admin orders shell](phase-09-admin-shells/54-admin-orders-shell.md)
+- [x] 55 [Admin customers shell](phase-09-admin-shells/55-admin-customers-shell.md)
+- [x] 56 [Admin kits shell](phase-09-admin-shells/56-admin-kits-shell.md)
+- [x] 57 [Admin robot projects shell](phase-09-admin-shells/57-admin-projects-shell.md)
 
 ---
 

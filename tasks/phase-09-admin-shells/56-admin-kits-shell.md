@@ -1,6 +1,6 @@
 # Task 56 — Admin kits shell
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

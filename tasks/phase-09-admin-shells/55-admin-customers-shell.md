@@ -1,6 +1,6 @@
 # Task 55 — Admin customers shell
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

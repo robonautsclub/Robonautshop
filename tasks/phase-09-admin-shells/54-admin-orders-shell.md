@@ -1,6 +1,6 @@
 # Task 54 — Admin orders shell
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

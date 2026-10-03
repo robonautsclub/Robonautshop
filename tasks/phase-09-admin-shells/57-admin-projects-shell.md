@@ -1,6 +1,6 @@
 # Task 57 — Admin robot projects shell
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

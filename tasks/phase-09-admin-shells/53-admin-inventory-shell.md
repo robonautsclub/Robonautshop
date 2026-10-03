@@ -1,6 +1,6 @@
 # Task 53 — Admin inventory shell
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

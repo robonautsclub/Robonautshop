@@ -1,6 +1,6 @@
 # Task 51 — Admin products shell
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

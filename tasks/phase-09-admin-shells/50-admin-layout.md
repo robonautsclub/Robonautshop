@@ -1,6 +1,6 @@
 # Task 50 — Admin layout and dashboard shell
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 
