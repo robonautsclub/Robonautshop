@@ -4,10 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, ShoppingCart, UserRound } from "lucide-react";
 
+import { useCart } from "@/components/cart/cart-provider";
 import { NavbarSearch } from "@/components/layout/navbar-search";
 import { storeNavLinks } from "@/components/layout/nav-links";
 import { PageContainer } from "@/components/layout/page-container";
-import { useCart } from "@/components/cart/cart-provider";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Sheet,
@@ -63,6 +63,20 @@ export function Navbar() {
                   {link.label}
                 </SheetClose>
               ))}
+              <SheetClose
+                nativeButton={false}
+                render={<Link href="/login" />}
+                className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground"
+              >
+                Sign in
+              </SheetClose>
+              <SheetClose
+                nativeButton={false}
+                render={<Link href="/register" />}
+                className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground"
+              >
+                Create account
+              </SheetClose>
             </nav>
             <form
               action="/products"
@@ -113,12 +127,30 @@ export function Navbar() {
 
         <div className="ml-auto flex items-center gap-1">
           <NavbarSearch />
+          <div className="hidden items-center gap-1 sm:flex">
+            <Link
+              href="/login"
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "sm" }),
+                isActive(pathname, "/login") && "bg-muted",
+              )}
+            >
+              Sign in
+            </Link>
+            <Link
+              href="/register"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "sm" }),
+                isActive(pathname, "/register") && "bg-muted",
+              )}
+            >
+              Register
+            </Link>
+          </div>
           <Link
             href="/cart"
             aria-label={
-              hydrated && itemCount > 0
-                ? `Cart, ${itemCount} items`
-                : "Cart"
+              hydrated && itemCount > 0 ? `Cart, ${itemCount} items` : "Cart"
             }
             className={cn(
               buttonVariants({ variant: "ghost", size: "icon" }),
@@ -135,7 +167,10 @@ export function Navbar() {
           <Link
             href="/account"
             aria-label="Account"
-            className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "icon" }),
+              isActive(pathname, "/account") && "bg-muted",
+            )}
           >
             <UserRound />
           </Link>

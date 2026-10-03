@@ -1,6 +1,6 @@
 # Task 43 — Addresses UI shell
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

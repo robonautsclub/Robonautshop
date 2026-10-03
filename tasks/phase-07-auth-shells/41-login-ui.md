@@ -1,6 +1,6 @@
 # Task 41 — Login UI shell
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

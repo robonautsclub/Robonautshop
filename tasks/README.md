@@ -84,11 +84,11 @@ Mock/faker data here is explicit development fixture data so the UI can be built
 
 UI only. Do not fake successful signup/login unless real auth is already wired.
 
-- [ ] 40 [Registration UI shell](phase-07-auth-shells/40-registration-ui.md)
-- [ ] 41 [Login UI shell](phase-07-auth-shells/41-login-ui.md)
-- [ ] 42 [Account page shell](phase-07-auth-shells/42-account-shell.md)
-- [ ] 43 [Addresses UI shell](phase-07-auth-shells/43-addresses-ui.md)
-- [ ] 44 [Auth nav states](phase-07-auth-shells/44-auth-nav-states.md)
+- [x] 40 [Registration UI shell](phase-07-auth-shells/40-registration-ui.md)
+- [x] 41 [Login UI shell](phase-07-auth-shells/41-login-ui.md)
+- [x] 42 [Account page shell](phase-07-auth-shells/42-account-shell.md)
+- [x] 43 [Addresses UI shell](phase-07-auth-shells/43-addresses-ui.md)
+- [x] 44 [Auth nav states](phase-07-auth-shells/44-auth-nav-states.md)
 
 ## Phase 8 — Checkout UI shells
 

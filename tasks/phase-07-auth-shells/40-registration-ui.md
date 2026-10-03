@@ -1,6 +1,6 @@
 # Task 40 — Registration UI shell
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

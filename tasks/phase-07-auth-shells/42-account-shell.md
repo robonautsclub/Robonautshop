@@ -1,6 +1,6 @@
 # Task 42 — Account page shell
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

@@ -1,6 +1,6 @@
 # Task 44 — Auth nav states
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 
