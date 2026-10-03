@@ -1,6 +1,6 @@
 # Task 27 — Project components UI
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

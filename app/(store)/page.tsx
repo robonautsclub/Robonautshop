@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { CatalogCoverImage } from "@/components/catalog/catalog-cover-image";
 import { PageContainer } from "@/components/layout/page-container";
 import {
   CatalogEmptyState,
@@ -166,12 +167,20 @@ export default function HomePage() {
                 <li key={kit.id}>
                   <Link
                     href={`/kits/${kit.slug}`}
-                    className="block rounded-xl border px-4 py-4 hover:border-foreground/20"
+                    className="flex overflow-hidden rounded-xl border hover:border-foreground/20"
                   >
-                    <p className="font-medium">{kit.name}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {kit.shortDescription}
-                    </p>
+                    <CatalogCoverImage
+                      src={kit.imageUrl}
+                      alt={kit.imageAlt}
+                      className="w-28 shrink-0 sm:w-36"
+                      sizes="144px"
+                    />
+                    <div className="p-4">
+                      <p className="font-medium">{kit.name}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {kit.shortDescription}
+                      </p>
+                    </div>
                   </Link>
                 </li>
               ))}
@@ -198,12 +207,20 @@ export default function HomePage() {
                 <li key={project.id}>
                   <Link
                     href={`/projects/${project.slug}`}
-                    className="block rounded-xl border px-4 py-4 hover:border-foreground/20"
+                    className="flex overflow-hidden rounded-xl border hover:border-foreground/20"
                   >
-                    <p className="font-medium">{project.name}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {project.shortDescription}
-                    </p>
+                    <CatalogCoverImage
+                      src={project.imageUrl}
+                      alt={project.imageAlt}
+                      className="w-28 shrink-0 sm:w-36"
+                      sizes="144px"
+                    />
+                    <div className="p-4">
+                      <p className="font-medium">{project.name}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {project.shortDescription}
+                      </p>
+                    </div>
                   </Link>
                 </li>
               ))}

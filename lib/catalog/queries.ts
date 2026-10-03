@@ -307,3 +307,115 @@ export function toProductCardModel(product: Product): ProductCardModel {
     availableQuantity,
   };
 }
+
+export type RequirementLine = {
+  id: string;
+  product: Product;
+  variant: ProductVariant | null;
+  quantity: number;
+  optional: boolean;
+  unitPrice: number;
+  lineTotal: number;
+  availableQuantity: number;
+  lowStockThreshold: number;
+};
+
+function resolveRequirementLine(input: {
+  id: string;
+  productId: string;
+  variantId: string | null;
+  quantity: number;
+  optional?: boolean;
+}): RequirementLine | null {
+  const product = mockProducts.find((item) => item.id === input.productId);
+
+  if (!product || !isPublishedProduct(product)) {
+    return null;
+  }
+
+  const variant = input.variantId
+    ? (mockVariants.find(
+        (item) =>
+          item.id === input.variantId && item.productId === product.id,
+      ) ?? null)
+    : null;
+
+  const inventoryRows = getInventoryForProduct(product.id);
+  const inventoryRow = variant
+    ? (inventoryRows.find((row) => row.variantId === variant.id) ?? null)
+    : (inventoryRows.find((row) => row.variantId === null) ??
+      inventoryRows[0] ??
+      null);
+
+  const availableQuantity = inventoryRow
+    ? getAvailableQuantity(inventoryRow)
+    : inventoryRows.reduce((sum, row) => sum + getAvailableQuantity(row), 0);
+
+  const unitPrice = variant?.price ?? product.price;
+
+  return {
+    id: input.id,
+    product,
+    variant,
+    quantity: input.quantity,
+    optional: Boolean(input.optional),
+    unitPrice,
+    lineTotal: unitPrice * input.quantity,
+    availableQuantity,
+    lowStockThreshold: inventoryRow?.lowStockThreshold ?? 5,
+  };
+}
+
+export function getKitRequirementLines(kitId: string): RequirementLine[] {
+  return getKitComponents(kitId)
+    .map((component) =>
+      resolveRequirementLine({
+        id: component.id,
+        productId: component.productId,
+        variantId: component.variantId,
+        quantity: component.quantity,
+      }),
+    )
+    .filter((line): line is RequirementLine => line !== null);
+}
+
+export function getProjectRequirementLines(
+  projectId: string,
+): RequirementLine[] {
+  return getProjectComponents(projectId)
+    .map((component) =>
+      resolveRequirementLine({
+        id: component.id,
+        productId: component.productId,
+        variantId: component.variantId,
+        quantity: component.quantity,
+        optional: component.optional,
+      }),
+    )
+    .filter((line): line is RequirementLine => line !== null);
+}
+
+export function getKitLinkedProject(kit: Kit): RobotProject | null {
+  if (!kit.projectId) {
+    return null;
+  }
+
+  return (
+    mockProjects.find(
+      (project) =>
+        project.id === kit.projectId && isPublishedProject(project),
+    ) ?? null
+  );
+}
+
+export function getProjectLinkedKit(projectId: string): Kit | null {
+  return (
+    mockKits.find(
+      (kit) => kit.projectId === projectId && isPublishedKit(kit),
+    ) ?? null
+  );
+}
+
+export function sumRequirementLineTotals(lines: RequirementLine[]): number {
+  return lines.reduce((sum, line) => sum + line.lineTotal, 0);
+}

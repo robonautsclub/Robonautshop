@@ -28,6 +28,7 @@ export type {
   ProductCardModel,
   ProductSort,
   ProductWithRelations,
+  RequirementLine,
 } from "@/lib/catalog/queries";
 
 export {
@@ -38,15 +39,20 @@ export {
   getInventoryForSku,
   getKitBySlug,
   getKitComponents,
+  getKitLinkedProject,
+  getKitRequirementLines,
   getKits,
   getProductById,
   getProductBySlug,
   getProducts,
   getProjectBySlug,
   getProjectComponents,
+  getProjectLinkedKit,
+  getProjectRequirementLines,
   getProjects,
   getRelatedProducts,
   getVariantsForProduct,
   searchProducts,
+  sumRequirementLineTotals,
   toProductCardModel,
 } from "@/lib/catalog/queries";

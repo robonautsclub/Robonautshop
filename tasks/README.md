@@ -56,11 +56,11 @@ Mock/faker data here is explicit development fixture data so the UI can be built
 
 ## Phase 4 — Kits and projects
 
-- [ ] 23 [Kits listing](phase-04-kits-projects/23-kits-listing.md)
-- [ ] 24 [Kit detail](phase-04-kits-projects/24-kit-detail.md)
-- [ ] 25 [Projects listing](phase-04-kits-projects/25-projects-listing.md)
-- [ ] 26 [Project detail](phase-04-kits-projects/26-project-detail.md)
-- [ ] 27 [Project components UI](phase-04-kits-projects/27-project-components-ui.md)
+- [x] 23 [Kits listing](phase-04-kits-projects/23-kits-listing.md)
+- [x] 24 [Kit detail](phase-04-kits-projects/24-kit-detail.md)
+- [x] 25 [Projects listing](phase-04-kits-projects/25-projects-listing.md)
+- [x] 26 [Project detail](phase-04-kits-projects/26-project-detail.md)
+- [x] 27 [Project components UI](phase-04-kits-projects/27-project-components-ui.md)
 
 ## Phase 5 — Cart (client + mock catalog)
 

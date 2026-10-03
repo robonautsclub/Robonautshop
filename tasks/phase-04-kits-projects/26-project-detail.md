@@ -1,6 +1,6 @@
 # Task 26 — Project detail
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

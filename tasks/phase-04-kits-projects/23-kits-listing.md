@@ -1,6 +1,6 @@
 # Task 23 — Kits listing
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

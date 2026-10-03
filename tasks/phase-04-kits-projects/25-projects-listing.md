@@ -1,6 +1,6 @@
 # Task 25 — Projects listing
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

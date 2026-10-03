@@ -1,6 +1,6 @@
 # Task 24 — Kit detail
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

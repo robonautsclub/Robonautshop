@@ -92,6 +92,8 @@ export interface Kit {
   /** Optional link to a robot project this kit builds. */
   projectId: string | null;
   featured: boolean;
+  imageUrl: string;
+  imageAlt: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -113,6 +115,8 @@ export interface RobotProject {
   skillLevel: ProjectSkillLevel;
   status: ProductStatus;
   featured: boolean;
+  imageUrl: string;
+  imageAlt: string;
   createdAt: string;
   updatedAt: string;
 }

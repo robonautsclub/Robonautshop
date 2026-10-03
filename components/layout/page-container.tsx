@@ -14,7 +14,7 @@ export function PageContainer({
   as: Comp = "div",
 }: PageContainerProps) {
   return (
-    <Comp className={cn("mx-auto w-full px-4 sm:px-6 lg:px-8", className)}>
+    <Comp className={cn("mx-auto w-full px-8 sm:px-12 lg:px-20 xl:px-28", className)}>
       {children}
     </Comp>
   );
