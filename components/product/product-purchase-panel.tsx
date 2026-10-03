@@ -2,8 +2,10 @@
 
 import { useMemo, useState } from "react";
 
+import { useCart } from "@/components/cart/cart-provider";
 import { PriceDisplay } from "@/components/product/price-display";
 import { StockBadge } from "@/components/product/stock-badge";
+import { Button } from "@/components/ui/button";
 import { getAvailableQuantity } from "@/lib/catalog/types";
 import type {
   InventorySummary,
@@ -22,9 +24,11 @@ export function ProductPurchasePanel({
   variants,
   inventory,
 }: ProductPurchasePanelProps) {
+  const { addItem } = useCart();
   const [selectedVariantId, setSelectedVariantId] = useState(
     variants[0]?.id ?? null,
   );
+  const [message, setMessage] = useState<string | null>(null);
 
   const selectedVariant = useMemo(
     () => variants.find((variant) => variant.id === selectedVariantId) ?? null,
@@ -47,6 +51,21 @@ export function ProductPurchasePanel({
     ? getAvailableQuantity(activeInventory)
     : 0;
   const lowStockThreshold = activeInventory?.lowStockThreshold ?? 5;
+  const canAdd = available > 0;
+
+  function handleAddToCart() {
+    const added = addItem({
+      productId: product.id,
+      variantId: selectedVariant?.id ?? null,
+      quantity: 1,
+    });
+
+    setMessage(
+      added
+        ? "Added to cart."
+        : "Could not add this item. It may be out of stock.",
+    );
+  }
 
   return (
     <div className="space-y-5">
@@ -76,7 +95,10 @@ export function ProductPurchasePanel({
                 <button
                   key={variant.id}
                   type="button"
-                  onClick={() => setSelectedVariantId(variant.id)}
+                  onClick={() => {
+                    setSelectedVariantId(variant.id);
+                    setMessage(null);
+                  }}
                   aria-pressed={selected}
                   className={
                     selected
@@ -92,10 +114,16 @@ export function ProductPurchasePanel({
         </fieldset>
       ) : null}
 
-      <p className="text-sm text-muted-foreground">
-        Add to cart arrives in a later cart task. Stock and price above come
-        from the catalog helpers.
-      </p>
+      <div className="space-y-2">
+        <Button type="button" size="lg" disabled={!canAdd} onClick={handleAddToCart}>
+          {canAdd ? "Add to cart" : "Out of stock"}
+        </Button>
+        {message ? (
+          <p className="text-sm text-muted-foreground" role="status">
+            {message}
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }

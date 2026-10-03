@@ -1,6 +1,6 @@
 # Task 28 — Cart state and page
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

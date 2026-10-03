@@ -1,6 +1,6 @@
 # Task 32 — Persistent cart
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

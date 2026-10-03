@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { AddKitToCartButton } from "@/components/cart/add-kit-to-cart-button";
 import { CatalogCoverImage } from "@/components/catalog/catalog-cover-image";
 import { ComponentRequirementsList } from "@/components/catalog/component-requirements-list";
 import { PageContainer } from "@/components/layout/page-container";
@@ -93,22 +94,25 @@ export default async function KitDetailPage({ params }: KitDetailPageProps) {
             ) : null}
           </div>
 
-          <div className="rounded-xl border p-5">
-            <p className="text-sm text-muted-foreground">Kit price</p>
-            <PriceDisplay
-              price={kit.price}
-              compareAtPrice={kit.compareAtPrice}
-              size="lg"
-              className="mt-2"
-            />
-            <p className="mt-4 text-sm text-muted-foreground">
-              Add to cart arrives in a later cart task. Components below are
-              resolved from the catalog helpers.
+          <div className="rounded-xl border p-5 space-y-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Kit price</p>
+              <PriceDisplay
+                price={kit.price}
+                compareAtPrice={kit.compareAtPrice}
+                size="lg"
+                className="mt-2"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Adds each included component to the cart using catalog product
+              ids. Stock is checked per line.
             </p>
+            <AddKitToCartButton lines={lines} kitName={kit.name} />
             {linkedProject ? (
               <Link
                 href={`/projects/${linkedProject.slug}`}
-                className={cn(buttonVariants({ variant: "outline" }), "mt-4")}
+                className={cn(buttonVariants({ variant: "outline" }))}
               >
                 View project guide
               </Link>

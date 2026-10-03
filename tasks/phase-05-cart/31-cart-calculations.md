@@ -1,6 +1,6 @@
 # Task 31 — Cart calculations
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

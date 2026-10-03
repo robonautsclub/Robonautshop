@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
 
-import { PlaceholderPage } from "@/components/layout/placeholder-page";
+import { CartPageContent } from "@/components/cart/cart-page-content";
 
 export const metadata: Metadata = {
   title: "Cart",
 };
 
 export default function CartPage() {
-  return (
-    <PlaceholderPage
-      title="Cart"
-      description="This section is not available yet."
-    />
-  );
+  return <CartPageContent />;
 }

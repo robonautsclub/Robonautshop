@@ -7,6 +7,7 @@ import { Menu, ShoppingCart, UserRound } from "lucide-react";
 import { NavbarSearch } from "@/components/layout/navbar-search";
 import { storeNavLinks } from "@/components/layout/nav-links";
 import { PageContainer } from "@/components/layout/page-container";
+import { useCart } from "@/components/cart/cart-provider";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Sheet,
@@ -24,6 +25,7 @@ function isActive(pathname: string, href: string) {
 
 export function Navbar() {
   const pathname = usePathname();
+  const { hydrated, itemCount } = useCart();
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
@@ -113,10 +115,22 @@ export function Navbar() {
           <NavbarSearch />
           <Link
             href="/cart"
-            aria-label="Cart"
-            className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}
+            aria-label={
+              hydrated && itemCount > 0
+                ? `Cart, ${itemCount} items`
+                : "Cart"
+            }
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "icon" }),
+              "relative",
+            )}
           >
             <ShoppingCart />
+            {hydrated && itemCount > 0 ? (
+              <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
+                {itemCount > 99 ? "99+" : itemCount}
+              </span>
+            ) : null}
           </Link>
           <Link
             href="/account"

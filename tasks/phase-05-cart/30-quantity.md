@@ -1,6 +1,6 @@
 # Task 30 — Quantity controls
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

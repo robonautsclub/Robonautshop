@@ -1,6 +1,6 @@
 # Task 29 — Add and remove products
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

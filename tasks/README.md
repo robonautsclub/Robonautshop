@@ -64,11 +64,11 @@ Mock/faker data here is explicit development fixture data so the UI can be built
 
 ## Phase 5 — Cart (client + mock catalog)
 
-- [ ] 28 [Cart state and page](phase-05-cart/28-cart-state.md)
-- [ ] 29 [Add and remove products](phase-05-cart/29-add-remove-products.md)
-- [ ] 30 [Quantity controls](phase-05-cart/30-quantity.md)
-- [ ] 31 [Cart calculations](phase-05-cart/31-cart-calculations.md)
-- [ ] 32 [Persistent cart](phase-05-cart/32-persistent-cart.md)
+- [x] 28 [Cart state and page](phase-05-cart/28-cart-state.md)
+- [x] 29 [Add and remove products](phase-05-cart/29-add-remove-products.md)
+- [x] 30 [Quantity controls](phase-05-cart/30-quantity.md)
+- [x] 31 [Cart calculations](phase-05-cart/31-cart-calculations.md)
+- [x] 32 [Persistent cart](phase-05-cart/32-persistent-cart.md)
 
 ## Phase 6 — Robot Builder UI
 
