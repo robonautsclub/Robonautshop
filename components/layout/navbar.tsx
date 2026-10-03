@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, ShoppingCart, UserRound } from "lucide-react";
 
+import { useAuth } from "@/components/auth/auth-provider";
 import { useCart } from "@/components/cart/cart-provider";
 import { NavbarSearch } from "@/components/layout/navbar-search";
 import { storeNavLinks } from "@/components/layout/nav-links";
@@ -25,7 +26,8 @@ function isActive(pathname: string, href: string) {
 
 export function Navbar() {
   const pathname = usePathname();
-  const { hydrated, itemCount } = useCart();
+  const { hydrated: cartHydrated, itemCount } = useCart();
+  const { hydrated: authHydrated, isSignedIn } = useAuth();
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
@@ -63,20 +65,24 @@ export function Navbar() {
                   {link.label}
                 </SheetClose>
               ))}
-              <SheetClose
-                nativeButton={false}
-                render={<Link href="/login" />}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground"
-              >
-                Sign in
-              </SheetClose>
-              <SheetClose
-                nativeButton={false}
-                render={<Link href="/register" />}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground"
-              >
-                Create account
-              </SheetClose>
+              {authHydrated && !isSignedIn ? (
+                <SheetClose
+                  nativeButton={false}
+                  render={<Link href="/login" />}
+                  className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground"
+                >
+                  Sign in
+                </SheetClose>
+              ) : null}
+              {authHydrated && isSignedIn ? (
+                <SheetClose
+                  nativeButton={false}
+                  render={<Link href="/account" />}
+                  className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground"
+                >
+                  Account
+                </SheetClose>
+              ) : null}
             </nav>
             <form
               action="/products"
@@ -127,30 +133,12 @@ export function Navbar() {
 
         <div className="ml-auto flex items-center gap-1">
           <NavbarSearch />
-          <div className="hidden items-center gap-1 sm:flex">
-            <Link
-              href="/login"
-              className={cn(
-                buttonVariants({ variant: "ghost", size: "sm" }),
-                isActive(pathname, "/login") && "bg-muted",
-              )}
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/register"
-              className={cn(
-                buttonVariants({ variant: "outline", size: "sm" }),
-                isActive(pathname, "/register") && "bg-muted",
-              )}
-            >
-              Register
-            </Link>
-          </div>
           <Link
             href="/cart"
             aria-label={
-              hydrated && itemCount > 0 ? `Cart, ${itemCount} items` : "Cart"
+              cartHydrated && itemCount > 0
+                ? `Cart, ${itemCount} items`
+                : "Cart"
             }
             className={cn(
               buttonVariants({ variant: "ghost", size: "icon" }),
@@ -158,22 +146,37 @@ export function Navbar() {
             )}
           >
             <ShoppingCart />
-            {hydrated && itemCount > 0 ? (
+            {cartHydrated && itemCount > 0 ? (
               <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
                 {itemCount > 99 ? "99+" : itemCount}
               </span>
             ) : null}
           </Link>
-          <Link
-            href="/account"
-            aria-label="Account"
-            className={cn(
-              buttonVariants({ variant: "ghost", size: "icon" }),
-              isActive(pathname, "/account") && "bg-muted",
-            )}
-          >
-            <UserRound />
-          </Link>
+
+          {authHydrated && !isSignedIn ? (
+            <Link
+              href="/login"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "sm" }),
+                isActive(pathname, "/login") && "bg-muted",
+              )}
+            >
+              Sign in
+            </Link>
+          ) : null}
+
+          {authHydrated && isSignedIn ? (
+            <Link
+              href="/account"
+              aria-label="Account"
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "icon" }),
+                isActive(pathname, "/account") && "bg-muted",
+              )}
+            >
+              <UserRound />
+            </Link>
+          ) : null}
         </div>
       </PageContainer>
     </header>

@@ -1,17 +1,18 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 
-import {
-  AuthComingSoonNote,
-  fieldClassName,
-} from "@/components/auth/auth-form-shell";
+import { useAuth } from "@/components/auth/auth-provider";
+import { fieldClassName } from "@/components/auth/auth-form-shell";
 import { Button } from "@/components/ui/button";
 import { loginSchema } from "@/lib/auth/schemas";
 
 type FieldErrors = Partial<Record<"email" | "password" | "form", string>>;
 
 export function LoginForm() {
+  const router = useRouter();
+  const { signIn } = useAuth();
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<string | null>(null);
 
@@ -38,14 +39,29 @@ export function LoginForm() {
     }
 
     setErrors({});
+    const result = signIn(parsed.data);
+
+    if (!result.ok) {
+      setErrors({ form: result.error });
+      setStatus("Not signed in.");
+      return;
+    }
+
     setStatus(
-      "Validation passed. Sign-in is not connected yet — no session was created.",
+      result.created
+        ? "Account created and signed in."
+        : "Signed in successfully.",
     );
+    router.push("/account");
   }
 
   return (
     <form className="space-y-4" onSubmit={onSubmit} noValidate>
-      <AuthComingSoonNote />
+      <p className="rounded-lg border border-dashed bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+        Demo auth is local to this browser. If the email is new, an account is
+        created automatically. If the email already exists, the password must
+        match or you stay signed out.
+      </p>
 
       <div className="space-y-1.5">
         <label htmlFor="login-email" className="text-sm font-medium">
@@ -81,8 +97,14 @@ export function LoginForm() {
         ) : null}
       </div>
 
+      {errors.form ? (
+        <p className="text-sm text-destructive" role="alert">
+          {errors.form}
+        </p>
+      ) : null}
+
       <Button type="submit" className="w-full">
-        Sign in (demo UI)
+        Sign in
       </Button>
 
       {status ? (

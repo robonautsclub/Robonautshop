@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 
-import {
-  AuthFormShell,
-  AuthSwitchLinks,
-} from "@/components/auth/auth-form-shell";
+import { AuthFormShell } from "@/components/auth/auth-form-shell";
 import { LoginForm } from "@/components/auth/login-form";
 
 export const metadata: Metadata = {
@@ -14,8 +11,7 @@ export default function LoginPage() {
   return (
     <AuthFormShell
       title="Sign in"
-      description="Access your Robonautshop account. This page is a UI shell until auth is wired."
-      footer={<AuthSwitchLinks mode="login" />}
+      description="Use your email and password. New emails create an account automatically."
     >
       <LoginForm />
     </AuthFormShell>
