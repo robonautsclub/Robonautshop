@@ -55,10 +55,10 @@ export default function HomePage() {
               View kits
             </Link>
             <Link
-              href="/projects"
+              href="/builder"
               className={cn(buttonVariants({ variant: "ghost", size: "lg" }))}
             >
-              Robot projects
+              Robot Builder
             </Link>
           </div>
         </PageContainer>

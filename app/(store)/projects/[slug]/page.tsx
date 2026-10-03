@@ -114,6 +114,15 @@ export default async function ProjectDetailPage({
                 View {linkedKit.name}
               </Link>
             ) : null}
+            <Link
+              href={`/builder/${project.slug}`}
+              className={cn(
+                buttonVariants({ variant: linkedKit ? "ghost" : "outline" }),
+                "mt-2",
+              )}
+            >
+              Open in Robot Builder
+            </Link>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 # Task 34 — Skill level selection
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

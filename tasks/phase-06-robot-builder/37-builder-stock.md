@@ -1,6 +1,6 @@
 # Task 37 — Builder stock validation UI
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

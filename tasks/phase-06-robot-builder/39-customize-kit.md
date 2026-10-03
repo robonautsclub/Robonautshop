@@ -1,6 +1,6 @@
 # Task 39 — Customize kit UI
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

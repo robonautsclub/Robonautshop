@@ -1,6 +1,6 @@
 # Task 35 — Builder component requirements
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

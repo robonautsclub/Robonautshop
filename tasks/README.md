@@ -72,13 +72,13 @@ Mock/faker data here is explicit development fixture data so the UI can be built
 
 ## Phase 6 — Robot Builder UI
 
-- [ ] 33 [Robot Builder entry](phase-06-robot-builder/33-builder-entry.md)
-- [ ] 34 [Skill level selection](phase-06-robot-builder/34-skill-level.md)
-- [ ] 35 [Builder component requirements](phase-06-robot-builder/35-builder-components.md)
-- [ ] 36 [Builder price calculation](phase-06-robot-builder/36-builder-price.md)
-- [ ] 37 [Builder stock validation UI](phase-06-robot-builder/37-builder-stock.md)
-- [ ] 38 [Add complete kit](phase-06-robot-builder/38-complete-kit.md)
-- [ ] 39 [Customize kit UI](phase-06-robot-builder/39-customize-kit.md)
+- [x] 33 [Robot Builder entry](phase-06-robot-builder/33-builder-entry.md)
+- [x] 34 [Skill level selection](phase-06-robot-builder/34-skill-level.md)
+- [x] 35 [Builder component requirements](phase-06-robot-builder/35-builder-components.md)
+- [x] 36 [Builder price calculation](phase-06-robot-builder/36-builder-price.md)
+- [x] 37 [Builder stock validation UI](phase-06-robot-builder/37-builder-stock.md)
+- [x] 38 [Add complete kit](phase-06-robot-builder/38-complete-kit.md)
+- [x] 39 [Customize kit UI](phase-06-robot-builder/39-customize-kit.md)
 
 ## Phase 7 — Auth UI shells
 

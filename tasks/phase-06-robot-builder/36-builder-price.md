@@ -1,6 +1,6 @@
 # Task 36 — Builder price calculation
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

@@ -1,6 +1,6 @@
 # Task 38 — Add complete kit
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

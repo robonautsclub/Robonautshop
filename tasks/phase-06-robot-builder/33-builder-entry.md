@@ -1,6 +1,6 @@
 # Task 33 — Robot Builder entry
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 
