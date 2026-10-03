@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { AdminDeleteTrigger } from "@/components/admin/admin-confirm-delete-dialog";
 import {
   AdminField,
   AdminFormDialog,
@@ -34,15 +35,21 @@ function roleTone(role: AdminUserRole) {
   return "neutral" as const;
 }
 
-export function AdminUsersShell({ users }: { users: AdminUser[] }) {
+export function AdminUsersShell({
+  users: initialUsers,
+}: {
+  users: AdminUser[];
+}) {
+  const [rows, setRows] = useState(initialUsers);
   const [showCreate, setShowCreate] = useState(false);
-  const pagination = useAdminPagination(users, 20);
+  const [status, setStatus] = useState<string | null>(null);
+  const pagination = useAdminPagination(rows, 20);
 
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Users"
-        description={`${users.length} demo users · roles are UI-only until real ADMIN auth.`}
+        description={`${rows.length} demo users · Delete always asks for confirmation. Roles are UI-only until real ADMIN auth.`}
         actions={
           <Button type="button" size="sm" onClick={() => setShowCreate(true)}>
             Invite user
@@ -81,6 +88,7 @@ export function AdminUsersShell({ users }: { users: AdminUser[] }) {
           <AdminTh>Role</AdminTh>
           <AdminTh>Status</AdminTh>
           <AdminTh>Joined</AdminTh>
+          <AdminTh className="text-right">Actions</AdminTh>
         </AdminTableHead>
         <tbody>
           {pagination.pageItems.map((user) => (
@@ -107,6 +115,23 @@ export function AdminUsersShell({ users }: { users: AdminUser[] }) {
               <AdminTd>
                 {new Date(user.createdAt).toLocaleDateString()}
               </AdminTd>
+              <AdminTd className="text-right">
+                <AdminDeleteTrigger
+                  itemLabel={`the user “${user.name}”`}
+                  title="Delete user?"
+                  description={`Are you sure you want to delete “${user.name}”? Demo only — this removes them from the admin list in this session.`}
+                  buttonLabel="Delete"
+                  buttonVariant="destructive"
+                  onConfirm={() => {
+                    setRows((current) =>
+                      current.filter((row) => row.id !== user.id),
+                    );
+                    setStatus(
+                      `Demo only — “${user.name}” was removed from this list.`,
+                    );
+                  }}
+                />
+              </AdminTd>
             </tr>
           ))}
         </tbody>
@@ -121,6 +146,12 @@ export function AdminUsersShell({ users }: { users: AdminUser[] }) {
         onPageSizeChange={pagination.setPageSize}
       />
 
+      {status ? (
+        <p className="text-sm text-muted-foreground" role="status">
+          {status}
+        </p>
+      ) : null}
+
       <AdminFormDialog
         open={showCreate}
         onOpenChange={setShowCreate}
@@ -129,7 +160,11 @@ export function AdminUsersShell({ users }: { users: AdminUser[] }) {
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <AdminField id="admin-user-name" label="Name">
-            <input id="admin-user-name" name="name" className={fieldClassName()} />
+            <input
+              id="admin-user-name"
+              name="name"
+              className={fieldClassName()}
+            />
           </AdminField>
           <AdminField id="admin-user-email" label="Email">
             <input

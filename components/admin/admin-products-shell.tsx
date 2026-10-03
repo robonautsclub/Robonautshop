@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { AdminDeleteTrigger } from "@/components/admin/admin-confirm-delete-dialog";
 import {
   AdminField,
   AdminFormDialog,
@@ -23,8 +24,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { formatBdt, type Product, type ProductStatus } from "@/lib/catalog";
 
+type ProductRow = Product & { categoryName: string };
+
 type AdminProductsShellProps = {
-  products: Array<Product & { categoryName: string }>;
+  products: ProductRow[];
   categories: Array<{ id: string; name: string }>;
 };
 
@@ -35,19 +38,21 @@ function statusTone(status: ProductStatus) {
 }
 
 export function AdminProductsShell({
-  products,
+  products: initialProducts,
   categories,
 }: AdminProductsShellProps) {
+  const [rows, setRows] = useState(initialProducts);
   const [editing, setEditing] = useState<Product | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
   const dialogOpen = showCreate || editing !== null;
-  const pagination = useAdminPagination(products, 20);
+  const pagination = useAdminPagination(rows, 20);
 
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Products"
-        description={`${products.length} catalog products · Add/Edit opens in a popup. Add products here before attaching them to kits.`}
+        description={`${rows.length} catalog products · Add/Edit opens in a popup. Delete always asks for confirmation.`}
         actions={
           <Button
             type="button"
@@ -99,17 +104,34 @@ export function AdminProductsShell({
                 </AdminStatusBadge>
               </AdminTd>
               <AdminTd className="text-right">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setShowCreate(false);
-                    setEditing(product);
-                  }}
-                >
-                  Edit
-                </Button>
+                <div className="flex flex-wrap justify-end gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setShowCreate(false);
+                      setEditing(product);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <AdminDeleteTrigger
+                    itemLabel={`the product “${product.name}”`}
+                    title="Delete product?"
+                    description={`Are you sure you want to delete “${product.name}”? Demo only — this removes it from the admin list in this session.`}
+                    buttonLabel="Delete"
+                    buttonVariant="destructive"
+                    onConfirm={() => {
+                      setRows((current) =>
+                        current.filter((row) => row.id !== product.id),
+                      );
+                      setStatus(
+                        `Demo only — “${product.name}” was removed from this list.`,
+                      );
+                    }}
+                  />
+                </div>
               </AdminTd>
             </tr>
           ))}
@@ -124,6 +146,12 @@ export function AdminProductsShell({
         onPageChange={pagination.setPage}
         onPageSizeChange={pagination.setPageSize}
       />
+
+      {status ? (
+        <p className="text-sm text-muted-foreground" role="status">
+          {status}
+        </p>
+      ) : null}
 
       <AdminFormDialog
         open={dialogOpen}

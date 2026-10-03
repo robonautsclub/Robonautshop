@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+import { AdminDeleteTrigger } from "@/components/admin/admin-confirm-delete-dialog";
 import { fieldClassName } from "@/components/admin/admin-form-dialog";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { listAdminProducts } from "@/lib/admin";
@@ -192,18 +193,19 @@ export function AdminBomEditor({
                     className={`${fieldClassName()} w-20`}
                   />
                 </label>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() =>
+                <AdminDeleteTrigger
+                  itemLabel={`“${product.name}” from this list`}
+                  title="Remove component?"
+                  description={`Are you sure you want to remove “${product.name}” from this BOM? You can add it again later by searching stock products.`}
+                  buttonLabel="Remove"
+                  confirmLabel="Remove"
+                  buttonVariant="ghost"
+                  onConfirm={() =>
                     onChange(
                       lines.filter((item) => item.productId !== line.productId),
                     )
                   }
-                >
-                  Remove
-                </Button>
+                />
               </li>
             );
           })}

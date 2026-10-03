@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { AdminDeleteTrigger } from "@/components/admin/admin-confirm-delete-dialog";
 import {
   AdminField,
   AdminFormDialog,
@@ -26,17 +27,21 @@ type AdminCategoriesShellProps = {
   categories: Category[];
 };
 
-export function AdminCategoriesShell({ categories }: AdminCategoriesShellProps) {
+export function AdminCategoriesShell({
+  categories: initialCategories,
+}: AdminCategoriesShellProps) {
+  const [rows, setRows] = useState(initialCategories);
   const [editing, setEditing] = useState<Category | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
   const dialogOpen = showCreate || editing !== null;
-  const pagination = useAdminPagination(categories, 20);
+  const pagination = useAdminPagination(rows, 20);
 
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Categories"
-        description={`${categories.length} categories · Add/Edit opens in a popup.`}
+        description={`${rows.length} categories · Add/Edit opens in a popup. Delete always asks for confirmation.`}
         actions={
           <Button
             type="button"
@@ -82,17 +87,34 @@ export function AdminCategoriesShell({ categories }: AdminCategoriesShellProps) 
               <AdminTd className="font-mono text-xs">{category.slug}</AdminTd>
               <AdminTd>{category.sortOrder}</AdminTd>
               <AdminTd className="text-right">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setShowCreate(false);
-                    setEditing(category);
-                  }}
-                >
-                  Edit
-                </Button>
+                <div className="flex flex-wrap justify-end gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setShowCreate(false);
+                      setEditing(category);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <AdminDeleteTrigger
+                    itemLabel={`the category “${category.name}”`}
+                    title="Delete category?"
+                    description={`Are you sure you want to delete “${category.name}”? Demo only — this removes it from the admin list in this session.`}
+                    buttonLabel="Delete"
+                    buttonVariant="destructive"
+                    onConfirm={() => {
+                      setRows((current) =>
+                        current.filter((row) => row.id !== category.id),
+                      );
+                      setStatus(
+                        `Demo only — “${category.name}” was removed from this list.`,
+                      );
+                    }}
+                  />
+                </div>
               </AdminTd>
             </tr>
           ))}
@@ -107,6 +129,12 @@ export function AdminCategoriesShell({ categories }: AdminCategoriesShellProps) 
         onPageChange={pagination.setPage}
         onPageSizeChange={pagination.setPageSize}
       />
+
+      {status ? (
+        <p className="text-sm text-muted-foreground" role="status">
+          {status}
+        </p>
+      ) : null}
 
       <AdminFormDialog
         open={dialogOpen}

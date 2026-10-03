@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+
+import { AdminDeleteTrigger } from "@/components/admin/admin-confirm-delete-dialog";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import {
   AdminPagination,
@@ -15,17 +18,19 @@ import {
 import type { AdminCustomer } from "@/lib/admin";
 
 export function AdminCustomersShell({
-  customers,
+  customers: initialCustomers,
 }: {
   customers: AdminCustomer[];
 }) {
-  const pagination = useAdminPagination(customers, 20);
+  const [rows, setRows] = useState(initialCustomers);
+  const [status, setStatus] = useState<string | null>(null);
+  const pagination = useAdminPagination(rows, 20);
 
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Customers"
-        description={`${customers.length} demo customers · no real user admin actions.`}
+        description={`${rows.length} demo customers · Delete always asks for confirmation.`}
         toolbar={
           <>
             <AdminTableToolbarSearch placeholder="Search customers (demo)" />
@@ -44,6 +49,7 @@ export function AdminCustomersShell({
           <AdminTh>City</AdminTh>
           <AdminTh>Orders</AdminTh>
           <AdminTh>Joined</AdminTh>
+          <AdminTh className="text-right">Actions</AdminTh>
         </AdminTableHead>
         <tbody>
           {pagination.pageItems.map((customer) => (
@@ -61,6 +67,23 @@ export function AdminCustomersShell({
               <AdminTd>
                 {new Date(customer.createdAt).toLocaleDateString()}
               </AdminTd>
+              <AdminTd className="text-right">
+                <AdminDeleteTrigger
+                  itemLabel={`the customer “${customer.name}”`}
+                  title="Delete customer?"
+                  description={`Are you sure you want to delete “${customer.name}”? Demo only — this removes them from the admin list in this session.`}
+                  buttonLabel="Delete"
+                  buttonVariant="destructive"
+                  onConfirm={() => {
+                    setRows((current) =>
+                      current.filter((row) => row.id !== customer.id),
+                    );
+                    setStatus(
+                      `Demo only — “${customer.name}” was removed from this list.`,
+                    );
+                  }}
+                />
+              </AdminTd>
             </tr>
           ))}
         </tbody>
@@ -74,6 +97,12 @@ export function AdminCustomersShell({
         onPageChange={pagination.setPage}
         onPageSizeChange={pagination.setPageSize}
       />
+
+      {status ? (
+        <p className="text-sm text-muted-foreground" role="status">
+          {status}
+        </p>
+      ) : null}
     </div>
   );
 }

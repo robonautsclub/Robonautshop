@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
+import { AdminDeleteTrigger } from "@/components/admin/admin-confirm-delete-dialog";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import {
   AdminPagination,
@@ -190,14 +191,15 @@ export function AdminOrdersShell({ orders }: { orders: AdminOrder[] }) {
                       View
                     </Link>
                     {order.orderStatus !== "CANCELLED" ? (
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => cancelOrder(order)}
-                      >
-                        Cancel
-                      </Button>
+                      <AdminDeleteTrigger
+                        itemLabel={`order ${order.id}`}
+                        title="Cancel order?"
+                        description={`Are you sure you want to cancel order ${order.id}? Booked inventory will be released back to available.`}
+                        buttonLabel="Cancel"
+                        confirmLabel="Cancel order"
+                        buttonVariant="destructive"
+                        onConfirm={() => cancelOrder(order)}
+                      />
                     ) : (
                       <Button
                         type="button"

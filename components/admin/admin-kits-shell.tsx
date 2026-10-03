@@ -6,6 +6,7 @@ import {
   AdminBomEditor,
   type AdminBomLine,
 } from "@/components/admin/admin-bom-editor";
+import { AdminDeleteTrigger } from "@/components/admin/admin-confirm-delete-dialog";
 import {
   AdminField,
   AdminFormDialog,
@@ -33,12 +34,14 @@ function statusTone(status: ProductStatus) {
   return "neutral" as const;
 }
 
-export function AdminKitsShell({ kits }: { kits: Kit[] }) {
+export function AdminKitsShell({ kits: initialKits }: { kits: Kit[] }) {
+  const [rows, setRows] = useState(initialKits);
   const [editing, setEditing] = useState<Kit | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [bom, setBom] = useState<AdminBomLine[]>([]);
+  const [status, setStatus] = useState<string | null>(null);
   const dialogOpen = showCreate || editing !== null;
-  const pagination = useAdminPagination(kits, 20);
+  const pagination = useAdminPagination(rows, 20);
 
   function openCreate() {
     setEditing(null);
@@ -62,7 +65,7 @@ export function AdminKitsShell({ kits }: { kits: Kit[] }) {
     <div className="space-y-6">
       <AdminPageHeader
         title="Kits"
-        description={`${kits.length} kits · BOM lines must come from Products (add the product first, then search it here).`}
+        description={`${rows.length} kits · BOM lines must come from Products. Delete always asks for confirmation.`}
         actions={
           <Button type="button" size="sm" onClick={openCreate}>
             New kit
@@ -107,14 +110,31 @@ export function AdminKitsShell({ kits }: { kits: Kit[] }) {
                 </AdminStatusBadge>
               </AdminTd>
               <AdminTd className="text-right">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => openEdit(kit)}
-                >
-                  Edit
-                </Button>
+                <div className="flex flex-wrap justify-end gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openEdit(kit)}
+                  >
+                    Edit
+                  </Button>
+                  <AdminDeleteTrigger
+                    itemLabel={`the kit “${kit.name}”`}
+                    title="Delete kit?"
+                    description={`Are you sure you want to delete “${kit.name}”? Demo only — this removes it from the admin list in this session.`}
+                    buttonLabel="Delete"
+                    buttonVariant="destructive"
+                    onConfirm={() => {
+                      setRows((current) =>
+                        current.filter((row) => row.id !== kit.id),
+                      );
+                      setStatus(
+                        `Demo only — “${kit.name}” was removed from this list.`,
+                      );
+                    }}
+                  />
+                </div>
               </AdminTd>
             </tr>
           ))}
@@ -129,6 +149,12 @@ export function AdminKitsShell({ kits }: { kits: Kit[] }) {
         onPageChange={pagination.setPage}
         onPageSizeChange={pagination.setPageSize}
       />
+
+      {status ? (
+        <p className="text-sm text-muted-foreground" role="status">
+          {status}
+        </p>
+      ) : null}
 
       <AdminFormDialog
         open={dialogOpen}
