@@ -11,6 +11,7 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import {
   AdminTable,
   AdminTableHead,
+  AdminTableToolbarSearch,
   AdminTd,
   AdminTh,
 } from "@/components/admin/admin-table";
@@ -26,10 +27,10 @@ export function AdminCategoriesShell({ categories }: AdminCategoriesShellProps) 
   const [showCreate, setShowCreate] = useState(false);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminPageHeader
         title="Categories"
-        description="Mock categories. Form changes are not written to a database."
+        description={`${categories.length} categories · form changes are not written to a database.`}
         actions={
           <Button
             type="button"
@@ -42,6 +43,14 @@ export function AdminCategoriesShell({ categories }: AdminCategoriesShellProps) 
             New category
           </Button>
         }
+        toolbar={
+          <>
+            <AdminTableToolbarSearch placeholder="Search categories (demo)" />
+            <p className="text-xs text-muted-foreground">
+              Sorted by catalog sort order
+            </p>
+          </>
+        }
       />
 
       <AdminTable>
@@ -51,9 +60,9 @@ export function AdminCategoriesShell({ categories }: AdminCategoriesShellProps) 
           <AdminTh>Sort</AdminTh>
           <AdminTh className="text-right">Actions</AdminTh>
         </AdminTableHead>
-        <tbody className="divide-y">
+        <tbody>
           {categories.map((category) => (
-            <tr key={category.id}>
+            <tr key={category.id} className="hover:bg-muted/30">
               <AdminTd>
                 <div>
                   <p className="font-medium">{category.name}</p>

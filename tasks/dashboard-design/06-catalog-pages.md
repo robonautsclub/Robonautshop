@@ -1,6 +1,6 @@
 # Task 06 — Catalog pages restyle
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

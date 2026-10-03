@@ -1,6 +1,6 @@
 # Task 07 — Orders + customers restyle
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

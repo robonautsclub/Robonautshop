@@ -12,6 +12,7 @@ import {
   AdminStatusBadge,
   AdminTable,
   AdminTableHead,
+  AdminTableToolbarSearch,
   AdminTd,
   AdminTh,
 } from "@/components/admin/admin-table";
@@ -29,10 +30,10 @@ export function AdminKitsShell({ kits }: { kits: Kit[] }) {
   const [showCreate, setShowCreate] = useState(false);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminPageHeader
         title="Kits"
-        description="Mock kits. Create/edit form does not persist."
+        description={`${kits.length} kits · create/edit form does not persist.`}
         actions={
           <Button
             type="button"
@@ -45,6 +46,14 @@ export function AdminKitsShell({ kits }: { kits: Kit[] }) {
             New kit
           </Button>
         }
+        toolbar={
+          <>
+            <AdminTableToolbarSearch placeholder="Search kits (demo)" />
+            <p className="text-xs text-muted-foreground">
+              Mock catalog kits
+            </p>
+          </>
+        }
       />
 
       <AdminTable>
@@ -55,22 +64,26 @@ export function AdminKitsShell({ kits }: { kits: Kit[] }) {
           <AdminTh>Featured</AdminTh>
           <AdminTh className="text-right">Actions</AdminTh>
         </AdminTableHead>
-        <tbody className="divide-y">
+        <tbody>
           {kits.map((kit) => (
-            <tr key={kit.id}>
+            <tr key={kit.id} className="hover:bg-muted/30">
               <AdminTd>
                 <div>
                   <p className="font-medium">{kit.name}</p>
                   <p className="text-xs text-muted-foreground">{kit.slug}</p>
                 </div>
               </AdminTd>
-              <AdminTd>{formatBdt(kit.price)}</AdminTd>
+              <AdminTd className="font-medium">{formatBdt(kit.price)}</AdminTd>
               <AdminTd>
                 <AdminStatusBadge tone={statusTone(kit.status)}>
                   {kit.status}
                 </AdminStatusBadge>
               </AdminTd>
-              <AdminTd>{kit.featured ? "Yes" : "No"}</AdminTd>
+              <AdminTd>
+                <AdminStatusBadge tone={kit.featured ? "success" : "neutral"}>
+                  {kit.featured ? "Featured" : "Standard"}
+                </AdminStatusBadge>
+              </AdminTd>
               <AdminTd className="text-right">
                 <Button
                   type="button"

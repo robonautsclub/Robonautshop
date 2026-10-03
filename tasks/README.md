@@ -117,16 +117,16 @@ UI shells over mock/static data. Real ADMIN auth comes in Phase 12.
 
 Professional e-commerce admin layout. Same width as the public store (`PageContainer`). Keep shadcn/ui + Lucide. UI shell only.
 
-- [ ] 01 [Shared dashboard shell + public width](dashboard-design/01-dashboard-shell-width.md)
-- [ ] 02 [Sidebar navigation redesign](dashboard-design/02-sidebar-nav.md)
-- [ ] 03 [Top bar / header redesign](dashboard-design/03-topbar.md)
-- [ ] 04 [Dashboard home metrics layout](dashboard-design/04-dashboard-home.md)
-- [ ] 05 [Shared table + page header patterns](dashboard-design/05-table-page-patterns.md)
-- [ ] 06 [Catalog pages restyle](dashboard-design/06-catalog-pages.md)
-- [ ] 07 [Orders + customers restyle](dashboard-design/07-orders-customers.md)
-- [ ] 08 [Kits + projects restyle](dashboard-design/08-kits-projects.md)
-- [ ] 09 [Responsive / mobile dashboard polish](dashboard-design/09-responsive-polish.md)
-- [ ] 10 [Lint, typecheck, visual QA](dashboard-design/10-verify.md)
+- [x] 01 [Shared dashboard shell + public width](dashboard-design/01-dashboard-shell-width.md)
+- [x] 02 [Sidebar navigation redesign](dashboard-design/02-sidebar-nav.md)
+- [x] 03 [Top bar / header redesign](dashboard-design/03-topbar.md)
+- [x] 04 [Dashboard home metrics layout](dashboard-design/04-dashboard-home.md)
+- [x] 05 [Shared table + page header patterns](dashboard-design/05-table-page-patterns.md)
+- [x] 06 [Catalog pages restyle](dashboard-design/06-catalog-pages.md)
+- [x] 07 [Orders + customers restyle](dashboard-design/07-orders-customers.md)
+- [x] 08 [Kits + projects restyle](dashboard-design/08-kits-projects.md)
+- [x] 09 [Responsive / mobile dashboard polish](dashboard-design/09-responsive-polish.md)
+- [x] 10 [Lint, typecheck, visual QA](dashboard-design/10-verify.md)
 
 See also [dashboard-design/README.md](dashboard-design/README.md).
 

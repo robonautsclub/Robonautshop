@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminFormNote } from "@/components/admin/admin-shell-note";
@@ -8,6 +8,7 @@ import {
   AdminStatusBadge,
   AdminTable,
   AdminTableHead,
+  AdminTableToolbarSearch,
   AdminTd,
   AdminTh,
 } from "@/components/admin/admin-table";
@@ -40,6 +41,20 @@ export function AdminInventoryShell({ rows }: AdminInventoryShellProps) {
   );
   const [message, setMessage] = useState<string | null>(null);
 
+  const lowCount = useMemo(
+    () =>
+      rows.filter((row) => {
+        const draft = drafts[row.sku];
+        if (!draft) return false;
+        const available = Math.max(
+          0,
+          draft.stockQuantity - draft.reservedQuantity,
+        );
+        return available <= draft.lowStockThreshold;
+      }).length,
+    [drafts, rows],
+  );
+
   function updateDraft(sku: string, patch: Partial<DraftRow>) {
     setDrafts((current) => ({
       ...current,
@@ -51,7 +66,15 @@ export function AdminInventoryShell({ rows }: AdminInventoryShellProps) {
     <div className="space-y-6">
       <AdminPageHeader
         title="Inventory"
-        description="Mock stock fields. Edits stay in this browser session only."
+        description={`${rows.length} SKUs · ${lowCount} low stock · edits stay in this browser session only.`}
+        toolbar={
+          <>
+            <AdminTableToolbarSearch placeholder="Search SKUs (demo)" />
+            <AdminStatusBadge tone={lowCount > 0 ? "warning" : "success"}>
+              {lowCount} low
+            </AdminStatusBadge>
+          </>
+        }
       />
 
       <AdminFormNote noun="inventory change" />
@@ -68,7 +91,7 @@ export function AdminInventoryShell({ rows }: AdminInventoryShellProps) {
             <span className="sr-only">Actions</span>
           </AdminTh>
         </AdminTableHead>
-        <tbody className="divide-y">
+        <tbody>
           {rows.map((row) => {
             const draft = drafts[row.sku] ?? {
               stockQuantity: row.stockQuantity,
@@ -82,7 +105,10 @@ export function AdminInventoryShell({ rows }: AdminInventoryShellProps) {
             const low = available <= draft.lowStockThreshold;
 
             return (
-              <tr key={row.sku}>
+              <tr
+                key={row.sku}
+                className={low ? "bg-amber-500/5 hover:bg-amber-500/10" : "hover:bg-muted/30"}
+              >
                 <AdminTd>
                   <p className="font-medium">{row.productName}</p>
                 </AdminTd>
@@ -117,7 +143,7 @@ export function AdminInventoryShell({ rows }: AdminInventoryShellProps) {
                 </AdminTd>
                 <AdminTd>
                   <div className="flex items-center gap-2">
-                    <span>{available}</span>
+                    <span className="font-medium">{available}</span>
                     {low ? (
                       <AdminStatusBadge tone="warning">Low</AdminStatusBadge>
                     ) : null}

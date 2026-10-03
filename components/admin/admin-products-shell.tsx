@@ -12,6 +12,7 @@ import {
   AdminStatusBadge,
   AdminTable,
   AdminTableHead,
+  AdminTableToolbarSearch,
   AdminTd,
   AdminTh,
 } from "@/components/admin/admin-table";
@@ -37,10 +38,10 @@ export function AdminProductsShell({
   const [showCreate, setShowCreate] = useState(false);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminPageHeader
         title="Products"
-        description="Mock catalog products. Create/edit is a non-persistent form shell."
+        description={`${products.length} catalog products · create/edit is a non-persistent form shell.`}
         actions={
           <Button
             type="button"
@@ -53,6 +54,14 @@ export function AdminProductsShell({
             New product
           </Button>
         }
+        toolbar={
+          <>
+            <AdminTableToolbarSearch placeholder="Search products (demo)" />
+            <p className="text-xs text-muted-foreground">
+              Filters come in a later phase
+            </p>
+          </>
+        }
       />
 
       <AdminTable>
@@ -64,9 +73,9 @@ export function AdminProductsShell({
           <AdminTh>Status</AdminTh>
           <AdminTh className="text-right">Actions</AdminTh>
         </AdminTableHead>
-        <tbody className="divide-y">
+        <tbody>
           {products.map((product) => (
-            <tr key={product.id}>
+            <tr key={product.id} className="hover:bg-muted/30">
               <AdminTd>
                 <div>
                   <p className="font-medium">{product.name}</p>
@@ -75,7 +84,9 @@ export function AdminProductsShell({
               </AdminTd>
               <AdminTd className="font-mono text-xs">{product.sku}</AdminTd>
               <AdminTd>{product.categoryName}</AdminTd>
-              <AdminTd>{formatBdt(product.price)}</AdminTd>
+              <AdminTd className="font-medium">
+                {formatBdt(product.price)}
+              </AdminTd>
               <AdminTd>
                 <AdminStatusBadge tone={statusTone(product.status)}>
                   {product.status}

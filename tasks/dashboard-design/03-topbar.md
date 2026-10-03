@@ -1,6 +1,6 @@
 # Task 03 — Top bar / header redesign
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

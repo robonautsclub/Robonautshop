@@ -2,6 +2,7 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import {
   AdminTable,
   AdminTableHead,
+  AdminTableToolbarSearch,
   AdminTd,
   AdminTh,
 } from "@/components/admin/admin-table";
@@ -13,10 +14,18 @@ export function AdminCustomersShell({
   customers: AdminCustomer[];
 }) {
   return (
-    <div>
+    <div className="space-y-6">
       <AdminPageHeader
         title="Customers"
-        description="Static demo customer rows. No real user admin actions."
+        description={`${customers.length} demo customers · no real user admin actions.`}
+        toolbar={
+          <>
+            <AdminTableToolbarSearch placeholder="Search customers (demo)" />
+            <p className="text-xs text-muted-foreground">
+              Static fixture rows only
+            </p>
+          </>
+        }
       />
 
       <AdminTable>
@@ -28,19 +37,19 @@ export function AdminCustomersShell({
           <AdminTh>Orders</AdminTh>
           <AdminTh>Joined</AdminTh>
         </AdminTableHead>
-        <tbody className="divide-y">
+        <tbody>
           {customers.map((customer) => (
-            <tr key={customer.id}>
+            <tr key={customer.id} className="hover:bg-muted/30">
               <AdminTd>
                 <div>
                   <p className="font-medium">{customer.name}</p>
                   <p className="text-xs text-muted-foreground">{customer.id}</p>
                 </div>
               </AdminTd>
-              <AdminTd>{customer.email}</AdminTd>
+              <AdminTd className="break-all">{customer.email}</AdminTd>
               <AdminTd className="font-mono text-xs">{customer.phone}</AdminTd>
               <AdminTd>{customer.city}</AdminTd>
-              <AdminTd>{customer.orderCount}</AdminTd>
+              <AdminTd className="font-medium">{customer.orderCount}</AdminTd>
               <AdminTd>
                 {new Date(customer.createdAt).toLocaleDateString()}
               </AdminTd>

@@ -1,4 +1,10 @@
-export { ADMIN_NAV, type AdminNavItem } from "@/lib/admin/nav";
+export {
+  ADMIN_NAV,
+  ADMIN_NAV_GROUPS,
+  getAdminSectionLabel,
+  type AdminNavGroup,
+  type AdminNavItem,
+} from "@/lib/admin/nav";
 export {
   getAdminCategoryName,
   getAdminDashboardStats,

@@ -28,13 +28,13 @@ professional ops dashboard (commerce-console density, still Robonautshop-branded
 
 ## Tasks
 
-- [ ] 01 [Shared dashboard shell + public width](01-dashboard-shell-width.md)
-- [ ] 02 [Sidebar navigation redesign](02-sidebar-nav.md)
-- [ ] 03 [Top bar / header redesign](03-topbar.md)
-- [ ] 04 [Dashboard home metrics layout](04-dashboard-home.md)
-- [ ] 05 [Shared table + page header patterns](05-table-page-patterns.md)
-- [ ] 06 [Catalog pages restyle (products, categories, inventory)](06-catalog-pages.md)
-- [ ] 07 [Orders + customers restyle](07-orders-customers.md)
-- [ ] 08 [Kits + projects restyle](08-kits-projects.md)
-- [ ] 09 [Responsive / mobile dashboard polish](09-responsive-polish.md)
-- [ ] 10 [Lint, typecheck, visual QA](10-verify.md)
+- [x] 01 [Shared dashboard shell + public width](01-dashboard-shell-width.md)
+- [x] 02 [Sidebar navigation redesign](02-sidebar-nav.md)
+- [x] 03 [Top bar / header redesign](03-topbar.md)
+- [x] 04 [Dashboard home metrics layout](04-dashboard-home.md)
+- [x] 05 [Shared table + page header patterns](05-table-page-patterns.md)
+- [x] 06 [Catalog pages restyle (products, categories, inventory)](06-catalog-pages.md)
+- [x] 07 [Orders + customers restyle](07-orders-customers.md)
+- [x] 08 [Kits + projects restyle](08-kits-projects.md)
+- [x] 09 [Responsive / mobile dashboard polish](09-responsive-polish.md)
+- [x] 10 [Lint, typecheck, visual QA](10-verify.md)

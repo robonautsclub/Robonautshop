@@ -5,11 +5,16 @@ import {
   AdminStatusBadge,
   AdminTable,
   AdminTableHead,
+  AdminTableToolbarSearch,
   AdminTd,
   AdminTh,
 } from "@/components/admin/admin-table";
 import { buttonVariants } from "@/components/ui/button";
-import type { AdminOrder, AdminOrderStatus, AdminPaymentStatus } from "@/lib/admin";
+import type {
+  AdminOrder,
+  AdminOrderStatus,
+  AdminPaymentStatus,
+} from "@/lib/admin";
 import { formatBdt } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 
@@ -28,10 +33,18 @@ function paymentTone(status: AdminPaymentStatus) {
 
 export function AdminOrdersShell({ orders }: { orders: AdminOrder[] }) {
   return (
-    <div>
+    <div className="space-y-6">
       <AdminPageHeader
         title="Orders"
-        description="Static demo orders fixture — not a real orders system."
+        description={`${orders.length} demo orders · not a real orders system.`}
+        toolbar={
+          <>
+            <AdminTableToolbarSearch placeholder="Search orders (demo)" />
+            <p className="text-xs text-muted-foreground">
+              Order status and payment status are tracked separately
+            </p>
+          </>
+        }
       />
 
       <AdminTable>
@@ -41,12 +54,12 @@ export function AdminOrdersShell({ orders }: { orders: AdminOrder[] }) {
           <AdminTh>City</AdminTh>
           <AdminTh>Order status</AdminTh>
           <AdminTh>Payment</AdminTh>
-          <AdminTh>Total</AdminTh>
+          <AdminTh className="text-right">Total</AdminTh>
           <AdminTh className="text-right">Actions</AdminTh>
         </AdminTableHead>
-        <tbody className="divide-y">
+        <tbody>
           {orders.map((order) => (
-            <tr key={order.id}>
+            <tr key={order.id} className="hover:bg-muted/30">
               <AdminTd>
                 <div>
                   <p className="font-medium">{order.id}</p>
@@ -79,7 +92,9 @@ export function AdminOrdersShell({ orders }: { orders: AdminOrder[] }) {
                   </p>
                 </div>
               </AdminTd>
-              <AdminTd>{formatBdt(order.total)}</AdminTd>
+              <AdminTd className="text-right font-medium">
+                {formatBdt(order.total)}
+              </AdminTd>
               <AdminTd className="text-right">
                 <Link
                   href={`/admin/orders/${order.id}`}

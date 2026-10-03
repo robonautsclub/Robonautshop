@@ -1,6 +1,6 @@
 # Task 09 — Responsive / mobile dashboard polish
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

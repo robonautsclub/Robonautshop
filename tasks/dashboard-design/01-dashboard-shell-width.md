@@ -1,6 +1,6 @@
 # Task 01 — Shared dashboard shell + public width
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

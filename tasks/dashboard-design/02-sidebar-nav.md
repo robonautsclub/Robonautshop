@@ -1,6 +1,6 @@
 # Task 02 — Sidebar navigation redesign
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

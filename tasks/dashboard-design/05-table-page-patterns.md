@@ -1,6 +1,6 @@
 # Task 05 — Shared table + page header patterns
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

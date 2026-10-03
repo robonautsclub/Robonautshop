@@ -1,6 +1,6 @@
 # Task 04 — Dashboard home metrics layout
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

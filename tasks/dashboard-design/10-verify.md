@@ -1,6 +1,6 @@
 # Task 10 — Lint, typecheck, visual QA
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

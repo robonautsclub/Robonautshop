@@ -1,6 +1,6 @@
 # Task 08 — Kits + projects restyle
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

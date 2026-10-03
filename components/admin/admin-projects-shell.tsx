@@ -12,6 +12,7 @@ import {
   AdminStatusBadge,
   AdminTable,
   AdminTableHead,
+  AdminTableToolbarSearch,
   AdminTd,
   AdminTh,
 } from "@/components/admin/admin-table";
@@ -40,10 +41,10 @@ export function AdminProjectsShell({ projects }: { projects: RobotProject[] }) {
   const [showCreate, setShowCreate] = useState(false);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminPageHeader
         title="Robot projects"
-        description="Mock robot projects. Form shell only — no persistence."
+        description={`${projects.length} projects · form shell only — no persistence.`}
         actions={
           <Button
             type="button"
@@ -56,6 +57,14 @@ export function AdminProjectsShell({ projects }: { projects: RobotProject[] }) {
             New project
           </Button>
         }
+        toolbar={
+          <>
+            <AdminTableToolbarSearch placeholder="Search projects (demo)" />
+            <p className="text-xs text-muted-foreground">
+              Skill levels: Beginner → Competition
+            </p>
+          </>
+        }
       />
 
       <AdminTable>
@@ -66,22 +75,32 @@ export function AdminProjectsShell({ projects }: { projects: RobotProject[] }) {
           <AdminTh>Featured</AdminTh>
           <AdminTh className="text-right">Actions</AdminTh>
         </AdminTableHead>
-        <tbody className="divide-y">
+        <tbody>
           {projects.map((project) => (
-            <tr key={project.id}>
+            <tr key={project.id} className="hover:bg-muted/30">
               <AdminTd>
                 <div>
                   <p className="font-medium">{project.name}</p>
                   <p className="text-xs text-muted-foreground">{project.slug}</p>
                 </div>
               </AdminTd>
-              <AdminTd>{project.skillLevel}</AdminTd>
+              <AdminTd>
+                <AdminStatusBadge tone="neutral">
+                  {project.skillLevel}
+                </AdminStatusBadge>
+              </AdminTd>
               <AdminTd>
                 <AdminStatusBadge tone={statusTone(project.status)}>
                   {project.status}
                 </AdminStatusBadge>
               </AdminTd>
-              <AdminTd>{project.featured ? "Yes" : "No"}</AdminTd>
+              <AdminTd>
+                <AdminStatusBadge
+                  tone={project.featured ? "success" : "neutral"}
+                >
+                  {project.featured ? "Featured" : "Standard"}
+                </AdminStatusBadge>
+              </AdminTd>
               <AdminTd className="text-right">
                 <Button
                   type="button"

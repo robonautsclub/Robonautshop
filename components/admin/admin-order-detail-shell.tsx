@@ -3,11 +3,32 @@ import Link from "next/link";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import {
   AdminStatusBadge,
+  AdminTable,
+  AdminTableHead,
+  AdminTd,
+  AdminTh,
 } from "@/components/admin/admin-table";
 import { buttonVariants } from "@/components/ui/button";
-import type { AdminOrder } from "@/lib/admin";
+import type {
+  AdminOrder,
+  AdminOrderStatus,
+  AdminPaymentStatus,
+} from "@/lib/admin";
 import { formatBdt } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
+
+function orderTone(status: AdminOrderStatus) {
+  if (status === "DELIVERED") return "success" as const;
+  if (status === "CANCELLED") return "danger" as const;
+  if (status === "PENDING") return "warning" as const;
+  return "neutral" as const;
+}
+
+function paymentTone(status: AdminPaymentStatus) {
+  if (status === "PAID") return "success" as const;
+  if (status === "FAILED" || status === "REFUNDED") return "danger" as const;
+  return "warning" as const;
+}
 
 export function AdminOrderDetailShell({ order }: { order: AdminOrder }) {
   return (
@@ -25,9 +46,9 @@ export function AdminOrderDetailShell({ order }: { order: AdminOrder }) {
         }
       />
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section className="space-y-3 rounded-xl border p-5">
-          <h2 className="font-semibold tracking-tight">Customer</h2>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <section className="space-y-3 rounded-xl border bg-muted/20 p-4 sm:p-5">
+          <h2 className="text-sm font-semibold tracking-tight">Customer</h2>
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between gap-3">
               <dt className="text-muted-foreground">Name</dt>
@@ -35,7 +56,7 @@ export function AdminOrderDetailShell({ order }: { order: AdminOrder }) {
             </div>
             <div className="flex justify-between gap-3">
               <dt className="text-muted-foreground">Email</dt>
-              <dd className="font-medium">{order.customerEmail}</dd>
+              <dd className="break-all font-medium">{order.customerEmail}</dd>
             </div>
             <div className="flex justify-between gap-3">
               <dt className="text-muted-foreground">City</dt>
@@ -51,44 +72,59 @@ export function AdminOrderDetailShell({ order }: { order: AdminOrder }) {
           {order.specialInstructions ? (
             <div className="border-t pt-3">
               <p className="text-sm font-medium">Special instructions</p>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">
                 {order.specialInstructions}
               </p>
             </div>
           ) : null}
         </section>
 
-        <section className="space-y-3 rounded-xl border p-5">
-          <h2 className="font-semibold tracking-tight">Status</h2>
+        <section className="space-y-3 rounded-xl border bg-muted/20 p-4 sm:p-5">
+          <h2 className="text-sm font-semibold tracking-tight">Status</h2>
           <div className="flex flex-wrap gap-2">
-            <AdminStatusBadge>{order.orderStatus}</AdminStatusBadge>
-            <AdminStatusBadge>{order.paymentStatus}</AdminStatusBadge>
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">Order</p>
+              <AdminStatusBadge tone={orderTone(order.orderStatus)}>
+                {order.orderStatus}
+              </AdminStatusBadge>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">Payment</p>
+              <AdminStatusBadge tone={paymentTone(order.paymentStatus)}>
+                {order.paymentStatus}
+              </AdminStatusBadge>
+            </div>
           </div>
           <p className="text-sm text-muted-foreground">
             Payment method: {order.paymentMethod}
           </p>
-          <p className="text-sm text-muted-foreground">
-            Demo fixture only — order and payment status are separate fields for
-            the future real system.
+          <p className="text-xs text-muted-foreground">
+            Demo fixture only — order and payment status stay separate for the
+            future real system.
           </p>
         </section>
       </div>
 
-      <section className="rounded-xl border p-5">
-        <h2 className="font-semibold tracking-tight">Items</h2>
-        <ul className="mt-4 space-y-3 text-sm">
-          {order.lines.map((line) => (
-            <li
-              key={`${line.name}-${line.quantity}`}
-              className="flex justify-between gap-3"
-            >
-              <span className="text-muted-foreground">
-                {line.name} × {line.quantity}
-              </span>
-              <span className="font-medium">{formatBdt(line.lineTotal)}</span>
-            </li>
-          ))}
-        </ul>
+      <section className="rounded-xl border p-4 sm:p-5">
+        <h2 className="text-sm font-semibold tracking-tight">Items</h2>
+        <AdminTable className="mt-4 border-0">
+          <AdminTableHead sticky={false}>
+            <AdminTh>Item</AdminTh>
+            <AdminTh>Qty</AdminTh>
+            <AdminTh className="text-right">Line total</AdminTh>
+          </AdminTableHead>
+          <tbody>
+            {order.lines.map((line) => (
+              <tr key={`${line.name}-${line.quantity}`}>
+                <AdminTd>{line.name}</AdminTd>
+                <AdminTd>{line.quantity}</AdminTd>
+                <AdminTd className="text-right font-medium">
+                  {formatBdt(line.lineTotal)}
+                </AdminTd>
+              </tr>
+            ))}
+          </tbody>
+        </AdminTable>
         <div className="mt-4 space-y-2 border-t pt-3 text-sm">
           <div className="flex justify-between gap-3">
             <span className="text-muted-foreground">Subtotal</span>
