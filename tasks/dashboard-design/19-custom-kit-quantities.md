@@ -1,6 +1,6 @@
 # Task 19 — Custom kit quantities (storefront / builder shell)
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

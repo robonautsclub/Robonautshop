@@ -1,6 +1,6 @@
 # Task 12 — Create / Edit dialogs for all admin entities
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

@@ -1,6 +1,6 @@
 # Task 20 — Buying a kit expands cart from stock components
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

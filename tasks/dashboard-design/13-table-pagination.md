@@ -1,6 +1,6 @@
 # Task 13 — Admin table pagination + page size
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

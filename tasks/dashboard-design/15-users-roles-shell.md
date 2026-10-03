@@ -1,6 +1,6 @@
 # Task 15 — Users tab + role matrix (UI shell)
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

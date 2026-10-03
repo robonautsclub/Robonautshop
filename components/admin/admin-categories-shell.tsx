@@ -4,10 +4,14 @@ import { useState } from "react";
 
 import {
   AdminField,
-  AdminShellForm,
+  AdminFormDialog,
   fieldClassName,
-} from "@/components/admin/admin-shell-form";
+} from "@/components/admin/admin-form-dialog";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import {
+  AdminPagination,
+  useAdminPagination,
+} from "@/components/admin/admin-pagination";
 import {
   AdminTable,
   AdminTableHead,
@@ -25,12 +29,14 @@ type AdminCategoriesShellProps = {
 export function AdminCategoriesShell({ categories }: AdminCategoriesShellProps) {
   const [editing, setEditing] = useState<Category | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const dialogOpen = showCreate || editing !== null;
+  const pagination = useAdminPagination(categories, 20);
 
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Categories"
-        description={`${categories.length} categories · form changes are not written to a database.`}
+        description={`${categories.length} categories · Add/Edit opens in a popup.`}
         actions={
           <Button
             type="button"
@@ -61,7 +67,7 @@ export function AdminCategoriesShell({ categories }: AdminCategoriesShellProps) 
           <AdminTh className="text-right">Actions</AdminTh>
         </AdminTableHead>
         <tbody>
-          {categories.map((category) => (
+          {pagination.pageItems.map((category) => (
             <tr key={category.id} className="hover:bg-muted/30">
               <AdminTd>
                 <div>
@@ -93,64 +99,67 @@ export function AdminCategoriesShell({ categories }: AdminCategoriesShellProps) 
         </tbody>
       </AdminTable>
 
-      {showCreate || editing ? (
-        <AdminShellForm
-          title={
-            editing ? `Edit category · ${editing.name}` : "Create category"
+      <AdminPagination
+        page={pagination.page}
+        totalPages={pagination.totalPages}
+        totalItems={pagination.totalItems}
+        pageSize={pagination.pageSize}
+        onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
+      />
+
+      <AdminFormDialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowCreate(false);
+            setEditing(null);
           }
-          noun="category"
-        >
-          <div className="grid gap-4 sm:grid-cols-2">
-            <AdminField id="admin-category-name" label="Name">
-              <input
-                id="admin-category-name"
-                name="name"
-                defaultValue={editing?.name ?? ""}
-                className={fieldClassName()}
+        }}
+        title={
+          editing ? `Edit category · ${editing.name}` : "Create category"
+        }
+        noun="category"
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <AdminField id="admin-category-name" label="Name">
+            <input
+              id="admin-category-name"
+              name="name"
+              defaultValue={editing?.name ?? ""}
+              className={fieldClassName()}
+            />
+          </AdminField>
+          <AdminField id="admin-category-slug" label="Slug">
+            <input
+              id="admin-category-slug"
+              name="slug"
+              defaultValue={editing?.slug ?? ""}
+              className={fieldClassName()}
+            />
+          </AdminField>
+          <AdminField id="admin-category-sort" label="Sort order">
+            <input
+              id="admin-category-sort"
+              name="sortOrder"
+              type="number"
+              defaultValue={editing?.sortOrder ?? 0}
+              className={fieldClassName()}
+            />
+          </AdminField>
+          <div className="sm:col-span-2">
+            <AdminField id="admin-category-desc" label="Description">
+              <textarea
+                id="admin-category-desc"
+                name="description"
+                rows={3}
+                defaultValue={editing?.description ?? ""}
+                className={`${fieldClassName()} min-h-20 py-2`}
               />
             </AdminField>
-            <AdminField id="admin-category-slug" label="Slug">
-              <input
-                id="admin-category-slug"
-                name="slug"
-                defaultValue={editing?.slug ?? ""}
-                className={fieldClassName()}
-              />
-            </AdminField>
-            <AdminField id="admin-category-sort" label="Sort order">
-              <input
-                id="admin-category-sort"
-                name="sortOrder"
-                type="number"
-                defaultValue={editing?.sortOrder ?? 0}
-                className={fieldClassName()}
-              />
-            </AdminField>
-            <div className="sm:col-span-2">
-              <AdminField id="admin-category-desc" label="Description">
-                <textarea
-                  id="admin-category-desc"
-                  name="description"
-                  rows={3}
-                  defaultValue={editing?.description ?? ""}
-                  className={`${fieldClassName()} min-h-20 py-2`}
-                />
-              </AdminField>
-            </div>
           </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setEditing(null);
-              setShowCreate(false);
-            }}
-          >
-            Cancel
-          </Button>
-        </AdminShellForm>
-      ) : null}
+        </div>
+      </AdminFormDialog>
     </div>
   );
 }

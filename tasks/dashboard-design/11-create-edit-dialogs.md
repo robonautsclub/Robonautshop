@@ -1,6 +1,6 @@
 # Task 11 — Create / Edit dialogs (shared modal)
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

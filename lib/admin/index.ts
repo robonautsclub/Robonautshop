@@ -26,3 +26,19 @@ export {
   listAdminCustomers,
   type AdminCustomer,
 } from "@/lib/admin/mock-customers";
+export {
+  ADMIN_ROLE_MATRIX,
+  listAdminUsers,
+  type AdminUser,
+  type AdminUserRole,
+} from "@/lib/admin/mock-users";
+export {
+  bookOrderLines,
+  ensureDemoOrderBookings,
+  getBookedQuantityForSku,
+  getBookingsByOrder,
+  isOrderBooked,
+  releaseOrderBooking,
+  subscribeBookingStore,
+  type BookingLine,
+} from "@/lib/admin/booking";

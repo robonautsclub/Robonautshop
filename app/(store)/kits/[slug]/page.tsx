@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { AddKitToCartButton } from "@/components/cart/add-kit-to-cart-button";
 import { CatalogCoverImage } from "@/components/catalog/catalog-cover-image";
 import { ComponentRequirementsList } from "@/components/catalog/component-requirements-list";
+import { KitCustomQuantities } from "@/components/kit/kit-custom-quantities";
 import { PageContainer } from "@/components/layout/page-container";
 import { PriceDisplay } from "@/components/product/price-display";
 import { buttonVariants } from "@/components/ui/button";
@@ -118,6 +119,8 @@ export default async function KitDetailPage({ params }: KitDetailPageProps) {
               </Link>
             ) : null}
           </div>
+
+          <KitCustomQuantities lines={lines} kitName={kit.name} />
         </div>
       </div>
 

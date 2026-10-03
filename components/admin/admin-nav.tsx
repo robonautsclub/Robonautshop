@@ -10,6 +10,7 @@ import {
   Package,
   ShoppingBag,
   Users,
+  UserCog,
   Warehouse,
   Bot,
 } from "lucide-react";
@@ -24,6 +25,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   "/admin/inventory": Warehouse,
   "/admin/orders": ShoppingBag,
   "/admin/customers": Users,
+  "/admin/users": UserCog,
   "/admin/kits": Boxes,
   "/admin/projects": Bot,
 };

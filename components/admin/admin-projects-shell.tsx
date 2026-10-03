@@ -4,10 +4,14 @@ import { useState } from "react";
 
 import {
   AdminField,
-  AdminShellForm,
+  AdminFormDialog,
   fieldClassName,
-} from "@/components/admin/admin-shell-form";
+} from "@/components/admin/admin-form-dialog";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import {
+  AdminPagination,
+  useAdminPagination,
+} from "@/components/admin/admin-pagination";
 import {
   AdminStatusBadge,
   AdminTable,
@@ -39,12 +43,14 @@ const SKILL_LEVELS: ProjectSkillLevel[] = [
 export function AdminProjectsShell({ projects }: { projects: RobotProject[] }) {
   const [editing, setEditing] = useState<RobotProject | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const dialogOpen = showCreate || editing !== null;
+  const pagination = useAdminPagination(projects, 20);
 
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Robot projects"
-        description={`${projects.length} projects · form shell only — no persistence.`}
+        description={`${projects.length} projects · Add/Edit opens in a popup.`}
         actions={
           <Button
             type="button"
@@ -76,7 +82,7 @@ export function AdminProjectsShell({ projects }: { projects: RobotProject[] }) {
           <AdminTh className="text-right">Actions</AdminTh>
         </AdminTableHead>
         <tbody>
-          {projects.map((project) => (
+          {pagination.pageItems.map((project) => (
             <tr key={project.id} className="hover:bg-muted/30">
               <AdminTd>
                 <div>
@@ -119,81 +125,84 @@ export function AdminProjectsShell({ projects }: { projects: RobotProject[] }) {
         </tbody>
       </AdminTable>
 
-      {showCreate || editing ? (
-        <AdminShellForm
-          title={
-            editing ? `Edit project · ${editing.name}` : "Create project"
+      <AdminPagination
+        page={pagination.page}
+        totalPages={pagination.totalPages}
+        totalItems={pagination.totalItems}
+        pageSize={pagination.pageSize}
+        onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
+      />
+
+      <AdminFormDialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowCreate(false);
+            setEditing(null);
           }
-          noun="project"
-        >
-          <div className="grid gap-4 sm:grid-cols-2">
-            <AdminField id="admin-project-name" label="Name">
-              <input
-                id="admin-project-name"
-                name="name"
-                defaultValue={editing?.name ?? ""}
-                className={fieldClassName()}
+        }}
+        title={
+          editing ? `Edit project · ${editing.name}` : "Create project"
+        }
+        noun="project"
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <AdminField id="admin-project-name" label="Name">
+            <input
+              id="admin-project-name"
+              name="name"
+              defaultValue={editing?.name ?? ""}
+              className={fieldClassName()}
+            />
+          </AdminField>
+          <AdminField id="admin-project-slug" label="Slug">
+            <input
+              id="admin-project-slug"
+              name="slug"
+              defaultValue={editing?.slug ?? ""}
+              className={fieldClassName()}
+            />
+          </AdminField>
+          <AdminField id="admin-project-skill" label="Skill level">
+            <select
+              id="admin-project-skill"
+              name="skillLevel"
+              defaultValue={editing?.skillLevel ?? "BEGINNER"}
+              className={fieldClassName()}
+            >
+              {SKILL_LEVELS.map((level) => (
+                <option key={level} value={level}>
+                  {level}
+                </option>
+              ))}
+            </select>
+          </AdminField>
+          <AdminField id="admin-project-status" label="Status">
+            <select
+              id="admin-project-status"
+              name="status"
+              defaultValue={editing?.status ?? "DRAFT"}
+              className={fieldClassName()}
+            >
+              <option value="DRAFT">DRAFT</option>
+              <option value="PUBLISHED">PUBLISHED</option>
+              <option value="ARCHIVED">ARCHIVED</option>
+            </select>
+          </AdminField>
+          <div className="sm:col-span-2">
+            <AdminField id="admin-project-short" label="Short description">
+              <textarea
+                id="admin-project-short"
+                name="shortDescription"
+                rows={2}
+                defaultValue={editing?.shortDescription ?? ""}
+                className={`${fieldClassName()} min-h-16 py-2`}
               />
             </AdminField>
-            <AdminField id="admin-project-slug" label="Slug">
-              <input
-                id="admin-project-slug"
-                name="slug"
-                defaultValue={editing?.slug ?? ""}
-                className={fieldClassName()}
-              />
-            </AdminField>
-            <AdminField id="admin-project-skill" label="Skill level">
-              <select
-                id="admin-project-skill"
-                name="skillLevel"
-                defaultValue={editing?.skillLevel ?? "BEGINNER"}
-                className={fieldClassName()}
-              >
-                {SKILL_LEVELS.map((level) => (
-                  <option key={level} value={level}>
-                    {level}
-                  </option>
-                ))}
-              </select>
-            </AdminField>
-            <AdminField id="admin-project-status" label="Status">
-              <select
-                id="admin-project-status"
-                name="status"
-                defaultValue={editing?.status ?? "DRAFT"}
-                className={fieldClassName()}
-              >
-                <option value="DRAFT">DRAFT</option>
-                <option value="PUBLISHED">PUBLISHED</option>
-                <option value="ARCHIVED">ARCHIVED</option>
-              </select>
-            </AdminField>
-            <div className="sm:col-span-2">
-              <AdminField id="admin-project-short" label="Short description">
-                <textarea
-                  id="admin-project-short"
-                  name="shortDescription"
-                  rows={2}
-                  defaultValue={editing?.shortDescription ?? ""}
-                  className={`${fieldClassName()} min-h-16 py-2`}
-                />
-              </AdminField>
-            </div>
           </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setEditing(null);
-              setShowCreate(false);
-            }}
-          >
-            Cancel
-          </Button>
-        </AdminShellForm>
-      ) : null}
+        </div>
+      </AdminFormDialog>
     </div>
   );
 }

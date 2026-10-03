@@ -32,7 +32,10 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   {
     id: "customers",
     label: "Customers",
-    items: [{ href: "/admin/customers", label: "Customers" }],
+    items: [
+      { href: "/admin/customers", label: "Customers" },
+      { href: "/admin/users", label: "Users" },
+    ],
   },
   {
     id: "content",

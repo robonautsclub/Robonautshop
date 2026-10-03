@@ -1,6 +1,6 @@
 # Task 18 — Admin kit BOM: pick components from stock
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

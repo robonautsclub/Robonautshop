@@ -1,6 +1,6 @@
 # Task 14 — Admin chrome: no logout button
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

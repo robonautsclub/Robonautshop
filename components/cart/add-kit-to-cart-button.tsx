@@ -32,7 +32,7 @@ export function AddKitToCartButton({
 
     setMessage(
       addedCount > 0
-        ? `Added ${addedCount} component${addedCount === 1 ? "" : "s"} from ${kitName} to cart.`
+        ? `Added ${addedCount} stock component${addedCount === 1 ? "" : "s"} from ${kitName} to cart (existing products, not new SKUs).`
         : "No in-stock kit components could be added.",
     );
   }
@@ -42,6 +42,10 @@ export function AddKitToCartButton({
       <Button type="button" disabled={!canAdd} onClick={handleAdd}>
         Add kit components to cart
       </Button>
+      <p className="text-xs text-muted-foreground">
+        Expands into stock products from this kit&apos;s BOM — nothing new is
+        created.
+      </p>
       {message ? (
         <p className="text-sm text-muted-foreground" role="status">
           {message}

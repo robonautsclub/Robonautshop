@@ -1,6 +1,6 @@
 # Task 16 — Inventory booking UI (stock vs booked vs available)
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

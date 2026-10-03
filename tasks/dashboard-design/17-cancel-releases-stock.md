@@ -1,6 +1,6 @@
 # Task 17 — Cancelled order releases booked stock (UI shell)
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

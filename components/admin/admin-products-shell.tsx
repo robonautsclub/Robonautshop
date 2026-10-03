@@ -4,10 +4,14 @@ import { useState } from "react";
 
 import {
   AdminField,
-  AdminShellForm,
+  AdminFormDialog,
   fieldClassName,
-} from "@/components/admin/admin-shell-form";
+} from "@/components/admin/admin-form-dialog";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import {
+  AdminPagination,
+  useAdminPagination,
+} from "@/components/admin/admin-pagination";
 import {
   AdminStatusBadge,
   AdminTable,
@@ -36,12 +40,14 @@ export function AdminProductsShell({
 }: AdminProductsShellProps) {
   const [editing, setEditing] = useState<Product | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const dialogOpen = showCreate || editing !== null;
+  const pagination = useAdminPagination(products, 20);
 
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Products"
-        description={`${products.length} catalog products · create/edit is a non-persistent form shell.`}
+        description={`${products.length} catalog products · Add/Edit opens in a popup. Add products here before attaching them to kits.`}
         actions={
           <Button
             type="button"
@@ -58,7 +64,7 @@ export function AdminProductsShell({
           <>
             <AdminTableToolbarSearch placeholder="Search products (demo)" />
             <p className="text-xs text-muted-foreground">
-              Filters come in a later phase
+              Products must exist before Kits can use them
             </p>
           </>
         }
@@ -74,7 +80,7 @@ export function AdminProductsShell({
           <AdminTh className="text-right">Actions</AdminTh>
         </AdminTableHead>
         <tbody>
-          {products.map((product) => (
+          {pagination.pageItems.map((product) => (
             <tr key={product.id} className="hover:bg-muted/30">
               <AdminTd>
                 <div>
@@ -110,97 +116,100 @@ export function AdminProductsShell({
         </tbody>
       </AdminTable>
 
-      {showCreate || editing ? (
-        <AdminShellForm
-          title={editing ? `Edit product · ${editing.name}` : "Create product"}
-          noun="product"
-        >
-          <div className="grid gap-4 sm:grid-cols-2">
-            <AdminField id="admin-product-name" label="Name">
-              <input
-                id="admin-product-name"
-                name="name"
-                defaultValue={editing?.name ?? ""}
-                className={fieldClassName()}
+      <AdminPagination
+        page={pagination.page}
+        totalPages={pagination.totalPages}
+        totalItems={pagination.totalItems}
+        pageSize={pagination.pageSize}
+        onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
+      />
+
+      <AdminFormDialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowCreate(false);
+            setEditing(null);
+          }
+        }}
+        title={editing ? `Edit product · ${editing.name}` : "Create product"}
+        noun="product"
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <AdminField id="admin-product-name" label="Name">
+            <input
+              id="admin-product-name"
+              name="name"
+              defaultValue={editing?.name ?? ""}
+              className={fieldClassName()}
+            />
+          </AdminField>
+          <AdminField id="admin-product-sku" label="SKU">
+            <input
+              id="admin-product-sku"
+              name="sku"
+              defaultValue={editing?.sku ?? ""}
+              className={fieldClassName()}
+            />
+          </AdminField>
+          <AdminField id="admin-product-slug" label="Slug">
+            <input
+              id="admin-product-slug"
+              name="slug"
+              defaultValue={editing?.slug ?? ""}
+              className={fieldClassName()}
+            />
+          </AdminField>
+          <AdminField id="admin-product-price" label="Price (BDT)">
+            <input
+              id="admin-product-price"
+              name="price"
+              type="number"
+              inputMode="numeric"
+              defaultValue={editing?.price ?? ""}
+              className={fieldClassName()}
+            />
+          </AdminField>
+          <AdminField id="admin-product-category" label="Category">
+            <select
+              id="admin-product-category"
+              name="categoryId"
+              defaultValue={editing?.categoryId ?? categories[0]?.id ?? ""}
+              className={fieldClassName()}
+            >
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </AdminField>
+          <AdminField id="admin-product-status" label="Status">
+            <select
+              id="admin-product-status"
+              name="status"
+              defaultValue={editing?.status ?? "DRAFT"}
+              className={fieldClassName()}
+            >
+              <option value="DRAFT">DRAFT</option>
+              <option value="PUBLISHED">PUBLISHED</option>
+              <option value="ARCHIVED">ARCHIVED</option>
+            </select>
+          </AdminField>
+          <div className="sm:col-span-2">
+            <AdminField id="admin-product-short" label="Short description">
+              <textarea
+                id="admin-product-short"
+                name="shortDescription"
+                rows={2}
+                defaultValue={editing?.shortDescription ?? ""}
+                className={`${fieldClassName()} min-h-16 py-2`}
               />
             </AdminField>
-            <AdminField id="admin-product-sku" label="SKU">
-              <input
-                id="admin-product-sku"
-                name="sku"
-                defaultValue={editing?.sku ?? ""}
-                className={fieldClassName()}
-              />
-            </AdminField>
-            <AdminField id="admin-product-slug" label="Slug">
-              <input
-                id="admin-product-slug"
-                name="slug"
-                defaultValue={editing?.slug ?? ""}
-                className={fieldClassName()}
-              />
-            </AdminField>
-            <AdminField id="admin-product-price" label="Price (BDT)">
-              <input
-                id="admin-product-price"
-                name="price"
-                type="number"
-                inputMode="numeric"
-                defaultValue={editing?.price ?? ""}
-                className={fieldClassName()}
-              />
-            </AdminField>
-            <AdminField id="admin-product-category" label="Category">
-              <select
-                id="admin-product-category"
-                name="categoryId"
-                defaultValue={editing?.categoryId ?? categories[0]?.id ?? ""}
-                className={fieldClassName()}
-              >
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </AdminField>
-            <AdminField id="admin-product-status" label="Status">
-              <select
-                id="admin-product-status"
-                name="status"
-                defaultValue={editing?.status ?? "DRAFT"}
-                className={fieldClassName()}
-              >
-                <option value="DRAFT">DRAFT</option>
-                <option value="PUBLISHED">PUBLISHED</option>
-                <option value="ARCHIVED">ARCHIVED</option>
-              </select>
-            </AdminField>
-            <div className="sm:col-span-2">
-              <AdminField id="admin-product-short" label="Short description">
-                <textarea
-                  id="admin-product-short"
-                  name="shortDescription"
-                  rows={2}
-                  defaultValue={editing?.shortDescription ?? ""}
-                  className={`${fieldClassName()} min-h-16 py-2`}
-                />
-              </AdminField>
-            </div>
           </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setEditing(null);
-              setShowCreate(false);
-            }}
-          >
-            Cancel
-          </Button>
-        </AdminShellForm>
-      ) : null}
+        </div>
+      </AdminFormDialog>
     </div>
   );
 }

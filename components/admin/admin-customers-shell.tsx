@@ -1,4 +1,10 @@
+"use client";
+
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import {
+  AdminPagination,
+  useAdminPagination,
+} from "@/components/admin/admin-pagination";
 import {
   AdminTable,
   AdminTableHead,
@@ -13,6 +19,8 @@ export function AdminCustomersShell({
 }: {
   customers: AdminCustomer[];
 }) {
+  const pagination = useAdminPagination(customers, 20);
+
   return (
     <div className="space-y-6">
       <AdminPageHeader
@@ -38,7 +46,7 @@ export function AdminCustomersShell({
           <AdminTh>Joined</AdminTh>
         </AdminTableHead>
         <tbody>
-          {customers.map((customer) => (
+          {pagination.pageItems.map((customer) => (
             <tr key={customer.id} className="hover:bg-muted/30">
               <AdminTd>
                 <div>
@@ -57,6 +65,15 @@ export function AdminCustomersShell({
           ))}
         </tbody>
       </AdminTable>
+
+      <AdminPagination
+        page={pagination.page}
+        totalPages={pagination.totalPages}
+        totalItems={pagination.totalItems}
+        pageSize={pagination.pageSize}
+        onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
+      />
     </div>
   );
 }
