@@ -1,6 +1,6 @@
 # Task 12 — Faker.js mock catalog
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

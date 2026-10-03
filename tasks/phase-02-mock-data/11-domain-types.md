@@ -1,6 +1,6 @@
 # Task 11 — Domain types
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

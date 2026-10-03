@@ -1,6 +1,6 @@
 # Task 13 — Mock data access layer
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

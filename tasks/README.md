@@ -38,9 +38,9 @@ Mock/faker data here is explicit development fixture data so the UI can be built
 
 ## Phase 2 — Mock data (Faker.js)
 
-- [ ] 11 [Domain types](phase-02-mock-data/11-domain-types.md)
-- [ ] 12 [Faker.js mock catalog](phase-02-mock-data/12-faker-mock-catalog.md)
-- [ ] 13 [Mock data access layer](phase-02-mock-data/13-mock-data-access.md)
+- [x] 11 [Domain types](phase-02-mock-data/11-domain-types.md)
+- [x] 12 [Faker.js mock catalog](phase-02-mock-data/12-faker-mock-catalog.md)
+- [x] 13 [Mock data access layer](phase-02-mock-data/13-mock-data-access.md)
 
 ## Phase 3 — Storefront
 
