@@ -1,6 +1,6 @@
 # Task 47 — Shipping estimate UI
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

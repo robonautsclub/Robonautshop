@@ -1,6 +1,6 @@
 # Task 45 — Checkout page shell
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

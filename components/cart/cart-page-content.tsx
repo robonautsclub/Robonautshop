@@ -162,13 +162,19 @@ export function CartPageContent() {
               <span className="font-semibold">{formatBdt(subtotal)}</span>
             </div>
             <p className="mt-3 text-sm text-muted-foreground">
-              Shipping and payment come in a later checkout phase.
+              Delivery charge and payment are selected on the checkout page.
             </p>
+            <Link
+              href="/checkout"
+              className={cn(buttonVariants(), "mt-4 w-full")}
+            >
+              Checkout
+            </Link>
             <Link
               href="/products"
               className={cn(
                 buttonVariants({ variant: "outline" }),
-                "mt-4 w-full",
+                "mt-2 w-full",
               )}
             >
               Continue shopping

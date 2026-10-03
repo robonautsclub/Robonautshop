@@ -1,6 +1,6 @@
 # Task 49 — Order confirmation shell
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

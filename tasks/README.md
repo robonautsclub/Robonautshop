@@ -94,11 +94,11 @@ UI only. Do not fake successful signup/login unless real auth is already wired.
 
 No real payments or order persistence.
 
-- [ ] 45 [Checkout page shell](phase-08-checkout-shells/45-checkout-shell.md)
-- [ ] 46 [Checkout address UI](phase-08-checkout-shells/46-checkout-address-ui.md)
-- [ ] 47 [Shipping estimate UI](phase-08-checkout-shells/47-shipping-estimate-ui.md)
-- [ ] 48 [Payment method UI](phase-08-checkout-shells/48-payment-method-ui.md)
-- [ ] 49 [Order confirmation shell](phase-08-checkout-shells/49-order-confirmation-shell.md)
+- [x] 45 [Checkout page shell](phase-08-checkout-shells/45-checkout-shell.md)
+- [x] 46 [Checkout address UI](phase-08-checkout-shells/46-checkout-address-ui.md)
+- [x] 47 [Shipping estimate UI](phase-08-checkout-shells/47-shipping-estimate-ui.md)
+- [x] 48 [Payment method UI](phase-08-checkout-shells/48-payment-method-ui.md)
+- [x] 49 [Order confirmation shell](phase-08-checkout-shells/49-order-confirmation-shell.md)
 
 ## Phase 9 — Admin UI shells
 

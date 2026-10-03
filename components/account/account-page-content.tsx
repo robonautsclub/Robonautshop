@@ -84,7 +84,7 @@ export function AccountPageContent() {
           >
             <h2 className="font-medium tracking-tight">Addresses</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Manage Bangladesh shipping addresses (session UI only).
+              Manage Bangladesh delivery addresses (session UI only).
             </p>
           </Link>
           <div className="rounded-xl border border-dashed p-5">

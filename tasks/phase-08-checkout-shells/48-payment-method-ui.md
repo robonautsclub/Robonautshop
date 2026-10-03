@@ -1,6 +1,6 @@
 # Task 48 — Payment method UI
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

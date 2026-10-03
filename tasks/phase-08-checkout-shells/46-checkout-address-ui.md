@@ -1,6 +1,6 @@
 # Task 46 — Checkout address UI
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

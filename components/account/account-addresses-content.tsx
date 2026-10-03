@@ -39,7 +39,7 @@ export function AccountAddressesContent() {
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">Addresses</h1>
           <p className="mt-2 text-muted-foreground">
-            Add shipping addresses with Bangladesh-friendly fields.
+            Add delivery addresses with Bangladesh-friendly fields.
           </p>
         </div>
         <AccountNav pathname="/account/addresses" />
