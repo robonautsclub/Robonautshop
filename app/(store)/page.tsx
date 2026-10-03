@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { PageContainer } from "@/components/layout/page-container";
 import {
   CatalogEmptyState,
   ProductCard,
@@ -31,7 +32,7 @@ export default function HomePage() {
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,oklch(0.92_0.02_250),transparent_55%),linear-gradient(180deg,oklch(0.97_0.01_240),transparent)]"
         />
-        <div className="relative mx-auto flex min-h-[70vh] w-full max-w-6xl flex-col justify-end gap-6 px-4 py-16 sm:py-24">
+        <PageContainer className="relative flex min-h-[70vh] flex-col justify-end gap-6 py-16 sm:py-24">
           <p className="text-4xl font-semibold tracking-tight sm:text-6xl">
             Robonautshop
           </p>
@@ -59,10 +60,10 @@ export default function HomePage() {
               Robot projects
             </Link>
           </div>
-        </div>
+        </PageContainer>
       </section>
 
-      <section className="mx-auto w-full max-w-6xl px-4 py-14">
+      <PageContainer as="section" className="py-14">
         <div className="mb-6 flex items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight">
@@ -102,10 +103,10 @@ export default function HomePage() {
             })}
           </ProductGrid>
         )}
-      </section>
+      </PageContainer>
 
       <section className="border-y bg-muted/30">
-        <div className="mx-auto w-full max-w-6xl px-4 py-14">
+        <PageContainer className="py-14">
           <h2 className="text-2xl font-semibold tracking-tight">Categories</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Jump straight into the part family you need.
@@ -118,7 +119,7 @@ export default function HomePage() {
               />
             </div>
           ) : (
-            <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {categories.map((category) => (
                 <li key={category.id}>
                   <Link
@@ -138,10 +139,13 @@ export default function HomePage() {
               ))}
             </ul>
           )}
-        </div>
+        </PageContainer>
       </section>
 
-      <section className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-14 lg:grid-cols-2">
+      <PageContainer
+        as="section"
+        className="grid gap-10 py-14 lg:grid-cols-2"
+      >
         <div>
           <h2 className="text-2xl font-semibold tracking-tight">Starter kits</h2>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -206,7 +210,7 @@ export default function HomePage() {
             </ul>
           )}
         </div>
-      </section>
+      </PageContainer>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { Menu, ShoppingCart, UserRound } from "lucide-react";
 
 import { NavbarSearch } from "@/components/layout/navbar-search";
 import { storeNavLinks } from "@/components/layout/nav-links";
+import { PageContainer } from "@/components/layout/page-container";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Sheet,
@@ -26,7 +27,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
-      <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-3 px-4">
+      <PageContainer className="flex h-14 items-center gap-3">
         <Sheet>
           <SheetTrigger
             render={
@@ -125,7 +126,7 @@ export function Navbar() {
             <UserRound />
           </Link>
         </div>
-      </div>
+      </PageContainer>
     </header>
   );
 }

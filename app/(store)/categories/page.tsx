@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { PageContainer } from "@/components/layout/page-container";
 import { CatalogEmptyState } from "@/components/product";
 import { getCategories, getProducts } from "@/lib/catalog";
 
@@ -12,7 +13,7 @@ export default function CategoriesPage() {
   const categories = getCategories();
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-4 py-10">
+    <PageContainer as="section" className="py-10">
       <div className="mb-8">
         <h1 className="text-3xl font-semibold tracking-tight">Categories</h1>
         <p className="mt-2 text-muted-foreground">
@@ -28,7 +29,7 @@ export default function CategoriesPage() {
           actionLabel="Browse products"
         />
       ) : (
-        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {categories.map((category) => {
             const count = getProducts({ categorySlug: category.slug }).length;
             return (
@@ -54,6 +55,6 @@ export default function CategoriesPage() {
           })}
         </ul>
       )}
-    </section>
+    </PageContainer>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { PageContainer } from "@/components/layout/page-container";
 import {
   CatalogEmptyState,
   ProductCard,
@@ -52,7 +53,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   });
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-4 py-10">
+    <PageContainer as="section" className="py-10">
       <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
         <ol className="flex flex-wrap items-center gap-1">
           <li>
@@ -99,6 +100,6 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           })}
         </ProductGrid>
       )}
-    </section>
+    </PageContainer>
   );
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { PageContainer } from "@/components/layout/page-container";
 import { storeNavLinks } from "@/components/layout/nav-links";
 
 export function Footer() {
@@ -7,7 +8,7 @@ export function Footer() {
 
   return (
     <footer className="border-t">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10">
+      <PageContainer className="flex flex-col gap-8 py-10">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="max-w-sm space-y-2">
             <p className="font-semibold tracking-tight">Robonautshop</p>
@@ -29,7 +30,7 @@ export function Footer() {
           </nav>
         </div>
         <p className="text-sm text-muted-foreground">© {year} Robonautshop</p>
-      </div>
+      </PageContainer>
     </footer>
   );
 }
