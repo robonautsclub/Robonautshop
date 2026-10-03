@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 
+import { SiteLogo } from "@/components/brand/site-logo";
 import { PageContainer } from "@/components/layout/page-container";
 
 type AuthFormShellProps = {
@@ -19,6 +20,7 @@ export function AuthFormShell({
   return (
     <PageContainer as="section" className="py-10">
       <div className="mx-auto w-full max-w-md">
+        <SiteLogo href="/" size="sm" className="mb-6" />
         <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
         <p className="mt-2 text-muted-foreground">{description}</p>
         <div className="mt-8 rounded-xl border p-5 sm:p-6">{children}</div>

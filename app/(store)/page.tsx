@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { CatalogCoverImage } from "@/components/catalog/catalog-cover-image";
+import { SiteLogo } from "@/components/brand/site-logo";
 import { PageContainer } from "@/components/layout/page-container";
 import {
   CatalogEmptyState,
@@ -34,9 +35,7 @@ export default function HomePage() {
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,oklch(0.92_0.02_250),transparent_55%),linear-gradient(180deg,oklch(0.97_0.01_240),transparent)]"
         />
         <PageContainer className="relative flex min-h-[70vh] flex-col justify-end gap-6 py-16 sm:py-24">
-          <p className="text-4xl font-semibold tracking-tight sm:text-6xl">
-            Robonautshop
-          </p>
+          <SiteLogo href={null} size="xl" priority />
           <h1 className="max-w-2xl text-xl font-medium tracking-tight text-foreground/90 sm:text-2xl">
             Robotics parts for builders who ship robots, not shopping carts.
           </h1>

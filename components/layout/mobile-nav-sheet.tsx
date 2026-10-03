@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 
 import { useAuth } from "@/components/auth/auth-provider";
+import { SiteLogo } from "@/components/brand/site-logo";
 import { storeNavLinks } from "@/components/layout/nav-links";
 import { Button } from "@/components/ui/button";
 import {
@@ -69,7 +70,8 @@ export function MobileNavSheet({ pathname }: MobileNavSheetProps) {
       </SheetTrigger>
       <SheetContent side="left" className="w-72">
         <SheetHeader>
-          <SheetTitle>Robonautshop</SheetTitle>
+          <SheetTitle className="sr-only">Robonautshop</SheetTitle>
+          <SiteLogo href="/" size="sm" />
         </SheetHeader>
         <nav className="flex flex-col gap-1 px-4">
           {storeNavLinks.map((link) => (

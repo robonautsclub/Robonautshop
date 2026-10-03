@@ -6,6 +6,7 @@ import { ExternalLink, Search } from "lucide-react";
 
 import { AdminMobileNav } from "@/components/admin/admin-mobile-nav";
 import { AdminShellNote } from "@/components/admin/admin-shell-note";
+import { SiteLogo } from "@/components/brand/site-logo";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { getAdminSectionLabel } from "@/lib/admin";
 import { cn } from "@/lib/utils";
@@ -19,10 +20,14 @@ export function AdminTopbar() {
       <div className="flex min-w-0 items-center gap-2">
         <AdminMobileNav />
         <div className="min-w-0">
-          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-            <p className="text-sm font-semibold tracking-tight lg:hidden">
-              Robonautshop Admin
-            </p>
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <SiteLogo
+              href="/admin"
+              size="sm"
+              wordmark="Admin"
+              className="lg:hidden"
+              wordmarkClassName="text-sm"
+            />
             <p className="hidden text-sm text-muted-foreground lg:inline">
               {section}
             </p>

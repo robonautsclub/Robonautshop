@@ -19,6 +19,11 @@ export const metadata: Metadata = {
   },
   description:
     "Robotics parts, kits, and project guides for builders in Bangladesh.",
+  icons: {
+    icon: [{ url: "/logo.png", type: "image/png", sizes: "1024x1024" }],
+    shortcut: "/logo.png",
+    apple: [{ url: "/logo.png", type: "image/png", sizes: "1024x1024" }],
+  },
 };
 
 export default function RootLayout({

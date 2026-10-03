@@ -1,35 +1,243 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
+import {
+  Lock,
+  Mail,
+  MapPin,
+  Phone,
+  ShieldCheck,
+  Truck,
+} from "lucide-react";
 
+import { SiteLogo } from "@/components/brand/site-logo";
 import { PageContainer } from "@/components/layout/page-container";
 import { storeNavLinks } from "@/components/layout/nav-links";
+import { cn } from "@/lib/utils";
+
+const helpLinks = [
+  { href: "/cart", label: "Cart" },
+  { href: "/account", label: "Account" },
+  { href: "/account/orders", label: "Order tracking" },
+  { href: "/builder", label: "Robot Builder" },
+] as const;
+
+const paymentMethods = [
+  {
+    id: "bkash",
+    label: "bKash",
+    className:
+      "border-[#E2136E]/25 bg-[#E2136E]/10 text-[#9B0B4A] dark:text-[#FF7AB5]",
+  },
+  {
+    id: "nagad",
+    label: "Nagad",
+    className:
+      "border-[#F68712]/30 bg-[#F68712]/10 text-[#9A4E00] dark:text-[#FFB86A]",
+  },
+  {
+    id: "cod",
+    label: "Cash on Delivery",
+    className: "border-foreground/15 bg-muted/60 text-foreground",
+  },
+  {
+    id: "sslcommerz",
+    label: "SSLCOMMERZ",
+    className:
+      "border-sky-500/25 bg-sky-500/10 text-sky-800 dark:text-sky-300",
+  },
+] as const;
+
+const trustPoints = [
+  {
+    icon: ShieldCheck,
+    title: "Secure checkout",
+    detail: "Payment details stay on trusted gateways — never stored by us.",
+  },
+  {
+    icon: Lock,
+    title: "Encrypted sessions",
+    detail: "HTTPS / SSL for every storefront and account request.",
+  },
+  {
+    icon: Truck,
+    title: "BD delivery",
+    detail: "Courier-ready packing for Dhaka and nationwide shipping.",
+  },
+] as const;
+
+function FooterLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+    >
+      {children}
+    </Link>
+  );
+}
 
 export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t">
-      <PageContainer className="flex flex-col gap-8 py-10">
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-          <div className="max-w-sm space-y-2">
-            <p className="font-semibold tracking-tight">Robonautshop</p>
-            <p className="text-sm text-muted-foreground">
-              Robotics parts for builders in Bangladesh, ready to expand to
-              customers elsewhere later.
+    <footer className="relative mt-auto overflow-hidden border-t">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,oklch(0.94_0.02_250),transparent_50%),linear-gradient(180deg,oklch(0.985_0.008_240),oklch(0.97_0.01_240))]"
+      />
+
+      <PageContainer className="relative flex flex-col gap-12 py-14 sm:py-16">
+        <div className="grid gap-10 lg:grid-cols-[1.35fr_repeat(3,minmax(0,1fr))]">
+          <div className="max-w-md space-y-4">
+            <SiteLogo href="/" size="lg" />
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              Robotics parts, kits, and guided builds for students, makers, and
+              competition teams across Bangladesh — designed to scale beyond
+              borders later.
+            </p>
+            <ul className="space-y-2.5 text-sm text-muted-foreground">
+              <li className="flex items-start gap-2.5">
+                <MapPin
+                  className="mt-0.5 size-4 shrink-0 text-foreground/70"
+                  aria-hidden
+                />
+                <span>Dhaka, Bangladesh · Nationwide courier delivery</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <Phone
+                  className="mt-0.5 size-4 shrink-0 text-foreground/70"
+                  aria-hidden
+                />
+                <a
+                  href="tel:+8801700000000"
+                  className="transition-colors hover:text-foreground"
+                >
+                  +880 1700-000000
+                </a>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <Mail
+                  className="mt-0.5 size-4 shrink-0 text-foreground/70"
+                  aria-hidden
+                />
+                <a
+                  href="mailto:hello@robonautshop.com"
+                  className="transition-colors hover:text-foreground"
+                >
+                  hello@robonautshop.com
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div className="space-y-3">
+            <p className="text-xs font-semibold tracking-[0.14em] text-foreground/80 uppercase">
+              Shop
+            </p>
+            <nav className="flex flex-col gap-2" aria-label="Shop">
+              {storeNavLinks.map((link) => (
+                <FooterLink key={link.href} href={link.href}>
+                  {link.label}
+                </FooterLink>
+              ))}
+            </nav>
+          </div>
+
+          <div className="space-y-3">
+            <p className="text-xs font-semibold tracking-[0.14em] text-foreground/80 uppercase">
+              Help
+            </p>
+            <nav className="flex flex-col gap-2" aria-label="Help">
+              {helpLinks.map((link) => (
+                <FooterLink key={link.href} href={link.href}>
+                  {link.label}
+                </FooterLink>
+              ))}
+            </nav>
+          </div>
+
+          <div className="space-y-3">
+            <p className="text-xs font-semibold tracking-[0.14em] text-foreground/80 uppercase">
+              Why shop here
+            </p>
+            <ul className="space-y-3">
+              {trustPoints.map((point) => (
+                <li key={point.title} className="flex gap-3">
+                  <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg border bg-background/80">
+                    <point.icon className="size-3.5" aria-hidden />
+                  </span>
+                  <div>
+                    <p className="text-sm font-medium tracking-tight">
+                      {point.title}
+                    </p>
+                    <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                      {point.detail}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="space-y-4 rounded-2xl border bg-background/70 p-5 shadow-[0_1px_0_oklch(1_0_0_/_0.6)_inset] backdrop-blur-sm sm:p-6">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.14em] text-foreground/80 uppercase">
+                Payment methods
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Pay the way you prefer — mobile wallets, cash on delivery, or
+                card via SSLCOMMERZ when live payments are enabled.
+              </p>
+            </div>
+            <p className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <Lock className="size-3.5" aria-hidden />
+              Payment secrets stay with the gateway
             </p>
           </div>
-          <nav className="flex flex-col gap-2 text-sm">
-            {storeNavLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                {link.label}
-              </Link>
+
+          <ul className="flex flex-wrap gap-2.5" aria-label="Accepted payments">
+            {paymentMethods.map((method) => (
+              <li key={method.id}>
+                <span
+                  className={cn(
+                    "inline-flex h-10 items-center rounded-xl border px-3.5 text-sm font-semibold tracking-tight",
+                    method.className,
+                  )}
+                >
+                  {method.label}
+                </span>
+              </li>
             ))}
-          </nav>
+          </ul>
         </div>
-        <p className="text-sm text-muted-foreground">© {year} Robonautshop</p>
+
+        <div className="flex flex-col gap-3 border-t pt-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
+            <p>© {year} Robonautshop. Built for robotics builders.</p>
+            <p className="text-xs sm:text-sm">
+              Prices in BDT · Secure checkout · Inventory reserved server-side
+            </p>
+          </div>
+          <p className="text-sm sm:text-right">
+            Developed by{" "}
+            <a
+              href="https://github.com/salahakramfuad"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-foreground underline-offset-4 transition-colors hover:underline"
+            >
+              Mohammad Salah
+            </a>
+          </p>
+        </div>
       </PageContainer>
     </footer>
   );
