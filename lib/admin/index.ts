@@ -33,6 +33,10 @@ export {
   type AdminUserRole,
 } from "@/lib/admin/mock-users";
 export {
+  getAdminFinanceSummary,
+  type AdminFinanceSummary,
+} from "@/lib/admin/finances";
+export {
   bookOrderLines,
   ensureDemoOrderBookings,
   getBookedQuantityForSku,

@@ -13,7 +13,10 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   {
     id: "overview",
     label: "Overview",
-    items: [{ href: "/admin", label: "Dashboard" }],
+    items: [
+      { href: "/admin", label: "Dashboard" },
+      { href: "/admin/finances", label: "Finances" },
+    ],
   },
   {
     id: "catalog",

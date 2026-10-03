@@ -13,6 +13,7 @@ import {
   UserCog,
   Warehouse,
   Bot,
+  Wallet,
 } from "lucide-react";
 
 import { ADMIN_NAV_GROUPS } from "@/lib/admin";
@@ -20,6 +21,7 @@ import { cn } from "@/lib/utils";
 
 const NAV_ICONS: Record<string, LucideIcon> = {
   "/admin": LayoutDashboard,
+  "/admin/finances": Wallet,
   "/admin/products": Package,
   "/admin/categories": FolderTree,
   "/admin/inventory": Warehouse,

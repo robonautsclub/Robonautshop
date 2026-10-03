@@ -3,6 +3,10 @@
 import { useState } from "react";
 
 import {
+  AdminBomEditor,
+  type AdminBomLine,
+} from "@/components/admin/admin-bom-editor";
+import {
   AdminField,
   AdminFormDialog,
   fieldClassName,
@@ -21,10 +25,11 @@ import {
   AdminTh,
 } from "@/components/admin/admin-table";
 import { Button } from "@/components/ui/button";
-import type {
-  ProductStatus,
-  ProjectSkillLevel,
-  RobotProject,
+import {
+  getProjectComponents,
+  type ProductStatus,
+  type ProjectSkillLevel,
+  type RobotProject,
 } from "@/lib/catalog";
 
 function statusTone(status: ProductStatus) {
@@ -43,23 +48,35 @@ const SKILL_LEVELS: ProjectSkillLevel[] = [
 export function AdminProjectsShell({ projects }: { projects: RobotProject[] }) {
   const [editing, setEditing] = useState<RobotProject | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [bom, setBom] = useState<AdminBomLine[]>([]);
   const dialogOpen = showCreate || editing !== null;
   const pagination = useAdminPagination(projects, 20);
+
+  function openCreate() {
+    setEditing(null);
+    setBom([]);
+    setShowCreate(true);
+  }
+
+  function openEdit(project: RobotProject) {
+    const components = getProjectComponents(project.id);
+    setBom(
+      components.map((component) => ({
+        productId: component.productId,
+        quantity: component.quantity,
+      })),
+    );
+    setShowCreate(false);
+    setEditing(project);
+  }
 
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Robot projects"
-        description={`${projects.length} projects · Add/Edit opens in a popup.`}
+        description={`${projects.length} projects · required parts must come from Products (same flow as kits).`}
         actions={
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => {
-              setEditing(null);
-              setShowCreate(true);
-            }}
-          >
+          <Button type="button" size="sm" onClick={openCreate}>
             New project
           </Button>
         }
@@ -67,7 +84,7 @@ export function AdminProjectsShell({ projects }: { projects: RobotProject[] }) {
           <>
             <AdminTableToolbarSearch placeholder="Search projects (demo)" />
             <p className="text-xs text-muted-foreground">
-              Skill levels: Beginner → Competition
+              Add product first, then attach here
             </p>
           </>
         }
@@ -112,10 +129,7 @@ export function AdminProjectsShell({ projects }: { projects: RobotProject[] }) {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => {
-                    setShowCreate(false);
-                    setEditing(project);
-                  }}
+                  onClick={() => openEdit(project)}
                 >
                   Edit
                 </Button>
@@ -140,12 +154,15 @@ export function AdminProjectsShell({ projects }: { projects: RobotProject[] }) {
           if (!open) {
             setShowCreate(false);
             setEditing(null);
+            setBom([]);
           }
         }}
         title={
           editing ? `Edit project · ${editing.name}` : "Create project"
         }
         noun="project"
+        description="Pick products that already exist. If wheels (or any part) are missing, add them under Products first."
+        className="sm:max-w-2xl"
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <AdminField id="admin-project-name" label="Name">
@@ -202,6 +219,14 @@ export function AdminProjectsShell({ projects }: { projects: RobotProject[] }) {
             </AdminField>
           </div>
         </div>
+
+        <AdminBomEditor
+          lines={bom}
+          onChange={setBom}
+          title="Project components (from stock products)"
+          emptyLabel="Project box is empty. Search a product from stock and add it."
+          searchInputId="project-product-search"
+        />
       </AdminFormDialog>
     </div>
   );

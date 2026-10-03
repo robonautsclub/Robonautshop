@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 
-import { AdminNav } from "@/components/admin/admin-nav";
-import { AdminShellNote } from "@/components/admin/admin-shell-note";
+import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -55,14 +54,14 @@ export function AdminMobileNav() {
       >
         <Menu />
       </SheetTrigger>
-      <SheetContent side="left" className="w-72 p-0">
-        <SheetHeader className="border-b">
+      <SheetContent side="left" className="h-full w-72 p-0">
+        <SheetHeader className="sr-only">
           <SheetTitle>Admin menu</SheetTitle>
         </SheetHeader>
-        <div className="space-y-4 overflow-y-auto p-4">
-          <AdminShellNote />
-          <AdminNav onNavigate={() => setOpen(false)} />
-        </div>
+        <AdminSidebar
+          className="h-full min-h-0"
+          onNavigate={() => setOpen(false)}
+        />
       </SheetContent>
     </Sheet>
   );

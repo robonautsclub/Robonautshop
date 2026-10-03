@@ -12,6 +12,7 @@ import {
 import { buttonVariants } from "@/components/ui/button";
 import {
   getAdminDashboardStats,
+  getAdminFinanceSummary,
   listAdminCustomers,
   listAdminInventory,
   listAdminOrders,
@@ -28,6 +29,7 @@ function orderTone(status: string) {
 
 export function AdminDashboardContent() {
   const stats = getAdminDashboardStats();
+  const finance = getAdminFinanceSummary();
   const orders = listAdminOrders();
   const customers = listAdminCustomers();
   const recentOrders = orders.slice(0, 5);
@@ -63,11 +65,35 @@ export function AdminDashboardContent() {
     },
   ];
 
+  const financeCards = [
+    {
+      label: "Stock value",
+      value: formatBdt(finance.stockValueBdt),
+      hint: `${finance.stockUnits} units on hand`,
+      href: "/admin/finances",
+    },
+    {
+      label: "Sales (paid)",
+      value: formatBdt(finance.salesPaidBdt),
+      hint: `${finance.salesPaidOrderCount} paid orders`,
+      href: "/admin/finances",
+    },
+    {
+      label: "COD to receive",
+      value: formatBdt(finance.codReceivableBdt),
+      hint: `${finance.codReceivableOrderCount} pending COD`,
+      href: "/admin/finances",
+      warn: finance.codReceivableBdt > 0,
+    },
+  ];
+
   const quickLinks = [
+    { href: "/admin/finances", label: "Open finances" },
     { href: "/admin/products", label: "Manage products" },
     { href: "/admin/orders", label: "Review orders" },
     { href: "/admin/inventory", label: "Check inventory" },
     { href: "/admin/kits", label: "Edit kits" },
+    { href: "/admin/projects", label: "Edit projects" },
   ];
 
   return (
@@ -97,6 +123,38 @@ export function AdminDashboardContent() {
           </Link>
         ))}
       </div>
+
+      <section className="mt-6">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold tracking-tight">Finances</h2>
+          <Link
+            href="/admin/finances"
+            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+          >
+            Open finances
+          </Link>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {financeCards.map((card) => (
+            <Link
+              key={card.label}
+              href={card.href}
+              className={cn(
+                "rounded-xl border p-4 transition-colors hover:border-foreground/20",
+                card.warn && "border-amber-500/30 bg-amber-500/5",
+              )}
+            >
+              <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                {card.label}
+              </p>
+              <p className="mt-2 text-2xl font-semibold tracking-tight">
+                {card.value}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">{card.hint}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       {stats.lowStockCount > 0 ? (
         <section className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">

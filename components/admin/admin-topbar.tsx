@@ -15,24 +15,20 @@ export function AdminTopbar() {
   const section = getAdminSectionLabel(pathname);
 
   return (
-    <div className="flex items-center justify-between gap-3 py-3">
-      <div className="flex min-w-0 items-start gap-2">
+    <div className="flex h-14 items-center justify-between gap-3">
+      <div className="flex min-w-0 items-center gap-2">
         <AdminMobileNav />
         <div className="min-w-0">
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-            <p className="text-sm font-semibold tracking-tight">Robonautshop</p>
-            <span className="text-muted-foreground" aria-hidden>
-              /
-            </span>
-            <p className="text-sm text-muted-foreground">Admin</p>
-            <span className="hidden text-muted-foreground sm:inline" aria-hidden>
-              /
-            </span>
-            <p className="hidden truncate text-sm font-medium sm:inline">
+            <p className="text-sm font-semibold tracking-tight lg:hidden">
+              Robonautshop Admin
+            </p>
+            <p className="hidden text-sm text-muted-foreground lg:inline">
               {section}
             </p>
+            <p className="truncate text-sm font-medium lg:hidden">{section}</p>
           </div>
-          <div className="mt-1">
+          <div className="mt-0.5 lg:hidden">
             <AdminShellNote compact />
           </div>
         </div>
@@ -52,11 +48,13 @@ export function AdminTopbar() {
         </Button>
         <Link
           href="/"
-          className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+          className={cn(
+            buttonVariants({ variant: "outline", size: "sm" }),
+            "lg:hidden",
+          )}
         >
           <ExternalLink className="size-3.5" aria-hidden />
-          <span className="hidden sm:inline">Back to store</span>
-          <span className="sm:hidden">Store</span>
+          Store
         </Link>
       </div>
     </div>

@@ -1,9 +1,11 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
+import {
+  AdminBomEditor,
+  type AdminBomLine,
+} from "@/components/admin/admin-bom-editor";
 import {
   AdminField,
   AdminFormDialog,
@@ -22,17 +24,8 @@ import {
   AdminTd,
   AdminTh,
 } from "@/components/admin/admin-table";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { listAdminProducts } from "@/lib/admin";
-import {
-  formatBdt,
-  getImagesForProduct,
-  getKitComponents,
-  type Kit,
-  type Product,
-  type ProductStatus,
-} from "@/lib/catalog";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { formatBdt, getKitComponents, type Kit, type ProductStatus } from "@/lib/catalog";
 
 function statusTone(status: ProductStatus) {
   if (status === "PUBLISHED") return "success" as const;
@@ -40,47 +33,16 @@ function statusTone(status: ProductStatus) {
   return "neutral" as const;
 }
 
-type BomLine = {
-  productId: string;
-  quantity: number;
-};
-
-function productThumb(product: Product) {
-  const image = getImagesForProduct(product.id)[0];
-  return image ?? null;
-}
-
 export function AdminKitsShell({ kits }: { kits: Kit[] }) {
-  const allProducts = useMemo(() => listAdminProducts(), []);
   const [editing, setEditing] = useState<Kit | null>(null);
   const [showCreate, setShowCreate] = useState(false);
-  const [bom, setBom] = useState<BomLine[]>([]);
-  const [productQuery, setProductQuery] = useState("");
+  const [bom, setBom] = useState<AdminBomLine[]>([]);
   const dialogOpen = showCreate || editing !== null;
   const pagination = useAdminPagination(kits, 20);
-
-  const productById = useMemo(
-    () => new Map(allProducts.map((product) => [product.id, product])),
-    [allProducts],
-  );
-
-  const searchHits = useMemo(() => {
-    const q = productQuery.trim().toLowerCase();
-    if (!q) return [];
-    return allProducts
-      .filter(
-        (product) =>
-          product.name.toLowerCase().includes(q) ||
-          product.sku.toLowerCase().includes(q),
-      )
-      .filter((product) => !bom.some((line) => line.productId === product.id))
-      .slice(0, 8);
-  }, [allProducts, bom, productQuery]);
 
   function openCreate() {
     setEditing(null);
     setBom([]);
-    setProductQuery("");
     setShowCreate(true);
   }
 
@@ -92,14 +54,8 @@ export function AdminKitsShell({ kits }: { kits: Kit[] }) {
         quantity: component.quantity,
       })),
     );
-    setProductQuery("");
     setShowCreate(false);
     setEditing(kit);
-  }
-
-  function addProduct(productId: string) {
-    setBom((current) => [...current, { productId, quantity: 1 }]);
-    setProductQuery("");
   }
 
   return (
@@ -181,7 +137,6 @@ export function AdminKitsShell({ kits }: { kits: Kit[] }) {
             setShowCreate(false);
             setEditing(null);
             setBom([]);
-            setProductQuery("");
           }
         }}
         title={editing ? `Edit kit · ${editing.name}` : "Create kit"}
@@ -229,163 +184,13 @@ export function AdminKitsShell({ kits }: { kits: Kit[] }) {
           </AdminField>
         </div>
 
-        <div className="space-y-3 border-t pt-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="text-sm font-semibold tracking-tight">
-              Kit BOM (from stock products)
-            </h3>
-            <Link
-              href="/admin/products"
-              className={cn(
-                buttonVariants({ variant: "outline", size: "sm" }),
-              )}
-            >
-              Add product first
-            </Link>
-          </div>
-
-          <div className="space-y-1.5">
-            <label htmlFor="kit-product-search" className="text-sm font-medium">
-              Search products to add
-            </label>
-            <input
-              id="kit-product-search"
-              value={productQuery}
-              onChange={(event) => setProductQuery(event.target.value)}
-              placeholder="Name or SKU…"
-              className={fieldClassName()}
-            />
-            {productQuery.trim() && searchHits.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No product found.{" "}
-                <Link
-                  href="/admin/products"
-                  className="font-medium underline-offset-4 hover:underline"
-                >
-                  Add it under Products
-                </Link>{" "}
-                first, then search again.
-              </p>
-            ) : null}
-            {searchHits.length > 0 ? (
-              <ul className="overflow-hidden rounded-lg border">
-                {searchHits.map((product) => {
-                  const image = productThumb(product);
-                  return (
-                    <li
-                      key={product.id}
-                      className="flex items-center gap-3 border-b px-3 py-2 last:border-b-0"
-                    >
-                      <div className="relative size-10 overflow-hidden rounded-md bg-muted">
-                        {image ? (
-                          <Image
-                            src={image.url}
-                            alt={image.alt}
-                            fill
-                            className="object-cover"
-                            sizes="40px"
-                          />
-                        ) : null}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium">
-                          {product.name}
-                        </p>
-                        <p className="font-mono text-xs text-muted-foreground">
-                          {product.sku}
-                        </p>
-                      </div>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={() => addProduct(product.id)}
-                      >
-                        Add
-                      </Button>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : null}
-          </div>
-
-          {bom.length === 0 ? (
-            <p className="rounded-lg border border-dashed px-3 py-6 text-center text-sm text-muted-foreground">
-              Kit box is empty. Search a product from stock and add it.
-            </p>
-          ) : (
-            <ul className="space-y-2">
-              {bom.map((line) => {
-                const product = productById.get(line.productId);
-                if (!product) return null;
-                const image = productThumb(product);
-                return (
-                  <li
-                    key={line.productId}
-                    className="flex flex-wrap items-center gap-3 rounded-lg border p-3"
-                  >
-                    <div className="relative size-12 overflow-hidden rounded-md bg-muted">
-                      {image ? (
-                        <Image
-                          src={image.url}
-                          alt={image.alt}
-                          fill
-                          className="object-cover"
-                          sizes="48px"
-                        />
-                      ) : null}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium">{product.name}</p>
-                      <p className="font-mono text-xs text-muted-foreground">
-                        {product.sku} · {formatBdt(product.price)}
-                      </p>
-                    </div>
-                    <label className="flex items-center gap-2 text-sm">
-                      Qty
-                      <input
-                        type="number"
-                        min={1}
-                        value={line.quantity}
-                        onChange={(event) =>
-                          setBom((current) =>
-                            current.map((item) =>
-                              item.productId === line.productId
-                                ? {
-                                    ...item,
-                                    quantity: Math.max(
-                                      1,
-                                      Number(event.target.value) || 1,
-                                    ),
-                                  }
-                                : item,
-                            ),
-                          )
-                        }
-                        className={`${fieldClassName()} w-20`}
-                      />
-                    </label>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        setBom((current) =>
-                          current.filter(
-                            (item) => item.productId !== line.productId,
-                          ),
-                        )
-                      }
-                    >
-                      Remove
-                    </Button>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
+        <AdminBomEditor
+          lines={bom}
+          onChange={setBom}
+          title="Kit BOM (from stock products)"
+          emptyLabel="Kit box is empty. Search a product from stock and add it."
+          searchInputId="kit-product-search"
+        />
       </AdminFormDialog>
     </div>
   );

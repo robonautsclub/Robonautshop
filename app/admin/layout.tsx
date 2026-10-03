@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
+import { AuthProvider } from "@/components/auth/auth-provider";
 
 export const metadata: Metadata = {
   title: "Admin",
@@ -13,5 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  return <AdminLayoutShell>{children}</AdminLayoutShell>;
+  return (
+    <AuthProvider>
+      <AdminLayoutShell>{children}</AdminLayoutShell>
+    </AuthProvider>
+  );
 }
