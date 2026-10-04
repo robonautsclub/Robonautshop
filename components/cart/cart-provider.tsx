@@ -6,10 +6,12 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 
+import { useAuth } from "@/components/auth/auth-provider";
 import {
   calculateCartItemCount,
   calculateCartSubtotal,
@@ -19,8 +21,42 @@ import {
   resolveCartLines,
   type ResolvedCartLine,
 } from "@/lib/cart/calculations";
+import {
+  type CartIdentity,
+  GUEST_CART_STORAGE_KEY,
+  resolveCartIdentity,
+} from "@/lib/cart/cart-identity";
 import { readStoredCart, writeStoredCart } from "@/lib/cart/storage";
 import type { CartLineInput } from "@/lib/cart/types";
+import {
+  getMyCartAction,
+  mergeGuestCartAction,
+  syncMyCartAction,
+} from "@/lib/server-cart/actions";
+
+/**
+ * Guests: the lines live in localStorage. Signed-in customers: the lines
+ * live server-side (lib/server-cart/), loaded/saved through Server Actions
+ * — see tasks/phase-12-wire-up/78-real-cart-orders.md.
+ */
+async function loadPersistedLines(identity: CartIdentity): Promise<CartLineInput[]> {
+  if (identity.kind === "user") {
+    return getMyCartAction();
+  }
+
+  return readStoredCart(GUEST_CART_STORAGE_KEY);
+}
+
+function savePersistedLines(identity: CartIdentity, lines: CartLineInput[]): void {
+  if (identity.kind === "user") {
+    void syncMyCartAction(lines).catch((error: unknown) => {
+      console.error("Failed to sync cart to the server", error);
+    });
+    return;
+  }
+
+  writeStoredCart(lines, GUEST_CART_STORAGE_KEY);
+}
 
 type CartContextValue = {
   hydrated: boolean;
@@ -92,13 +128,47 @@ function mergeLine(
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { user, hydrated: authHydrated } = useAuth();
+  const identity = useMemo(
+    () => resolveCartIdentity(user ? { id: user.id, role: user.role } : null),
+    [user],
+  );
   const [lines, setLines] = useState<CartLineInput[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  // Tracks which identity `lines` currently reflects, so the write-effect
+  // below never saves stale lines into the *new* identity's cart during the
+  // single render between a sign-in/out and the load effect resolving.
+  const [loadedIdentity, setLoadedIdentity] = useState<CartIdentity | null>(null);
+  // null means "haven't loaded a cart yet" — distinguishes a genuine guest →
+  // user sign-in (merge) from simply reloading the page while already
+  // signed in (no merge; AGENTS.md "Avoid duplicate data").
+  const previousIdentityRef = useRef<CartIdentity | null>(null);
 
   useEffect(() => {
-    queueMicrotask(() => {
-      const stored = readStoredCart();
-      const cleaned = resolveCartLines(stored)
+    if (!authHydrated) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function load() {
+      const previous = previousIdentityRef.current;
+      const isNewSignIn =
+        previous !== null && previous.kind === "guest" && identity.kind === "user";
+
+      const rawLines = isNewSignIn
+        ? await mergeGuestCartAction(readStoredCart(GUEST_CART_STORAGE_KEY))
+        : await loadPersistedLines(identity);
+
+      if (isNewSignIn) {
+        writeStoredCart([], GUEST_CART_STORAGE_KEY);
+      }
+
+      if (cancelled) {
+        return;
+      }
+
+      const cleaned = resolveCartLines(rawLines)
         .map((line) => ({
           productId: line.productId,
           variantId: line.variantId,
@@ -109,18 +179,35 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }))
         .filter((line) => line.quantity > 0);
 
+      previousIdentityRef.current = identity;
+      setLoadedIdentity(identity);
       setLines(cleaned);
       setHydrated(true);
-    });
-  }, []);
+    }
+
+    void load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authHydrated, identity]);
 
   useEffect(() => {
-    if (!hydrated) {
+    if (!hydrated || !loadedIdentity) {
       return;
     }
 
-    writeStoredCart(lines);
-  }, [hydrated, lines]);
+    if (
+      loadedIdentity.kind !== identity.kind ||
+      (loadedIdentity.kind === "user" &&
+        identity.kind === "user" &&
+        loadedIdentity.userId !== identity.userId)
+    ) {
+      return;
+    }
+
+    savePersistedLines(identity, lines);
+  }, [hydrated, lines, loadedIdentity, identity]);
 
   const resolvedLines = useMemo(() => resolveCartLines(lines), [lines]);
   const itemCount = useMemo(() => calculateCartItemCount(lines), [lines]);
