@@ -1,6 +1,6 @@
 # Task 58 — Configure Cloudflare
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

@@ -1,6 +1,6 @@
 # Task 64 — Configure R2
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

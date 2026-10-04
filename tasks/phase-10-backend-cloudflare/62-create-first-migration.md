@@ -1,6 +1,6 @@
 # Task 62 — Create first migration
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

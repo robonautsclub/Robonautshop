@@ -1,6 +1,6 @@
 # Task 59 — Configure Workers
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

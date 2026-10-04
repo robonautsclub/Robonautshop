@@ -1,6 +1,6 @@
 # Task 61 — Configure Drizzle
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

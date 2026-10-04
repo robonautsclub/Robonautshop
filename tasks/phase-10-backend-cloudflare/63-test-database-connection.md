@@ -1,6 +1,6 @@
 # Task 63 — Test database connection
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

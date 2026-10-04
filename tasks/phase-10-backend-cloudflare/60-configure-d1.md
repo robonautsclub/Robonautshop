@@ -1,6 +1,6 @@
 # Task 60 — Configure D1
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

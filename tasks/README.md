@@ -160,13 +160,13 @@ Do not start these until Phases 2–9 are done (unless you explicitly change str
 
 ## Phase 10 — Cloudflare backend
 
-- [ ] 58 [Configure Cloudflare](phase-10-backend-cloudflare/58-configure-cloudflare.md)
-- [ ] 59 [Configure Workers](phase-10-backend-cloudflare/59-configure-workers.md)
-- [ ] 60 [Configure D1](phase-10-backend-cloudflare/60-configure-d1.md)
-- [ ] 61 [Configure Drizzle](phase-10-backend-cloudflare/61-configure-drizzle.md)
-- [ ] 62 [Create first migration](phase-10-backend-cloudflare/62-create-first-migration.md)
-- [ ] 63 [Test database connection](phase-10-backend-cloudflare/63-test-database-connection.md)
-- [ ] 64 [Configure R2](phase-10-backend-cloudflare/64-configure-r2.md)
+- [x] 58 [Configure Cloudflare](phase-10-backend-cloudflare/58-configure-cloudflare.md)
+- [x] 59 [Configure Workers](phase-10-backend-cloudflare/59-configure-workers.md)
+- [x] 60 [Configure D1](phase-10-backend-cloudflare/60-configure-d1.md)
+- [x] 61 [Configure Drizzle](phase-10-backend-cloudflare/61-configure-drizzle.md)
+- [x] 62 [Create first migration](phase-10-backend-cloudflare/62-create-first-migration.md)
+- [x] 63 [Test database connection](phase-10-backend-cloudflare/63-test-database-connection.md)
+- [x] 64 [Configure R2](phase-10-backend-cloudflare/64-configure-r2.md)
 
 ## Phase 11 — Database schema
 
