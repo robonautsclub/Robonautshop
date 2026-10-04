@@ -1,6 +1,6 @@
 # Task 69 — Inventory schema
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

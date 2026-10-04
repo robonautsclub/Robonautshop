@@ -1,6 +1,6 @@
 # Task 70 — Product images schema
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

@@ -1,6 +1,6 @@
 # Task 68 — Product variants schema
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

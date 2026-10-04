@@ -1,6 +1,6 @@
 # Task 72 — Project components schema
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

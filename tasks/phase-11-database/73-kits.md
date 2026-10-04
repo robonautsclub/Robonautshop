@@ -1,6 +1,6 @@
 # Task 73 — Kits schema
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

@@ -1,6 +1,6 @@
 # Task 74 — Kit components schema
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

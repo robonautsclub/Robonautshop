@@ -1,6 +1,6 @@
 # Task 66 — Categories schema
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

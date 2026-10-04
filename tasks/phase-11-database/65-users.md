@@ -1,6 +1,6 @@
 # Task 65 — Users schema
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

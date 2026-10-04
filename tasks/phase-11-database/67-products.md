@@ -1,6 +1,6 @@
 # Task 67 — Products schema
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

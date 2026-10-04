@@ -170,16 +170,16 @@ Do not start these until Phases 2–9 are done (unless you explicitly change str
 
 ## Phase 11 — Database schema
 
-- [ ] 65 [Users schema](phase-11-database/65-users.md)
-- [ ] 66 [Categories schema](phase-11-database/66-categories.md)
-- [ ] 67 [Products schema](phase-11-database/67-products.md)
-- [ ] 68 [Product variants schema](phase-11-database/68-product-variants.md)
-- [ ] 69 [Inventory schema](phase-11-database/69-inventory.md)
-- [ ] 70 [Product images schema](phase-11-database/70-product-images.md)
-- [ ] 71 [Robot projects schema](phase-11-database/71-robot-projects.md)
-- [ ] 72 [Project components schema](phase-11-database/72-project-components.md)
-- [ ] 73 [Kits schema](phase-11-database/73-kits.md)
-- [ ] 74 [Kit components schema](phase-11-database/74-kit-components.md)
+- [x] 65 [Users schema](phase-11-database/65-users.md)
+- [x] 66 [Categories schema](phase-11-database/66-categories.md)
+- [x] 67 [Products schema](phase-11-database/67-products.md)
+- [x] 68 [Product variants schema](phase-11-database/68-product-variants.md)
+- [x] 69 [Inventory schema](phase-11-database/69-inventory.md)
+- [x] 70 [Product images schema](phase-11-database/70-product-images.md)
+- [x] 71 [Robot projects schema](phase-11-database/71-robot-projects.md)
+- [x] 72 [Project components schema](phase-11-database/72-project-components.md)
+- [x] 73 [Kits schema](phase-11-database/73-kits.md)
+- [x] 74 [Kit components schema](phase-11-database/74-kit-components.md)
 
 ## Phase 12 — Wire UI to backend
 

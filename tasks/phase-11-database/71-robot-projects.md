@@ -1,6 +1,6 @@
 # Task 71 — Robot projects schema
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

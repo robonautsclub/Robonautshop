@@ -37,8 +37,10 @@ Local `next dev` also gets local versions of these bindings (D1, R2, ...), via `
 
 ### Database (D1 + Drizzle)
 
-- Schema: `lib/db/schema.ts`. No domain tables yet — those are added one at a time in `tasks/phase-11-database`.
+- Schema: `lib/db/schema/` — one file per table (`users.ts`, `categories.ts`, `products.ts`, `product-variants.ts`, `inventory.ts`, `product-images.ts`, `robot-projects.ts`, `project-components.ts`, `kits.ts`, `kit-components.ts`, plus the infra-only `health.ts`), re-exported from `index.ts`. These mirror the frontend types in `lib/catalog/types.ts` — see that file's comments for the exact shapes.
 - Client: `createDb(d1)` in `lib/db/index.ts`, called with `env.DB` inside a request.
+- The `users`/`sessions`/`accounts`/`verifications` tables match what Better Auth needs, plus a `role` (`CUSTOMER` | `ADMIN`) column — see the comment at the top of `lib/db/schema/users.ts`. Wiring Better Auth to actually use D1 is `tasks/phase-12-wire-up/77-real-auth.md`, not done yet.
+- Nothing reads from or writes to these tables yet outside the `/api/health/db` smoke check — the storefront and admin UI still run on the Faker mock catalog (`lib/catalog/mock-data.ts`). Swapping that over is `tasks/phase-12-wire-up/75-replace-mock-catalog.md`.
 
 ```bash
 pnpm db:generate         # diff lib/db/schema.ts and write a new SQL file into migrations/
