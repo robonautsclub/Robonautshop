@@ -1,23 +1,24 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 
-import {
-  AuthComingSoonNote,
-  fieldClassName,
-} from "@/components/auth/auth-form-shell";
+import { fieldClassName } from "@/components/auth/auth-form-shell";
 import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth/client";
 import { registerSchema } from "@/lib/auth/schemas";
 
 type FieldErrors = Partial<
   Record<"name" | "email" | "password" | "confirmPassword" | "form", string>
 >;
 
+/** Customer-only registration (AGENTS.md "Authentication": CUSTOMER / ADMIN roles). */
 export function RegisterForm() {
+  const router = useRouter();
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<string | null>(null);
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus(null);
 
@@ -47,15 +48,27 @@ export function RegisterForm() {
     }
 
     setErrors({});
-    setStatus(
-      "Validation passed. Account creation is not connected yet — no account was created.",
-    );
+    setStatus("Creating account…");
+    const { error } = await authClient.signUp.email({
+      name: parsed.data.name,
+      email: parsed.data.email,
+      password: parsed.data.password,
+    });
+
+    if (error) {
+      setErrors({
+        form: error.message ?? "Could not create an account with that email.",
+      });
+      setStatus(null);
+      return;
+    }
+
+    setStatus("Account created.");
+    router.push("/account");
   }
 
   return (
     <form className="space-y-4" onSubmit={onSubmit} noValidate>
-      <AuthComingSoonNote />
-
       <div className="space-y-1.5">
         <label htmlFor="register-name" className="text-sm font-medium">
           Full name
@@ -124,8 +137,14 @@ export function RegisterForm() {
         ) : null}
       </div>
 
+      {errors.form ? (
+        <p className="text-sm text-destructive" role="alert">
+          {errors.form}
+        </p>
+      ) : null}
+
       <Button type="submit" className="w-full">
-        Create account (demo UI)
+        Create account
       </Button>
 
       {status ? (

@@ -71,10 +71,10 @@ export function Navbar() {
 
           {authHydrated && !isSignedIn ? (
             <Link
-              href="/login"
+              href="/user/login"
               className={cn(
                 buttonVariants({ variant: "outline", size: "sm" }),
-                isActive(pathname, "/login") && "bg-muted",
+                isActive(pathname, "/user/login") && "bg-muted",
               )}
             >
               Sign in

@@ -40,15 +40,7 @@ export function fieldClassName(hasError?: boolean) {
     .join(" ");
 }
 
-export function AuthComingSoonNote() {
-  return (
-    <p className="rounded-lg border border-dashed bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-      Auth submit is a UI shell only for now. Real sign-in and registration are
-      wired in a later backend phase — this form will not create a session.
-    </p>
-  );
-}
-
+/** Customer-only: switches between /user/login and /register. Never used on the admin /login page. */
 export function AuthSwitchLinks({ mode }: { mode: "login" | "register" }) {
   if (mode === "login") {
     return (
@@ -64,7 +56,7 @@ export function AuthSwitchLinks({ mode }: { mode: "login" | "register" }) {
   return (
     <p>
       Already have an account?{" "}
-      <Link href="/login" className="font-medium text-foreground underline-offset-4 hover:underline">
+      <Link href="/user/login" className="font-medium text-foreground underline-offset-4 hover:underline">
         Sign in
       </Link>
     </p>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { type FormEvent, useState } from "react";
 
 import { useAuth } from "@/components/auth/auth-provider";
@@ -10,13 +10,25 @@ import { loginSchema } from "@/lib/auth/schemas";
 
 type FieldErrors = Partial<Record<"email" | "password" | "form", string>>;
 
-export function LoginForm() {
+type LoginFormProps = {
+  /** Where to send the user after a successful sign-in, unless ?callbackUrl= overrides it. */
+  redirectTo: string;
+};
+
+/**
+ * Plain email/password sign-in. Used as-is for the admin `/login` page and
+ * wrapped with social buttons for the customer `/user/login` page (see
+ * tasks/phase-12-wire-up/77d-split-login-uis.md) — kept provider-agnostic so
+ * it never grows an admin-only or customer-only assumption.
+ */
+export function LoginForm({ redirectTo }: LoginFormProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signIn } = useAuth();
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<string | null>(null);
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus(null);
 
@@ -39,30 +51,21 @@ export function LoginForm() {
     }
 
     setErrors({});
-    const result = signIn(parsed.data);
+    setStatus("Signing in…");
+    const result = await signIn(parsed.data);
 
     if (!result.ok) {
       setErrors({ form: result.error });
-      setStatus("Not signed in.");
+      setStatus(null);
       return;
     }
 
-    setStatus(
-      result.created
-        ? "Account created and signed in."
-        : "Signed in successfully.",
-    );
-    router.push("/account");
+    setStatus("Signed in successfully.");
+    router.push(searchParams.get("callbackUrl") || redirectTo);
   }
 
   return (
     <form className="space-y-4" onSubmit={onSubmit} noValidate>
-      <p className="rounded-lg border border-dashed bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-        Demo auth is local to this browser. If the email is new, an account is
-        created automatically. If the email already exists, the password must
-        match or you stay signed out.
-      </p>
-
       <div className="space-y-1.5">
         <label htmlFor="login-email" className="text-sm font-medium">
           Email

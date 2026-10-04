@@ -18,7 +18,7 @@ export default function Unauthorized() {
         code="401"
         title="Sign in required"
         description="You need to sign in before you can view this page."
-        primaryAction={{ href: "/login", label: "Sign in" }}
+        primaryAction={{ href: "/user/login", label: "Sign in" }}
         secondaryAction={{ href: "/", label: "Go home" }}
       />
     </PageContainer>
