@@ -1,35 +1,17 @@
-# Task 77 — Wire real authentication
+# Task 77 — Wire real authentication (superseded)
 
 - [ ] Implemented
 
-## Goal
+## Superseded
 
-Connect registration/login shells to Better Auth with server-side session validation.
+This stub was expanded into smaller tasks. Do **not** implement this file.
 
-## In scope
+Use in order:
 
-- This task only
-- Reuse existing types, mock data helpers, and UI components
-- Keep components small and reusable; do not duplicate code
+1. [77a — Better Auth server + D1](77a-better-auth-server.md)
+2. [77b — Customer Google + Microsoft OAuth](77b-customer-social-oauth.md)
+3. [77c — Replace mock auth with real sessions](77c-replace-mock-auth.md)
+4. [77d — Split login UIs](77d-split-login-uis.md)
 
-## Out of scope
-
-- Any later task in the sequence
-- Cloudflare Workers, D1, Drizzle, R2, or real APIs
-- Real payments, real order persistence, or production secrets
-- Hard-coded API keys or credentials
-
-## Steps
-
-1. Inspect the current project and this task's dependencies.
-2. Implement only this task.
-3. Run `pnpm lint` and `pnpm typecheck`.
-4. Fix errors.
-5. Check this box and the matching box in `tasks/README.md`.
-6. Stop. Do not start the next task.
-
-## Done when
-
-- The goal above is true in the running app
-- Lint and typecheck pass
-- The report lists completed work, files changed, and the next suggested task
+Check boxes on those files and in `tasks/README.md` only when each sub-task is
+done.

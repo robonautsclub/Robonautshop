@@ -4,24 +4,42 @@
 
 ## Goal
 
-Move cart authority server-side and create real orders with separate order status and payment status fields.
+Move cart authority server-side for signed-in customers and create real orders
+with separate **order status** and **payment status** fields. Orders require an
+authenticated customer; prices and stock must be read server-side.
+
+## Prerequisites
+
+- Task 78b (checkout login + cart merge) complete
+- Catalog readable from D1 (tasks 75–76) strongly preferred before treating
+  orders as production-ready
+
+## Locked rules
+
+- No guest orders
+- Cart merge from 78b remains the path from guest browsing → logged-in checkout
+- Never trust client-provided prices, discounts, or stock
+- Order status and payment status are separate fields (see AGENTS.md)
 
 ## In scope
 
 - This task only
-- Reuse existing types, mock data helpers, and UI components
-- Keep components small and reusable; do not duplicate code
+- Server-owned cart for the signed-in user (persist lines against `userId`)
+- Create order from server cart / validated line items
+- Separate order status vs payment status
+- Reuse the cart merge helper from 78b; one authoritative pricing/totals path
+- Keep components small; business logic out of giant UI files
 
 ## Out of scope
 
-- Any later task in the sequence
-- Cloudflare Workers, D1, Drizzle, R2, or real APIs
-- Real payments, real order persistence, or production secrets
-- Hard-coded API keys or credentials
+- Payment provider capture (bKash, Nagad, SSLCOMMERZ, etc.)
+- Admin order management beyond what already exists as UI shells
+- Admin route protection (79a)
+- Email notifications
 
 ## Steps
 
-1. Inspect the current project and this task's dependencies.
+1. Inspect cart calculations, checkout shells, and database readiness for orders.
 2. Implement only this task.
 3. Run `pnpm lint` and `pnpm typecheck`.
 4. Fix errors.
@@ -30,6 +48,8 @@ Move cart authority server-side and create real orders with separate order statu
 
 ## Done when
 
-- The goal above is true in the running app
+- Signed-in customers can create a real order server-side
+- Guests still cannot place orders
+- Order status and payment status are stored separately
 - Lint and typecheck pass
-- The report lists completed work, files changed, and the next suggested task
+- The report lists completed work, files changed, and next task **79a**

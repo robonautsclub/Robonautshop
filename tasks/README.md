@@ -183,11 +183,29 @@ Do not start these until Phases 2–9 are done (unless you explicitly change str
 
 ## Phase 12 — Wire UI to backend
 
+Catalog first, then auth/access, then real orders.
+
+**Auth product rules (locked):**
+
+- Guests may use the cart; **no guest checkout**
+- On customer login, guest cart **merges** into that user’s cart
+- Customer login: `/user/login` — email/password + Google + Microsoft
+- Admin login: `/login` — **email/password only** (no Google/Microsoft)
+- Protect `/account`, `/checkout` (place order), and `/admin` server-side
+
 - [ ] 75 [Replace mock catalog with D1](phase-12-wire-up/75-replace-mock-catalog.md)
 - [ ] 76 [Seed database from faker catalog](phase-12-wire-up/76-seed-from-faker.md)
-- [ ] 77 [Wire real authentication](phase-12-wire-up/77-real-auth.md)
+- [ ] 77a [Better Auth server + D1](phase-12-wire-up/77a-better-auth-server.md)
+- [ ] 77b [Customer Google + Microsoft OAuth](phase-12-wire-up/77b-customer-social-oauth.md)
+- [ ] 77c [Replace mock auth with real sessions](phase-12-wire-up/77c-replace-mock-auth.md)
+- [ ] 77d [Split login UIs (admin `/login`, customer `/user/login`)](phase-12-wire-up/77d-split-login-uis.md)
+- [ ] 78a [Protect `/account` routes](phase-12-wire-up/78a-protect-account-routes.md)
+- [ ] 78b [Checkout login + guest cart merge](phase-12-wire-up/78b-checkout-login-cart-merge.md)
 - [ ] 78 [Server cart and order creation](phase-12-wire-up/78-real-cart-orders.md)
-- [ ] 79 [Admin route protection](phase-12-wire-up/79-admin-protection.md)
+- [ ] 79a [Admin route protection](phase-12-wire-up/79a-admin-route-protection.md)
+- [ ] 79b [Admin bootstrap (email/password only)](phase-12-wire-up/79b-admin-bootstrap.md)
+
+Superseded stubs (do not implement): [77](phase-12-wire-up/77-real-auth.md), [79](phase-12-wire-up/79-admin-protection.md).
 
 ## Phase 13 — Content
 
