@@ -2,6 +2,12 @@ import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Enables next/navigation's forbidden()/unauthorized() — used by the
+  // admin role gate (tasks/phase-12-wire-up/79a-admin-route-protection.md)
+  // and app/forbidden.tsx / app/unauthorized.tsx (tasks 98-99).
+  experimental: {
+    authInterrupts: true,
+  },
   images: {
     remotePatterns: [
       {
