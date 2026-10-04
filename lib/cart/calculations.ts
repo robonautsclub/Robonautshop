@@ -1,12 +1,36 @@
 import {
-  getAvailableQuantity,
-  getImagesForProduct,
-  getInventoryForProduct,
-  getProductById,
-  type Product,
-  type ProductVariant,
-} from "@/lib/catalog";
+  mockImages,
+  mockInventory,
+  mockProducts,
+  mockVariants,
+} from "@/lib/catalog/mock-data";
+import { getAvailableQuantity, type Product, type ProductVariant } from "@/lib/catalog/types";
 import type { CartLineInput } from "@/lib/cart/types";
+
+/**
+ * This module intentionally does NOT use `@/lib/catalog` (D1-backed as of
+ * tasks/phase-12-wire-up/75-replace-mock-catalog.md). The client-side cart
+ * (components/cart/cart-provider.tsx) needs synchronous pricing for instant
+ * UI feedback, which a real D1 query can't give it from the browser.
+ *
+ * Moving cart pricing onto real server-authoritative data is exactly what
+ * tasks/phase-12-wire-up/78-real-cart-orders.md does. Until then, this stays
+ * on the mock catalog snapshot — one isolated, clearly-labeled exception
+ * rather than silently drifting from the real catalog's prices/stock.
+ */
+function findProductById(id: string): Product | null {
+  return mockProducts.find((item) => item.id === id) ?? null;
+}
+
+function findInventoryForProduct(productId: string) {
+  return mockInventory.filter((row) => row.productId === productId);
+}
+
+function findImagesForProduct(productId: string) {
+  return mockImages
+    .filter((image) => image.productId === productId)
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+}
 
 export type ResolvedCartLine = {
   key: string;
@@ -35,21 +59,23 @@ export function cartLineKey(
 export function resolveCartLine(
   line: CartLineInput,
 ): ResolvedCartLine | null {
-  const product = getProductById(line.productId);
+  const product = findProductById(line.productId);
 
   if (!product) {
     return null;
   }
 
   const variant = line.variantId
-    ? (product.variants.find((item) => item.id === line.variantId) ?? null)
+    ? (mockVariants.find(
+        (item) => item.id === line.variantId && item.productId === product.id,
+      ) ?? null)
     : null;
 
   if (line.variantId && !variant) {
     return null;
   }
 
-  const inventoryRows = getInventoryForProduct(product.id);
+  const inventoryRows = findInventoryForProduct(product.id);
   const inventoryRow = variant
     ? (inventoryRows.find((row) => row.variantId === variant.id) ?? null)
     : (inventoryRows.find((row) => row.variantId === null) ??
@@ -62,7 +88,7 @@ export function resolveCartLine(
 
   const unitPrice = variant?.price ?? product.price;
   const quantity = Math.max(0, line.quantity);
-  const images = getImagesForProduct(product.id);
+  const images = findImagesForProduct(product.id);
   const primaryImage = images[0];
 
   return {
@@ -87,6 +113,44 @@ export function resolveCartLines(lines: CartLineInput[]): ResolvedCartLine[] {
   return lines
     .map(resolveCartLine)
     .filter((line): line is ResolvedCartLine => line !== null && line.quantity > 0);
+}
+
+/**
+ * The one guest → signed-in-user cart merge rule (AGENTS.md "Business logic
+ * should not be duplicated"): same product + variant sums quantities,
+ * otherwise the line is added as-is. Order of `userLines` first, then any
+ * guest-only lines appended, matches "merge guest into user" rather than
+ * the reverse.
+ *
+ * Pure and storage-agnostic on purpose — tasks/phase-12-wire-up/78b uses it
+ * against localStorage buckets (lib/cart/cart-identity.ts); task 78's real
+ * server cart reuses this same function against D1 rows instead of
+ * reimplementing the merge.
+ */
+export function mergeCartLines(
+  userLines: CartLineInput[],
+  guestLines: CartLineInput[],
+): CartLineInput[] {
+  const merged = [...userLines];
+
+  for (const guestLine of guestLines) {
+    const key = cartLineKey(guestLine.productId, guestLine.variantId);
+    const index = merged.findIndex(
+      (line) => cartLineKey(line.productId, line.variantId) === key,
+    );
+
+    if (index === -1) {
+      merged.push(guestLine);
+      continue;
+    }
+
+    merged[index] = {
+      ...merged[index],
+      quantity: merged[index].quantity + guestLine.quantity,
+    };
+  }
+
+  return merged;
 }
 
 /** Authoritative cart money math — use this instead of recalculating in UI. */

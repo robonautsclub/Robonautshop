@@ -1,8 +1,4 @@
-import {
-  CART_STORAGE_KEY,
-  type CartLineInput,
-  type StoredCart,
-} from "@/lib/cart/types";
+import type { CartLineInput, StoredCart } from "@/lib/cart/types";
 
 function isCartLineInput(value: unknown): value is CartLineInput {
   if (!value || typeof value !== "object") {
@@ -18,13 +14,18 @@ function isCartLineInput(value: unknown): value is CartLineInput {
   );
 }
 
-export function readStoredCart(): CartLineInput[] {
+/**
+ * `storageKey` picks which cart bucket to read/write — see
+ * lib/cart/cart-identity.ts for the guest vs. per-user keys
+ * (tasks/phase-12-wire-up/78b-checkout-login-cart-merge.md).
+ */
+export function readStoredCart(storageKey: string): CartLineInput[] {
   if (typeof window === "undefined") {
     return [];
   }
 
   try {
-    const raw = window.localStorage.getItem(CART_STORAGE_KEY);
+    const raw = window.localStorage.getItem(storageKey);
     if (!raw) {
       return [];
     }
@@ -44,7 +45,7 @@ export function readStoredCart(): CartLineInput[] {
   }
 }
 
-export function writeStoredCart(lines: CartLineInput[]): void {
+export function writeStoredCart(lines: CartLineInput[], storageKey: string): void {
   if (typeof window === "undefined") {
     return;
   }
@@ -58,5 +59,5 @@ export function writeStoredCart(lines: CartLineInput[]): void {
     })),
   };
 
-  window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(payload));
+  window.localStorage.setItem(storageKey, JSON.stringify(payload));
 }

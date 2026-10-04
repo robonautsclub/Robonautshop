@@ -15,6 +15,13 @@
       "when": 1791139171877,
       "tag": "0001_phase-11-domain-schema",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1791144877635,
+      "tag": "0002_orders-and-carts",
+      "breakpoints": true
     }
   ]
 }

@@ -1,70 +1,37 @@
-"use client";
-
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { buttonVariants } from "@/components/ui/button";
 import { formatBdt } from "@/lib/catalog";
-import { readDemoOrder } from "@/lib/checkout/demo-order-storage";
-import { PAYMENT_METHODS, type DemoOrderSnapshot } from "@/lib/checkout/types";
+import { PAYMENT_METHODS } from "@/lib/checkout/types";
+import type { OrderItemRecord, OrderRecord } from "@/lib/server-cart/order-queries";
 import { cn } from "@/lib/utils";
 
-export function OrderConfirmationContent() {
-  const [order, setOrder] = useState<DemoOrderSnapshot | null>(null);
-  const [ready, setReady] = useState(false);
+type OrderConfirmationContentProps = {
+  order: OrderRecord;
+  items: OrderItemRecord[];
+};
 
-  useEffect(() => {
-    queueMicrotask(() => {
-      setOrder(readDemoOrder());
-      setReady(true);
-    });
-  }, []);
-
-  if (!ready) {
-    return (
-      <PageContainer as="section" className="py-10">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Order confirmation
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">Loading…</p>
-      </PageContainer>
-    );
-  }
-
-  if (!order) {
-    return (
-      <PageContainer as="section" className="py-10">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Order confirmation
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          No demo order found. Place an order from checkout first.
-        </p>
-        <Link
-          href="/checkout"
-          className={cn(buttonVariants(), "mt-6 inline-flex")}
-        >
-          Go to checkout
-        </Link>
-      </PageContainer>
-    );
-  }
-
+export function OrderConfirmationContent({
+  order,
+  items,
+}: OrderConfirmationContentProps) {
   const paymentLabel =
-    PAYMENT_METHODS.find((method) => method.id === order.paymentMethod)
-      ?.label ?? order.paymentMethod;
+    PAYMENT_METHODS.find((method) => method.id === order.paymentMethod)?.label ??
+    order.paymentMethod;
 
   return (
     <PageContainer as="section" className="py-10">
       <div className="mb-8 max-w-2xl">
-        <p className="text-sm font-medium text-muted-foreground">Demo order</p>
+        <p className="text-sm font-medium text-muted-foreground">
+          Order {order.id}
+        </p>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight">
-          Thanks — your demo order is confirmed
+          Thanks — your order is confirmed
         </h1>
         <p className="mt-2 text-muted-foreground">
-          This confirmation is stored in session storage only. The cart was
-          cleared after placing the demo order. No payment was taken.
+          We’ll update the status here as it’s processed. No payment has been
+          charged yet.
         </p>
       </div>
 
@@ -74,45 +41,47 @@ export function OrderConfirmationContent() {
             <h2 className="font-semibold tracking-tight">Order details</h2>
             <dl className="mt-4 space-y-2 text-sm">
               <div className="flex justify-between gap-3">
-                <dt className="text-muted-foreground">Demo order ID</dt>
-                <dd className="font-medium">{order.demoOrderId}</dd>
+                <dt className="text-muted-foreground">Order ID</dt>
+                <dd className="font-medium">{order.id}</dd>
               </div>
               <div className="flex justify-between gap-3">
                 <dt className="text-muted-foreground">Placed at</dt>
                 <dd className="font-medium">
-                  {new Date(order.placedAt).toLocaleString()}
+                  {new Date(order.createdAt).toLocaleString()}
                 </dd>
               </div>
               <div className="flex justify-between gap-3">
+                <dt className="text-muted-foreground">Order status</dt>
+                <dd className="font-medium">{order.status}</dd>
+              </div>
+              <div className="flex justify-between gap-3">
                 <dt className="text-muted-foreground">Payment</dt>
-                <dd className="font-medium">{paymentLabel}</dd>
+                <dd className="font-medium">
+                  {paymentLabel} · {order.paymentStatus}
+                </dd>
               </div>
             </dl>
           </section>
 
           <section className="rounded-xl border p-5">
             <h2 className="font-semibold tracking-tight">Deliver to</h2>
-            <p className="mt-3 text-sm">{order.address.fullName}</p>
-            <p className="text-sm text-muted-foreground">{order.address.phone}</p>
+            <p className="mt-3 text-sm">{order.shippingFullName}</p>
+            <p className="text-sm text-muted-foreground">{order.shippingPhone}</p>
             <p className="mt-2 text-sm text-muted-foreground">
-              {order.address.addressLine1}
-              {order.address.addressLine2
-                ? `, ${order.address.addressLine2}`
-                : ""}
+              {order.shippingAddressLine1}
+              {order.shippingAddressLine2 ? `, ${order.shippingAddressLine2}` : ""}
             </p>
             <p className="text-sm text-muted-foreground">
-              {order.address.city}
-              {order.address.postalCode ? ` · ${order.address.postalCode}` : ""}
+              {order.shippingCity}
+              {order.shippingPostalCode ? ` · ${order.shippingPostalCode}` : ""}
             </p>
-            {order.location ? (
+            {order.shippingLat !== null && order.shippingLng !== null ? (
               <p className="mt-2 text-sm text-muted-foreground">
-                Map pin: {order.location.lat.toFixed(5)},{" "}
-                {order.location.lng.toFixed(5)}
+                Map pin: {order.shippingLat.toFixed(5)}, {order.shippingLng.toFixed(5)}
               </p>
             ) : null}
             <p className="mt-3 text-sm text-muted-foreground">
-              {order.shipping.method} · {formatBdt(order.shipping.amount)}{" "}
-              delivery charge
+              {formatBdt(order.shippingTotal)} delivery charge
             </p>
             {order.specialInstructions ? (
               <div className="mt-4 border-t pt-3">
@@ -128,12 +97,12 @@ export function OrderConfirmationContent() {
         <aside className="h-fit rounded-xl border p-5">
           <h2 className="font-semibold tracking-tight">Items</h2>
           <ul className="mt-4 space-y-3 text-sm">
-            {order.lines.map((line) => (
-              <li key={line.key} className="flex justify-between gap-3">
+            {items.map((item) => (
+              <li key={item.id} className="flex justify-between gap-3">
                 <span className="text-muted-foreground">
-                  {line.name} × {line.quantity}
+                  {item.productName} × {item.quantity}
                 </span>
-                <span className="font-medium">{formatBdt(line.lineTotal)}</span>
+                <span className="font-medium">{formatBdt(item.lineTotal)}</span>
               </li>
             ))}
           </ul>
@@ -144,7 +113,7 @@ export function OrderConfirmationContent() {
             </div>
             <div className="flex justify-between gap-3">
               <span className="text-muted-foreground">Delivery charge</span>
-              <span>{formatBdt(order.shipping.amount)}</span>
+              <span>{formatBdt(order.shippingTotal)}</span>
             </div>
             <div className="flex justify-between gap-3 text-base font-semibold">
               <span>Total</span>

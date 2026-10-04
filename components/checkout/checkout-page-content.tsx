@@ -13,12 +13,12 @@ import { CatalogEmptyState } from "@/components/product";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { addressSchema } from "@/lib/auth/schemas";
 import { formatBdt } from "@/lib/catalog";
-import { writeDemoOrder } from "@/lib/checkout/demo-order-storage";
 import {
   estimateShippingBdt,
   PAYMENT_METHODS,
   type PaymentMethodId,
 } from "@/lib/checkout/types";
+import { placeOrderAction } from "@/lib/server-cart/actions";
 import { cn } from "@/lib/utils";
 
 type AddressErrors = Partial<
@@ -80,7 +80,7 @@ export function CheckoutPageContent() {
     );
   }
 
-  function onPlaceOrder(event: FormEvent<HTMLFormElement>) {
+  async function onPlaceOrder(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus(null);
 
@@ -114,14 +114,12 @@ export function CheckoutPageContent() {
     }
 
     setErrors({});
+    setStatus("Placing order…");
 
-    const shippingForOrder = estimateShippingBdt(parsed.data.city);
-    const orderTotal = subtotal + shippingForOrder.amount;
-    const demoOrderId = `DEMO-${Date.now().toString(36).toUpperCase()}`;
-
-    writeDemoOrder({
-      demoOrderId,
-      placedAt: new Date().toISOString(),
+    // Prices, stock, and the shipping total are all recomputed server-side
+    // from the signed-in user's real cart — this request only carries the
+    // delivery details (AGENTS.md "Pricing": never trust the client).
+    const result = await placeOrderAction({
       address: {
         fullName: parsed.data.fullName,
         phone: parsed.data.phone,
@@ -131,25 +129,19 @@ export function CheckoutPageContent() {
         postalCode: parsed.data.postalCode || undefined,
       },
       location: pinnedLocation ?? undefined,
-      shipping: shippingForOrder,
       paymentMethod,
       specialInstructions: specialInstructions.trim() || undefined,
-      lines: resolvedLines.map((line) => ({
-        key: line.key,
-        name: line.name,
-        quantity: line.quantity,
-        unitPrice: line.unitPrice,
-        lineTotal: line.lineTotal,
-      })),
-      subtotal,
-      total: orderTotal,
     });
 
-    // Demo rule: clear the cart after placing a demo order so the storefront
-    // feels complete. Nothing is persisted to a real orders database.
+    if (!result.ok) {
+      setErrors({ form: result.error });
+      setStatus(null);
+      return;
+    }
+
     clearCart();
-    setStatus("Demo order placed. Redirecting…");
-    router.push("/checkout/confirmation");
+    setStatus("Order placed. Redirecting…");
+    router.push(`/checkout/confirmation?orderId=${result.orderId}`);
   }
 
   return (
@@ -157,7 +149,8 @@ export function CheckoutPageContent() {
       <div className="mb-8">
         <h1 className="text-3xl font-semibold tracking-tight">Checkout</h1>
         <p className="mt-2 text-muted-foreground">
-          Demo checkout only — no payment is charged and no real order is saved.
+          Your order is saved for real. No payment is charged yet — payment
+          provider integration is a later phase.
         </p>
       </div>
 
@@ -416,8 +409,14 @@ export function CheckoutPageContent() {
             </div>
           </div>
 
+          {errors.form ? (
+            <p className="text-sm text-destructive" role="alert">
+              {errors.form}
+            </p>
+          ) : null}
+
           <Button type="submit" className="w-full">
-            Place order (demo)
+            Place order
           </Button>
           <Link
             href="/cart"

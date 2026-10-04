@@ -26,7 +26,7 @@ export function AccountAddressesContent() {
       <PageContainer as="section" className="py-10">
         <h1 className="text-3xl font-semibold tracking-tight">Addresses</h1>
         <p className="mt-2 text-muted-foreground">Not signed in.</p>
-        <Link href="/login" className={cn(buttonVariants(), "mt-6 inline-flex")}>
+        <Link href="/user/login" className={cn(buttonVariants(), "mt-6 inline-flex")}>
           Sign in
         </Link>
       </PageContainer>

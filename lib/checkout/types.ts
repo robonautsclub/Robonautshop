@@ -62,35 +62,3 @@ export function estimateShippingBdt(city: string): ShippingEstimate {
   };
 }
 
-export type DemoOrderLine = {
-  key: string;
-  name: string;
-  quantity: number;
-  unitPrice: number;
-  lineTotal: number;
-};
-
-export type DemoOrderSnapshot = {
-  demoOrderId: string;
-  placedAt: string;
-  address: {
-    fullName: string;
-    phone: string;
-    addressLine1: string;
-    addressLine2?: string;
-    city: string;
-    postalCode?: string;
-  };
-  location?: {
-    lat: number;
-    lng: number;
-  };
-  shipping: ShippingEstimate;
-  paymentMethod: PaymentMethodId;
-  specialInstructions?: string;
-  lines: DemoOrderLine[];
-  subtotal: number;
-  total: number;
-};
-
-export const DEMO_ORDER_STORAGE_KEY = "robonautshop.demo-order.v1";
