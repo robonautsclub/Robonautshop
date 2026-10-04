@@ -3,9 +3,9 @@
  * Derived from mock catalog inventory + demo orders — not live accounting.
  */
 
-import { listAdminInventory } from "@/lib/admin/catalog";
+import { listAdminInventory, listAdminProducts } from "@/lib/admin/catalog";
 import { listAdminOrders } from "@/lib/admin/mock-orders";
-import { getProductById } from "@/lib/catalog";
+import type { Database } from "@/lib/db";
 
 export type AdminFinanceSummary = {
   stockValueBdt: number;
@@ -27,14 +27,21 @@ function isCashOnDelivery(method: string) {
   );
 }
 
-export function getAdminFinanceSummary(): AdminFinanceSummary {
-  const inventory = listAdminInventory();
+export async function getAdminFinanceSummary(
+  db: Database,
+): Promise<AdminFinanceSummary> {
+  const [inventory, productRows] = await Promise.all([
+    listAdminInventory(db),
+    listAdminProducts(db),
+  ]);
+  const priceByProductId = new Map(
+    productRows.map((product) => [product.id, product.price]),
+  );
   let stockValueBdt = 0;
   let stockUnits = 0;
 
   for (const row of inventory) {
-    const product = getProductById(row.productId);
-    const unitPrice = product?.price ?? 0;
+    const unitPrice = priceByProductId.get(row.productId) ?? 0;
     stockUnits += row.stockQuantity;
     stockValueBdt += row.stockQuantity * unitPrice;
   }

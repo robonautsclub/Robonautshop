@@ -12,20 +12,29 @@ import { buttonVariants } from "@/components/ui/button";
 import {
   getCategories,
   getKits,
+  getProductCardModels,
   getProducts,
   getProjects,
-  toProductCardModel,
 } from "@/lib/catalog";
+import { getRequestDb } from "@/lib/db/request";
 import { cn } from "@/lib/utils";
 
-export default function HomePage() {
-  const featuredProducts = getProducts({ featured: true, sort: "name-asc" }).slice(
-    0,
-    6,
+export default async function HomePage() {
+  const db = await getRequestDb();
+  const featuredProductsRaw = await getProducts(db, {
+    featured: true,
+    sort: "name-asc",
+  });
+  const featuredProducts = await getProductCardModels(
+    db,
+    featuredProductsRaw.slice(0, 6),
   );
-  const categories = getCategories().slice(0, 6);
-  const featuredKits = getKits({ featured: true }).slice(0, 2);
-  const featuredProjects = getProjects({ featured: true }).slice(0, 2);
+  const categoriesAll = await getCategories(db);
+  const categories = categoriesAll.slice(0, 6);
+  const featuredKitsAll = await getKits(db, { featured: true });
+  const featuredKits = featuredKitsAll.slice(0, 2);
+  const featuredProjectsAll = await getProjects(db, { featured: true });
+  const featuredProjects = featuredProjectsAll.slice(0, 2);
 
   return (
     <div>
@@ -89,18 +98,15 @@ export default function HomePage() {
           />
         ) : (
           <ProductGrid>
-            {featuredProducts.map((product) => {
-              const card = toProductCardModel(product);
-              return (
-                <ProductCard
-                  key={product.id}
-                  product={card.product}
-                  imageUrl={card.imageUrl}
-                  imageAlt={card.imageAlt}
-                  availableQuantity={card.availableQuantity}
-                />
-              );
-            })}
+            {featuredProducts.map((card) => (
+              <ProductCard
+                key={card.product.id}
+                product={card.product}
+                imageUrl={card.imageUrl}
+                imageAlt={card.imageAlt}
+                availableQuantity={card.availableQuantity}
+              />
+            ))}
           </ProductGrid>
         )}
       </PageContainer>

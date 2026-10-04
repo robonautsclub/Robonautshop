@@ -1,9 +1,9 @@
 /**
  * Public catalog module.
  *
- * Prefer importing helpers from here in app code.
- * Implementation currently uses seeded Faker mock data and will later
- * call D1/API without changing these export names where possible.
+ * Prefer importing helpers from here in app code. Implementation reads from
+ * D1 via Drizzle (lib/catalog/queries.ts) — every function takes a
+ * `db: Database` first argument (see `getRequestDb()` in lib/db/request.ts).
  */
 
 export type {
@@ -39,14 +39,17 @@ export {
   getInventoryForSku,
   getKitBySlug,
   getKitComponents,
+  getKitComponentsForKits,
   getKitLinkedProject,
   getKitRequirementLines,
   getKits,
   getProductById,
   getProductBySlug,
+  getProductCardModels,
   getProducts,
   getProjectBySlug,
   getProjectComponents,
+  getProjectComponentsForProjects,
   getProjectLinkedKit,
   getProjectRequirementLines,
   getProjects,
@@ -54,5 +57,4 @@ export {
   getVariantsForProduct,
   searchProducts,
   sumRequirementLineTotals,
-  toProductCardModel,
 } from "@/lib/catalog/queries";

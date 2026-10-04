@@ -26,7 +26,8 @@ import {
   AdminTh,
 } from "@/components/admin/admin-table";
 import { Button } from "@/components/ui/button";
-import { formatBdt, getKitComponents, type Kit, type ProductStatus } from "@/lib/catalog";
+import type { AdminProductOption } from "@/lib/admin";
+import { formatBdt, type Kit, type KitComponent, type ProductStatus } from "@/lib/catalog";
 
 function statusTone(status: ProductStatus) {
   if (status === "PUBLISHED") return "success" as const;
@@ -34,7 +35,18 @@ function statusTone(status: ProductStatus) {
   return "neutral" as const;
 }
 
-export function AdminKitsShell({ kits: initialKits }: { kits: Kit[] }) {
+type AdminKitsShellProps = {
+  kits: Kit[];
+  /** All kit components across every kit — filtered per kit when a BOM dialog opens. */
+  kitComponents: KitComponent[];
+  productOptions: AdminProductOption[];
+};
+
+export function AdminKitsShell({
+  kits: initialKits,
+  kitComponents,
+  productOptions,
+}: AdminKitsShellProps) {
   const [rows, setRows] = useState(initialKits);
   const [editing, setEditing] = useState<Kit | null>(null);
   const [showCreate, setShowCreate] = useState(false);
@@ -50,7 +62,9 @@ export function AdminKitsShell({ kits: initialKits }: { kits: Kit[] }) {
   }
 
   function openEdit(kit: Kit) {
-    const components = getKitComponents(kit.id);
+    const components = kitComponents.filter(
+      (component) => component.kitId === kit.id,
+    );
     setBom(
       components.map((component) => ({
         productId: component.productId,
@@ -213,6 +227,7 @@ export function AdminKitsShell({ kits: initialKits }: { kits: Kit[] }) {
         <AdminBomEditor
           lines={bom}
           onChange={setBom}
+          products={productOptions}
           title="Kit BOM (from stock products)"
           emptyLabel="Kit box is empty. Search a product from stock and add it."
           searchInputId="kit-product-search"

@@ -12,24 +12,21 @@ import {
   getProjectBySlug,
   getProjectLinkedKit,
   getProjectRequirementLines,
-  getProjects,
   sumRequirementLineTotals,
 } from "@/lib/catalog";
+import { getRequestDb } from "@/lib/db/request";
 import { cn } from "@/lib/utils";
 
 type ProjectDetailPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export async function generateStaticParams() {
-  return getProjects().map((project) => ({ slug: project.slug }));
-}
-
 export async function generateMetadata({
   params,
 }: ProjectDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const db = await getRequestDb();
+  const project = await getProjectBySlug(db, slug);
 
   if (!project) {
     return { title: "Project not found" };
@@ -45,17 +42,18 @@ export default async function ProjectDetailPage({
   params,
 }: ProjectDetailPageProps) {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const db = await getRequestDb();
+  const project = await getProjectBySlug(db, slug);
 
   if (!project) {
     notFound();
   }
 
-  const lines = getProjectRequirementLines(project.id);
+  const lines = await getProjectRequirementLines(db, project.id);
   const requiredLines = lines.filter((line) => !line.optional);
   const optionalLines = lines.filter((line) => line.optional);
   const requiredTotal = sumRequirementLineTotals(requiredLines);
-  const linkedKit = getProjectLinkedKit(project.id);
+  const linkedKit = await getProjectLinkedKit(db, project.id);
 
   return (
     <PageContainer as="section" className="py-10">

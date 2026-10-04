@@ -11,10 +11,12 @@ import {
 import { buttonVariants } from "@/components/ui/button";
 import { getAdminFinanceSummary, listAdminOrders } from "@/lib/admin";
 import { formatBdt } from "@/lib/catalog";
+import { getRequestDb } from "@/lib/db/request";
 import { cn } from "@/lib/utils";
 
-export function AdminFinancesContent() {
-  const finance = getAdminFinanceSummary();
+export async function AdminFinancesContent() {
+  const db = await getRequestDb();
+  const finance = await getAdminFinanceSummary(db);
   const orders = listAdminOrders();
 
   const codPending = orders.filter(

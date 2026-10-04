@@ -26,9 +26,10 @@ import {
   AdminTh,
 } from "@/components/admin/admin-table";
 import { Button } from "@/components/ui/button";
+import type { AdminProductOption } from "@/lib/admin";
 import {
-  getProjectComponents,
   type ProductStatus,
+  type ProjectComponent,
   type ProjectSkillLevel,
   type RobotProject,
 } from "@/lib/catalog";
@@ -46,11 +47,18 @@ const SKILL_LEVELS: ProjectSkillLevel[] = [
   "COMPETITION",
 ];
 
+type AdminProjectsShellProps = {
+  projects: RobotProject[];
+  /** All project components across every project — filtered per project when a BOM dialog opens. */
+  projectComponents: ProjectComponent[];
+  productOptions: AdminProductOption[];
+};
+
 export function AdminProjectsShell({
   projects: initialProjects,
-}: {
-  projects: RobotProject[];
-}) {
+  projectComponents,
+  productOptions,
+}: AdminProjectsShellProps) {
   const [rows, setRows] = useState(initialProjects);
   const [editing, setEditing] = useState<RobotProject | null>(null);
   const [showCreate, setShowCreate] = useState(false);
@@ -66,7 +74,9 @@ export function AdminProjectsShell({
   }
 
   function openEdit(project: RobotProject) {
-    const components = getProjectComponents(project.id);
+    const components = projectComponents.filter(
+      (component) => component.projectId === project.id,
+    );
     setBom(
       components.map((component) => ({
         productId: component.productId,
@@ -253,6 +263,7 @@ export function AdminProjectsShell({
         <AdminBomEditor
           lines={bom}
           onChange={setBom}
+          products={productOptions}
           title="Project components (from stock products)"
           emptyLabel="Project box is empty. Search a product from stock and add it."
           searchInputId="project-product-search"

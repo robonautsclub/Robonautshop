@@ -18,6 +18,7 @@ import {
   listAdminOrders,
 } from "@/lib/admin";
 import { formatBdt } from "@/lib/catalog";
+import { getRequestDb } from "@/lib/db/request";
 import { cn } from "@/lib/utils";
 
 function orderTone(status: string) {
@@ -27,13 +28,17 @@ function orderTone(status: string) {
   return "neutral" as const;
 }
 
-export function AdminDashboardContent() {
-  const stats = getAdminDashboardStats();
-  const finance = getAdminFinanceSummary();
+export async function AdminDashboardContent() {
+  const db = await getRequestDb();
+  const [stats, finance, inventoryRows] = await Promise.all([
+    getAdminDashboardStats(db),
+    getAdminFinanceSummary(db),
+    listAdminInventory(db),
+  ]);
   const orders = listAdminOrders();
   const customers = listAdminCustomers();
   const recentOrders = orders.slice(0, 5);
-  const lowStockRows = listAdminInventory()
+  const lowStockRows = inventoryRows
     .filter((row) => row.availableQuantity <= row.lowStockThreshold)
     .slice(0, 5);
 

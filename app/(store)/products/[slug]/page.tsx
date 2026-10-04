@@ -12,24 +12,21 @@ import {
 import { ProductPurchasePanel } from "@/components/product/product-purchase-panel";
 import {
   getProductBySlug,
-  getProducts,
+  getProductCardModels,
   getRelatedProducts,
-  toProductCardModel,
 } from "@/lib/catalog";
+import { getRequestDb } from "@/lib/db/request";
 
 type ProductDetailPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export async function generateStaticParams() {
-  return getProducts().map((product) => ({ slug: product.slug }));
-}
-
 export async function generateMetadata({
   params,
 }: ProductDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const db = await getRequestDb();
+  const product = await getProductBySlug(db, slug);
 
   if (!product) {
     return { title: "Product not found" };
@@ -45,13 +42,15 @@ export default async function ProductDetailPage({
   params,
 }: ProductDetailPageProps) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const db = await getRequestDb();
+  const product = await getProductBySlug(db, slug);
 
   if (!product) {
     notFound();
   }
 
-  const related = getRelatedProducts(product.slug, 4);
+  const related = await getRelatedProducts(db, product.slug, 4);
+  const relatedCards = await getProductCardModels(db, related);
   const primaryImage = product.images[0];
   const specificationEntries = Object.entries(product.specifications);
 
@@ -162,7 +161,7 @@ export default async function ProductDetailPage({
           More parts from the same category.
         </p>
         <div className="mt-6">
-          {related.length === 0 ? (
+          {relatedCards.length === 0 ? (
             <CatalogEmptyState
               title="No related products"
               description="Browse the catalog for more components."
@@ -171,18 +170,15 @@ export default async function ProductDetailPage({
             />
           ) : (
             <ProductGrid>
-              {related.map((item) => {
-                const card = toProductCardModel(item);
-                return (
-                  <ProductCard
-                    key={item.id}
-                    product={card.product}
-                    imageUrl={card.imageUrl}
-                    imageAlt={card.imageAlt}
-                    availableQuantity={card.availableQuantity}
-                  />
-                );
-              })}
+              {relatedCards.map((card) => (
+                <ProductCard
+                  key={card.product.id}
+                  product={card.product}
+                  imageUrl={card.imageUrl}
+                  imageAlt={card.imageAlt}
+                  availableQuantity={card.availableQuantity}
+                />
+              ))}
             </ProductGrid>
           )}
         </div>

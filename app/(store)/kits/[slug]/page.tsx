@@ -13,23 +13,20 @@ import {
   getKitBySlug,
   getKitLinkedProject,
   getKitRequirementLines,
-  getKits,
 } from "@/lib/catalog";
+import { getRequestDb } from "@/lib/db/request";
 import { cn } from "@/lib/utils";
 
 type KitDetailPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export async function generateStaticParams() {
-  return getKits().map((kit) => ({ slug: kit.slug }));
-}
-
 export async function generateMetadata({
   params,
 }: KitDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const kit = getKitBySlug(slug);
+  const db = await getRequestDb();
+  const kit = await getKitBySlug(db, slug);
 
   if (!kit) {
     return { title: "Kit not found" };
@@ -43,14 +40,15 @@ export async function generateMetadata({
 
 export default async function KitDetailPage({ params }: KitDetailPageProps) {
   const { slug } = await params;
-  const kit = getKitBySlug(slug);
+  const db = await getRequestDb();
+  const kit = await getKitBySlug(db, slug);
 
   if (!kit) {
     notFound();
   }
 
-  const lines = getKitRequirementLines(kit.id);
-  const linkedProject = getKitLinkedProject(kit);
+  const lines = await getKitRequirementLines(db, kit.id);
+  const linkedProject = await getKitLinkedProject(db, kit);
 
   return (
     <PageContainer as="section" className="py-10">

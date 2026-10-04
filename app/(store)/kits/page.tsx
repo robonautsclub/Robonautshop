@@ -6,13 +6,15 @@ import { PageContainer } from "@/components/layout/page-container";
 import { CatalogEmptyState } from "@/components/product";
 import { PriceDisplay } from "@/components/product/price-display";
 import { getKits } from "@/lib/catalog";
+import { getRequestDb } from "@/lib/db/request";
 
 export const metadata: Metadata = {
   title: "Kits",
 };
 
-export default function KitsPage() {
-  const kits = getKits();
+export default async function KitsPage() {
+  const db = await getRequestDb();
+  const kits = await getKits(db);
 
   return (
     <PageContainer as="section" className="py-10">

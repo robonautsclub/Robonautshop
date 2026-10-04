@@ -16,7 +16,6 @@ import {
 } from "@/lib/builder/pricing";
 import {
   formatBdt,
-  getImagesForProduct,
   type Kit,
   type RequirementLine,
   type RobotProject,
@@ -145,7 +144,6 @@ export function BuilderWorkspace({
               : line.product.name;
             const selected = selectedIds.has(line.id);
             const enoughStock = line.availableQuantity >= line.quantity;
-            const image = getImagesForProduct(line.product.id)[0];
 
             return (
               <li key={line.id} className="flex gap-3 p-4">
@@ -157,10 +155,10 @@ export function BuilderWorkspace({
                   className="mt-1 size-4 rounded border"
                 />
                 <div className="relative size-16 shrink-0 overflow-hidden rounded-lg border bg-muted">
-                  {image ? (
+                  {line.imageUrl ? (
                     <Image
-                      src={image.url}
-                      alt={image.alt}
+                      src={line.imageUrl}
+                      alt={line.imageAlt}
                       fill
                       sizes="64px"
                       className="object-cover"

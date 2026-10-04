@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { BuilderEntry } from "@/components/builder/builder-entry";
 import { getProjects, type ProjectSkillLevel } from "@/lib/catalog";
+import { getRequestDb } from "@/lib/db/request";
 
 export const metadata: Metadata = {
   title: "Robot Builder",
@@ -33,10 +34,11 @@ type BuilderPageProps = {
 export default async function BuilderPage({ searchParams }: BuilderPageProps) {
   const params = await searchParams;
   const activeSkill = parseSkill(params.skill);
+  const db = await getRequestDb();
   const projects =
     activeSkill === "ALL"
-      ? getProjects()
-      : getProjects({ skillLevel: activeSkill });
+      ? await getProjects(db)
+      : await getProjects(db, { skillLevel: activeSkill });
 
   return <BuilderEntry projects={projects} activeSkill={activeSkill} />;
 }

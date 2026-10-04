@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AdminDeleteTrigger } from "@/components/admin/admin-confirm-delete-dialog";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
@@ -22,14 +22,13 @@ import {
   bookOrderLines,
   ensureDemoOrderBookings,
   isOrderBooked,
-  listAdminProducts,
   releaseOrderBooking,
   subscribeBookingStore,
   type AdminOrder,
   type AdminOrderStatus,
   type AdminPaymentStatus,
 } from "@/lib/admin";
-import { formatBdt } from "@/lib/catalog";
+import { formatBdt, type Product } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 
 function orderTone(status: AdminOrderStatus) {
@@ -45,8 +44,13 @@ function paymentTone(status: AdminPaymentStatus) {
   return "warning" as const;
 }
 
-export function AdminOrdersShell({ orders }: { orders: AdminOrder[] }) {
-  const products = useMemo(() => listAdminProducts(), []);
+export function AdminOrdersShell({
+  orders,
+  products,
+}: {
+  orders: AdminOrder[];
+  products: Product[];
+}) {
   const [localOrders, setLocalOrders] = useState(orders);
   const [, setTick] = useState(0);
   const [message, setMessage] = useState<string | null>(null);

@@ -6,13 +6,15 @@ import { SkillLevelBadge } from "@/components/catalog/skill-level-badge";
 import { PageContainer } from "@/components/layout/page-container";
 import { CatalogEmptyState } from "@/components/product";
 import { getProjects } from "@/lib/catalog";
+import { getRequestDb } from "@/lib/db/request";
 
 export const metadata: Metadata = {
   title: "Projects",
 };
 
-export default function ProjectsPage() {
-  const projects = getProjects();
+export default async function ProjectsPage() {
+  const db = await getRequestDb();
+  const projects = await getProjects(db);
 
   return (
     <PageContainer as="section" className="py-10">
@@ -43,7 +45,7 @@ export default function ProjectsPage() {
                   alt={project.imageAlt}
                   className="transition-transform duration-300 group-hover:scale-[1.02]"
                 />
-                <div className="flex flex-1 flex-col p-5">
+                <div className="flex flex-1 flex-col gap-2 p-5">
                   <div className="flex items-start justify-between gap-3">
                     <h2 className="text-lg font-medium tracking-tight">
                       {project.name}

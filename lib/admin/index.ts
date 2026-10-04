@@ -11,9 +11,11 @@ export {
   listAdminCategories,
   listAdminInventory,
   listAdminKits,
+  listAdminProductOptions,
   listAdminProducts,
   listAdminProjects,
   type AdminInventoryRow,
+  type AdminProductOption,
 } from "@/lib/admin/catalog";
 export {
   getAdminOrderById,

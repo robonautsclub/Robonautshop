@@ -4,13 +4,20 @@ import Link from "next/link";
 import { PageContainer } from "@/components/layout/page-container";
 import { CatalogEmptyState } from "@/components/product";
 import { getCategories, getProducts } from "@/lib/catalog";
+import { getRequestDb } from "@/lib/db/request";
 
 export const metadata: Metadata = {
   title: "Categories",
 };
 
-export default function CategoriesPage() {
-  const categories = getCategories();
+export default async function CategoriesPage() {
+  const db = await getRequestDb();
+  const categories = await getCategories(db);
+  const counts = await Promise.all(
+    categories.map((category) =>
+      getProducts(db, { categorySlug: category.slug }).then((products) => products.length),
+    ),
+  );
 
   return (
     <PageContainer as="section" className="py-10">
@@ -30,8 +37,8 @@ export default function CategoriesPage() {
         />
       ) : (
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {categories.map((category) => {
-            const count = getProducts({ categorySlug: category.slug }).length;
+          {categories.map((category, index) => {
+            const count = counts[index];
             return (
               <li key={category.id}>
                 <Link

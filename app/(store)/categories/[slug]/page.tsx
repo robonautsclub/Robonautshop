@@ -9,25 +9,22 @@ import {
   ProductGrid,
 } from "@/components/product";
 import {
-  getCategories,
   getCategoryBySlug,
+  getProductCardModels,
   getProducts,
-  toProductCardModel,
 } from "@/lib/catalog";
+import { getRequestDb } from "@/lib/db/request";
 
 type CategoryPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export async function generateStaticParams() {
-  return getCategories().map((category) => ({ slug: category.slug }));
-}
-
 export async function generateMetadata({
   params,
 }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const category = getCategoryBySlug(slug);
+  const db = await getRequestDb();
+  const category = await getCategoryBySlug(db, slug);
 
   if (!category) {
     return { title: "Category not found" };
@@ -41,16 +38,18 @@ export async function generateMetadata({
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
-  const category = getCategoryBySlug(slug);
+  const db = await getRequestDb();
+  const category = await getCategoryBySlug(db, slug);
 
   if (!category) {
     notFound();
   }
 
-  const products = getProducts({
+  const products = await getProducts(db, {
     categorySlug: category.slug,
     sort: "name-asc",
   });
+  const cards = await getProductCardModels(db, products);
 
   return (
     <PageContainer as="section" className="py-10">
@@ -77,7 +76,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         ) : null}
       </div>
 
-      {products.length === 0 ? (
+      {cards.length === 0 ? (
         <CatalogEmptyState
           title="No products in this category"
           description="Try another category or browse the full catalog."
@@ -86,18 +85,15 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         />
       ) : (
         <ProductGrid>
-          {products.map((product) => {
-            const card = toProductCardModel(product);
-            return (
-              <ProductCard
-                key={product.id}
-                product={card.product}
-                imageUrl={card.imageUrl}
-                imageAlt={card.imageAlt}
-                availableQuantity={card.availableQuantity}
-              />
-            );
-          })}
+          {cards.map((card) => (
+            <ProductCard
+              key={card.product.id}
+              product={card.product}
+              imageUrl={card.imageUrl}
+              imageAlt={card.imageAlt}
+              availableQuantity={card.availableQuantity}
+            />
+          ))}
         </ProductGrid>
       )}
     </PageContainer>

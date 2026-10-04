@@ -7,8 +7,8 @@ import { useMemo, useState } from "react";
 import { AdminDeleteTrigger } from "@/components/admin/admin-confirm-delete-dialog";
 import { fieldClassName } from "@/components/admin/admin-form-dialog";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { listAdminProducts } from "@/lib/admin";
-import { formatBdt, getImagesForProduct, type Product } from "@/lib/catalog";
+import type { AdminProductOption } from "@/lib/admin";
+import { formatBdt } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 
 export type AdminBomLine = {
@@ -19,23 +19,21 @@ export type AdminBomLine = {
 type AdminBomEditorProps = {
   lines: AdminBomLine[];
   onChange: (lines: AdminBomLine[]) => void;
+  /** Stock products available to add, with price + primary image already resolved server-side. */
+  products: AdminProductOption[];
   title?: string;
   emptyLabel?: string;
   searchInputId?: string;
 };
 
-function productThumb(product: Product) {
-  return getImagesForProduct(product.id)[0] ?? null;
-}
-
 export function AdminBomEditor({
   lines,
   onChange,
+  products: allProducts,
   title = "Components (from stock products)",
   emptyLabel = "Box is empty. Search a product from stock and add it.",
   searchInputId = "admin-bom-product-search",
 }: AdminBomEditorProps) {
-  const allProducts = useMemo(() => listAdminProducts(), []);
   const [productQuery, setProductQuery] = useState("");
 
   const productById = useMemo(
@@ -99,17 +97,16 @@ export function AdminBomEditor({
         {searchHits.length > 0 ? (
           <ul className="overflow-hidden rounded-lg border">
             {searchHits.map((product) => {
-              const image = productThumb(product);
               return (
                 <li
                   key={product.id}
                   className="flex items-center gap-3 border-b px-3 py-2 last:border-b-0"
                 >
                   <div className="relative size-10 overflow-hidden rounded-md bg-muted">
-                    {image ? (
+                    {product.imageUrl ? (
                       <Image
-                        src={image.url}
-                        alt={image.alt}
+                        src={product.imageUrl}
+                        alt={product.imageAlt}
                         fill
                         className="object-cover"
                         sizes="40px"
@@ -146,17 +143,16 @@ export function AdminBomEditor({
           {lines.map((line) => {
             const product = productById.get(line.productId);
             if (!product) return null;
-            const image = productThumb(product);
             return (
               <li
                 key={line.productId}
                 className="flex flex-wrap items-center gap-3 rounded-lg border p-3"
               >
                 <div className="relative size-12 overflow-hidden rounded-md bg-muted">
-                  {image ? (
+                  {product.imageUrl ? (
                     <Image
-                      src={image.url}
-                      alt={image.alt}
+                      src={product.imageUrl}
+                      alt={product.imageAlt}
                       fill
                       className="object-cover"
                       sizes="48px"

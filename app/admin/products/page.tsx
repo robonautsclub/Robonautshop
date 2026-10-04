@@ -1,16 +1,21 @@
 import { AdminProductsShell } from "@/components/admin/admin-products-shell";
-import {
-  getAdminCategoryName,
-  listAdminCategories,
-  listAdminProducts,
-} from "@/lib/admin";
+import { listAdminCategories, listAdminProducts } from "@/lib/admin";
+import { getRequestDb } from "@/lib/db/request";
 
-export default function AdminProductsPage() {
-  const products = listAdminProducts().map((product) => ({
+export default async function AdminProductsPage() {
+  const db = await getRequestDb();
+  const [productRows, categoryRows] = await Promise.all([
+    listAdminProducts(db),
+    listAdminCategories(db),
+  ]);
+  const categoryNameById = new Map(
+    categoryRows.map((category) => [category.id, category.name]),
+  );
+  const products = productRows.map((product) => ({
     ...product,
-    categoryName: getAdminCategoryName(product.categoryId),
+    categoryName: categoryNameById.get(product.categoryId) ?? "Unknown",
   }));
-  const categories = listAdminCategories().map((category) => ({
+  const categories = categoryRows.map((category) => ({
     id: category.id,
     name: category.name,
   }));

@@ -11,11 +11,8 @@ import {
   parseProductSort,
   ProductToolbar,
 } from "@/components/product/product-toolbar";
-import {
-  getCategories,
-  getProducts,
-  toProductCardModel,
-} from "@/lib/catalog";
+import { getCategories, getProductCardModels, getProducts } from "@/lib/catalog";
+import { getRequestDb } from "@/lib/db/request";
 
 export const metadata: Metadata = {
   title: "Products",
@@ -36,14 +33,16 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const category = params.category?.trim() ?? "";
   const inStock = params.inStock === "1" || params.inStock === "true";
   const sort = parseProductSort(params.sort);
-  const categories = getCategories();
 
-  const products = getProducts({
+  const db = await getRequestDb();
+  const categories = await getCategories(db);
+  const products = await getProducts(db, {
     query: q || undefined,
     categorySlug: category || undefined,
     inStock: inStock || undefined,
     sort,
   });
+  const cards = await getProductCardModels(db, products);
 
   const hasFilters = Boolean(q || category || inStock || sort !== "newest");
 
@@ -74,7 +73,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       </div>
 
       <div className="mt-6">
-        {products.length === 0 ? (
+        {cards.length === 0 ? (
           <CatalogEmptyState
             title="No products found"
             description="Try changing your search, removing a filter, or browsing another category."
@@ -83,18 +82,15 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           />
         ) : (
           <ProductGrid>
-            {products.map((product) => {
-              const card = toProductCardModel(product);
-              return (
-                <ProductCard
-                  key={product.id}
-                  product={card.product}
-                  imageUrl={card.imageUrl}
-                  imageAlt={card.imageAlt}
-                  availableQuantity={card.availableQuantity}
-                />
-              );
-            })}
+            {cards.map((card) => (
+              <ProductCard
+                key={card.product.id}
+                product={card.product}
+                imageUrl={card.imageUrl}
+                imageAlt={card.imageAlt}
+                availableQuantity={card.availableQuantity}
+              />
+            ))}
           </ProductGrid>
         )}
       </div>
