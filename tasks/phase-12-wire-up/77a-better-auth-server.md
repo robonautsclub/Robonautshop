@@ -1,6 +1,6 @@
 # Task 77a — Better Auth server + D1 adapter
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

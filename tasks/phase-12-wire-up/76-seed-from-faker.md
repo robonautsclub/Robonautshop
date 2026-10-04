@@ -1,6 +1,6 @@
 # Task 76 — Seed database from faker catalog
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

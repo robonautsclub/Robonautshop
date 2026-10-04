@@ -1,6 +1,6 @@
 # Task 79b — Admin bootstrap (email/password only)
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

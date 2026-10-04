@@ -1,6 +1,6 @@
 # Robonautshop
 
-Robotics parts, kits, and project guides for builders in Bangladesh. The catalog, cart, accounts, and checkout are not built yet.
+Robotics parts, kits, and project guides for builders in Bangladesh. Catalog, cart, auth, checkout, and orders are wired to a real Cloudflare D1 database — payments are not integrated yet, and the admin dashboard is still UI shells over real catalog data (see "Admin" below).
 
 ## Run locally
 
@@ -18,7 +18,7 @@ pnpm lint
 pnpm typecheck
 ```
 
-Copy `.env.example` to `.env.local` when a later task needs secrets. Do not commit `.env.local`.
+Copy `.env.example` to `.env` and fill in `BETTER_AUTH_SECRET`/`BETTER_AUTH_URL` before running auth-dependent features locally. Do not commit `.env` or `.env.local`.
 
 ## Cloudflare deployment
 
@@ -35,20 +35,38 @@ Config lives in `wrangler.jsonc` (Worker name, compatibility date/flags, static 
 
 Local `next dev` also gets local versions of these bindings (D1, R2, ...), via `initOpenNextCloudflareForDev()` in `next.config.ts` — no extra setup needed.
 
+Every storefront and admin page reads from D1 at request time, so these routes render dynamically (`export const dynamic = "force-dynamic"` on the `(store)` and `admin` layouts) rather than being statically prerendered at build time — D1 bindings aren't available during `next build`.
+
 ### Database (D1 + Drizzle)
 
-- Schema: `lib/db/schema/` — one file per table (`users.ts`, `categories.ts`, `products.ts`, `product-variants.ts`, `inventory.ts`, `product-images.ts`, `robot-projects.ts`, `project-components.ts`, `kits.ts`, `kit-components.ts`, plus the infra-only `health.ts`), re-exported from `index.ts`. These mirror the frontend types in `lib/catalog/types.ts` — see that file's comments for the exact shapes.
-- Client: `createDb(d1)` in `lib/db/index.ts`, called with `env.DB` inside a request.
-- The `users`/`sessions`/`accounts`/`verifications` tables match what Better Auth needs, plus a `role` (`CUSTOMER` | `ADMIN`) column — see the comment at the top of `lib/db/schema/users.ts`. Wiring Better Auth to actually use D1 is `tasks/phase-12-wire-up/77-real-auth.md`, not done yet.
-- Nothing reads from or writes to these tables yet outside the `/api/health/db` smoke check — the storefront and admin UI still run on the Faker mock catalog (`lib/catalog/mock-data.ts`). Swapping that over is `tasks/phase-12-wire-up/75-replace-mock-catalog.md`.
+- Schema: `lib/db/schema/` — one file per table (`users`, `categories`, `products`, `product-variants`, `inventory`, `product-images`, `robot-projects`, `project-components`, `kits`, `kit-components`, `cart-items`, `orders`, `order-items`, plus the infra-only `health`), re-exported from `index.ts`. The catalog tables mirror the frontend types in `lib/catalog/types.ts`.
+- Client: `createDb(d1)` in `lib/db/index.ts`; `getRequestDb()` in `lib/db/request.ts` is the one place server code (Server Components, Server Actions) gets a request-bound instance.
+- `lib/catalog/queries.ts` is the one D1-backed catalog read layer — storefront pages and the admin dashboard both go through it (`lib/admin/catalog.ts` wraps it for admin-only views that include DRAFT/ARCHIVED rows).
 
 ```bash
-pnpm db:generate         # diff lib/db/schema.ts and write a new SQL file into migrations/
+pnpm db:generate         # diff lib/db/schema/ and write a new SQL file into migrations/
 pnpm db:migrate:local    # apply pending migrations to the local D1 database
 pnpm db:migrate:remote   # apply pending migrations to the real, deployed D1 database
+pnpm db:seed:local       # regenerate + apply the Faker catalog as dev seed data (local D1)
+pnpm db:seed:remote      # same, against the deployed D1 — development data only
 ```
 
-`migrations/` (including `migrations/meta/`) is committed — it's Drizzle's and Wrangler's shared source of truth for schema history, never hand-edited.
+`migrations/` (including `migrations/meta/`) is committed — it's Drizzle's and Wrangler's shared source of truth for schema history, never hand-edited. `.seed/` (generated SQL) is gitignored and regenerated on demand.
+
+### Auth (Better Auth + D1)
+
+- `lib/auth/server.ts`: `getAuth()` builds a Better Auth instance per request (it needs the request-bound D1 client), backed by the `users`/`sessions`/`accounts`/`verifications` tables via `@better-auth/drizzle-adapter`. Email/password is always on; Google/Microsoft are registered only when their client id/secret env vars are set.
+- `lib/auth/client.ts` / `components/auth/auth-provider.tsx`: the browser-side session (`useAuth()`), backed by real Better Auth sessions — no mock localStorage auth remains.
+- **Two separate login pages**: `/login` is admin-only (email/password, no OAuth); `/user/login` is for customers (email/password + Google + Microsoft). The storefront "Sign in" link always points at `/user/login`.
+- `lib/auth/session.ts`: `getServerSession()` (any valid session) and `requireAdminSession()` (session + `role === "ADMIN"`, else redirects to `/login` or 403s via `app/forbidden.tsx`) — the one place route guards live. Used by the `/account`, `/checkout`, and `/admin` layouts.
+- `pnpm admin:bootstrap` (`scripts/bootstrap-admin.ts`) creates or promotes an `ADMIN` user locally from `ADMIN_BOOTSTRAP_EMAIL`/`ADMIN_BOOTSTRAP_PASSWORD` env vars — see the script's header comment for the documented remote-database procedure (sign up normally in production, then promote with a `wrangler d1 execute --remote` SQL update).
+
+### Cart and orders
+
+- Guests: cart lines live in `localStorage` only (`lib/cart/`).
+- Signed-in customers: the cart is server-owned, persisted in D1 against the user's id (`lib/server-cart/`), loaded/saved through Server Actions (`lib/server-cart/actions.ts`).
+- On customer sign-in, any guest cart lines are merged into the server cart (same quantities-sum rule either way — `mergeCartLines()` in `lib/cart/calculations.ts`); admin sessions never get a cart of their own.
+- Placing an order (`placeOrderAction`) re-reads the server cart and re-validates every line's price and stock straight from D1 — nothing from the client is trusted for money or availability. Orders (`orders` + `order_items`) have separate `status` and `paymentStatus` columns; no payment provider is integrated yet, so both start at `PENDING`.
 
 ### Object storage (R2)
 

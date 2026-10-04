@@ -1,6 +1,6 @@
 # Task 78a — Protect customer `/account` routes
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

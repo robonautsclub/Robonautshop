@@ -193,17 +193,17 @@ Catalog first, then auth/access, then real orders.
 - Admin login: `/login` — **email/password only** (no Google/Microsoft)
 - Protect `/account`, `/checkout` (place order), and `/admin` server-side
 
-- [ ] 75 [Replace mock catalog with D1](phase-12-wire-up/75-replace-mock-catalog.md)
-- [ ] 76 [Seed database from faker catalog](phase-12-wire-up/76-seed-from-faker.md)
-- [ ] 77a [Better Auth server + D1](phase-12-wire-up/77a-better-auth-server.md)
-- [ ] 77b [Customer Google + Microsoft OAuth](phase-12-wire-up/77b-customer-social-oauth.md)
-- [ ] 77c [Replace mock auth with real sessions](phase-12-wire-up/77c-replace-mock-auth.md)
-- [ ] 77d [Split login UIs (admin `/login`, customer `/user/login`)](phase-12-wire-up/77d-split-login-uis.md)
-- [ ] 78a [Protect `/account` routes](phase-12-wire-up/78a-protect-account-routes.md)
-- [ ] 78b [Checkout login + guest cart merge](phase-12-wire-up/78b-checkout-login-cart-merge.md)
-- [ ] 78 [Server cart and order creation](phase-12-wire-up/78-real-cart-orders.md)
-- [ ] 79a [Admin route protection](phase-12-wire-up/79a-admin-route-protection.md)
-- [ ] 79b [Admin bootstrap (email/password only)](phase-12-wire-up/79b-admin-bootstrap.md)
+- [x] 75 [Replace mock catalog with D1](phase-12-wire-up/75-replace-mock-catalog.md)
+- [x] 76 [Seed database from faker catalog](phase-12-wire-up/76-seed-from-faker.md)
+- [x] 77a [Better Auth server + D1](phase-12-wire-up/77a-better-auth-server.md)
+- [x] 77b [Customer Google + Microsoft OAuth](phase-12-wire-up/77b-customer-social-oauth.md)
+- [x] 77c [Replace mock auth with real sessions](phase-12-wire-up/77c-replace-mock-auth.md)
+- [x] 77d [Split login UIs (admin `/login`, customer `/user/login`)](phase-12-wire-up/77d-split-login-uis.md)
+- [x] 78a [Protect `/account` routes](phase-12-wire-up/78a-protect-account-routes.md)
+- [x] 78b [Checkout login + guest cart merge](phase-12-wire-up/78b-checkout-login-cart-merge.md)
+- [x] 78 [Server cart and order creation](phase-12-wire-up/78-real-cart-orders.md)
+- [x] 79a [Admin route protection](phase-12-wire-up/79a-admin-route-protection.md)
+- [x] 79b [Admin bootstrap (email/password only)](phase-12-wire-up/79b-admin-bootstrap.md)
 
 Superseded stubs (do not implement): [77](phase-12-wire-up/77-real-auth.md), [79](phase-12-wire-up/79-admin-protection.md).
 

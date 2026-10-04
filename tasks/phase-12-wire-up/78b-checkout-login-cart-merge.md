@@ -1,6 +1,6 @@
 # Task 78b — Checkout requires login + guest cart merge
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

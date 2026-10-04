@@ -1,6 +1,6 @@
 # Task 77c — Replace mock auth with real sessions
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

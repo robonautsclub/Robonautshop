@@ -1,6 +1,6 @@
 # Task 78 — Server cart and order creation
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

@@ -1,6 +1,6 @@
 # Task 79a — Admin route protection (`/admin`)
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

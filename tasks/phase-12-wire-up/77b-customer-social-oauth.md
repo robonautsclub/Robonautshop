@@ -1,6 +1,6 @@
 # Task 77b — Customer Google + Microsoft OAuth
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

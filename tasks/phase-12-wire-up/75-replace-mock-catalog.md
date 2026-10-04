@@ -1,6 +1,6 @@
 # Task 75 — Replace mock catalog with D1
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

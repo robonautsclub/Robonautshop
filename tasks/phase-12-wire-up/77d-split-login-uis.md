@@ -1,6 +1,6 @@
 # Task 77d — Split login UIs (admin `/login`, customer `/user/login`)
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 
