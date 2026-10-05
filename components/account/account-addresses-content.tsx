@@ -1,37 +1,16 @@
-"use client";
-
-import Link from "next/link";
-
 import { AccountNav } from "@/components/account/account-nav";
 import { AddressesPanel } from "@/components/auth/addresses-panel";
-import { useAuth } from "@/components/auth/auth-provider";
 import { PageContainer } from "@/components/layout/page-container";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { listAddressesForUser } from "@/lib/account/address-queries";
+import { getServerSession } from "@/lib/auth/session";
+import { getRequestDb } from "@/lib/db/request";
 
-export function AccountAddressesContent() {
-  const { hydrated, isSignedIn } = useAuth();
-
-  if (!hydrated) {
-    return (
-      <PageContainer as="section" className="py-10">
-        <h1 className="text-3xl font-semibold tracking-tight">Addresses</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Loading…</p>
-      </PageContainer>
-    );
-  }
-
-  if (!isSignedIn) {
-    return (
-      <PageContainer as="section" className="py-10">
-        <h1 className="text-3xl font-semibold tracking-tight">Addresses</h1>
-        <p className="mt-2 text-muted-foreground">Not signed in.</p>
-        <Link href="/user/login" className={cn(buttonVariants(), "mt-6 inline-flex")}>
-          Sign in
-        </Link>
-      </PageContainer>
-    );
-  }
+export async function AccountAddressesContent() {
+  const session = await getServerSession();
+  const db = await getRequestDb();
+  const addresses = session
+    ? await listAddressesForUser(db, session.user.id)
+    : [];
 
   return (
     <PageContainer as="section" className="py-10">
@@ -39,13 +18,13 @@ export function AccountAddressesContent() {
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">Addresses</h1>
           <p className="mt-2 text-muted-foreground">
-            Add delivery addresses with Bangladesh-friendly fields.
+            Saved Bangladesh delivery addresses for checkout.
           </p>
         </div>
         <AccountNav pathname="/account/addresses" />
       </div>
 
-      <AddressesPanel />
+      <AddressesPanel initialAddresses={addresses} />
     </PageContainer>
   );
 }

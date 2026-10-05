@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { type FormEvent, useMemo, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useState } from "react";
 
 import { fieldClassName } from "@/components/auth/auth-form-shell";
 import { useCart } from "@/components/cart/cart-provider";
@@ -11,6 +11,8 @@ import type { MapCoordinates } from "@/components/checkout/location-map-picker";
 import { PageContainer } from "@/components/layout/page-container";
 import { CatalogEmptyState } from "@/components/product";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { getMyAddressesAction } from "@/lib/account/address-actions";
+import type { UserAddressRecord } from "@/lib/account/address-queries";
 import { addressSchema } from "@/lib/auth/schemas";
 import { formatBdt } from "@/lib/catalog";
 import {
@@ -39,6 +41,10 @@ export function CheckoutPageContent() {
   const searchParams = useSearchParams();
   const paymentErrorFromUrl = searchParams.get("paymentError");
   const { hydrated, resolvedLines, subtotal, clearCart } = useCart();
+  const [savedAddresses, setSavedAddresses] = useState<UserAddressRecord[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>("");
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
   const [addressLine1, setAddressLine1] = useState("");
   const [addressLine2, setAddressLine2] = useState("");
   const [cityDraft, setCityDraft] = useState("Dhaka");
@@ -51,11 +57,61 @@ export function CheckoutPageContent() {
   const [errors, setErrors] = useState<AddressErrors>({});
   const [status, setStatus] = useState<string | null>(null);
 
+  useEffect(() => {
+    let cancelled = false;
+    void getMyAddressesAction().then((addresses) => {
+      if (cancelled) {
+        return;
+      }
+      setSavedAddresses(addresses);
+      const preferred =
+        addresses.find((row) => row.isDefault) ?? addresses[0] ?? null;
+      if (preferred) {
+        setSelectedAddressId(preferred.id);
+        setFullName(preferred.fullName);
+        setPhone(preferred.phone);
+        setAddressLine1(preferred.addressLine1);
+        setAddressLine2(preferred.addressLine2 ?? "");
+        setCityDraft(preferred.city);
+        setPostalCode(preferred.postalCode ?? "");
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const shipping = useMemo(
     () => estimateShippingBdt(cityDraft),
     [cityDraft],
   );
   const total = subtotal + shipping.amount;
+
+  function applySavedAddress(addressId: string) {
+    setSelectedAddressId(addressId);
+    if (!addressId) {
+      return;
+    }
+    const address = savedAddresses.find((row) => row.id === addressId);
+    if (!address) {
+      return;
+    }
+    setFullName(address.fullName);
+    setPhone(address.phone);
+    setAddressLine1(address.addressLine1);
+    setAddressLine2(address.addressLine2 ?? "");
+    setCityDraft(address.city);
+    setPostalCode(address.postalCode ?? "");
+    setErrors((current) => ({
+      ...current,
+      fullName: undefined,
+      phone: undefined,
+      addressLine1: undefined,
+      addressLine2: undefined,
+      city: undefined,
+      postalCode: undefined,
+    }));
+  }
 
   if (!hydrated) {
     return (
@@ -118,9 +174,6 @@ export function CheckoutPageContent() {
     setErrors({});
     setStatus("Placing order…");
 
-    // Prices, stock, and the shipping total are all recomputed server-side
-    // from the signed-in user's real cart — this request only carries the
-    // delivery details (AGENTS.md "Pricing": never trust the client).
     const result = await placeOrderAction({
       address: {
         fullName: parsed.data.fullName,
@@ -141,8 +194,6 @@ export function CheckoutPageContent() {
       return;
     }
 
-    // bKash: keep the cart until payment succeeds and the order is created
-    // in the callback. COD/Nagad: order already exists — clear local cart.
     if (result.redirectUrl) {
       setStatus("Redirecting to bKash…");
       window.location.assign(result.redirectUrl);
@@ -181,10 +232,35 @@ export function CheckoutPageContent() {
                 Delivery address
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Type an address or pin it on the map to auto-fill road, area,
-                city, and postal code.
+                Use a previous address, type a new one, or pin it on the map.
               </p>
             </div>
+
+            {savedAddresses.length > 0 ? (
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="checkout-saved-address"
+                  className="text-sm font-medium"
+                >
+                  Use previous address
+                </label>
+                <select
+                  id="checkout-saved-address"
+                  value={selectedAddressId}
+                  onChange={(event) => applySavedAddress(event.target.value)}
+                  className={fieldClassName(false)}
+                >
+                  <option value="">Enter a new address</option>
+                  {savedAddresses.map((address) => (
+                    <option key={address.id} value={address.id}>
+                      {address.fullName} · {address.addressLine1},{" "}
+                      {address.city}
+                      {address.isDefault ? " (default)" : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : null}
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5 sm:col-span-2">
@@ -194,6 +270,11 @@ export function CheckoutPageContent() {
                 <input
                   id="checkout-name"
                   name="fullName"
+                  value={fullName}
+                  onChange={(event) => {
+                    setFullName(event.target.value);
+                    setSelectedAddressId("");
+                  }}
                   className={fieldClassName(Boolean(errors.fullName))}
                 />
                 {errors.fullName ? (
@@ -210,6 +291,11 @@ export function CheckoutPageContent() {
                   name="phone"
                   inputMode="numeric"
                   placeholder="01XXXXXXXXX"
+                  value={phone}
+                  onChange={(event) => {
+                    setPhone(event.target.value);
+                    setSelectedAddressId("");
+                  }}
                   className={fieldClassName(Boolean(errors.phone))}
                 />
                 {errors.phone ? (
@@ -225,7 +311,10 @@ export function CheckoutPageContent() {
                   id="checkout-line1"
                   name="addressLine1"
                   value={addressLine1}
-                  onChange={(event) => setAddressLine1(event.target.value)}
+                  onChange={(event) => {
+                    setAddressLine1(event.target.value);
+                    setSelectedAddressId("");
+                  }}
                   className={fieldClassName(Boolean(errors.addressLine1))}
                 />
                 {errors.addressLine1 ? (
@@ -243,7 +332,10 @@ export function CheckoutPageContent() {
                   id="checkout-line2"
                   name="addressLine2"
                   value={addressLine2}
-                  onChange={(event) => setAddressLine2(event.target.value)}
+                  onChange={(event) => {
+                    setAddressLine2(event.target.value);
+                    setSelectedAddressId("");
+                  }}
                   className={fieldClassName(Boolean(errors.addressLine2))}
                 />
               </div>
@@ -256,7 +348,10 @@ export function CheckoutPageContent() {
                   id="checkout-city"
                   name="city"
                   value={cityDraft}
-                  onChange={(event) => setCityDraft(event.target.value)}
+                  onChange={(event) => {
+                    setCityDraft(event.target.value);
+                    setSelectedAddressId("");
+                  }}
                   className={fieldClassName(Boolean(errors.city))}
                 />
                 {errors.city ? (
@@ -273,7 +368,10 @@ export function CheckoutPageContent() {
                   name="postalCode"
                   inputMode="numeric"
                   value={postalCode}
-                  onChange={(event) => setPostalCode(event.target.value)}
+                  onChange={(event) => {
+                    setPostalCode(event.target.value);
+                    setSelectedAddressId("");
+                  }}
                   className={fieldClassName(Boolean(errors.postalCode))}
                 />
                 {errors.postalCode ? (
@@ -289,6 +387,7 @@ export function CheckoutPageContent() {
                   setAddressLine2(resolved.addressLine2 ?? "");
                   setCityDraft(resolved.city);
                   setPostalCode(resolved.postalCode ?? "");
+                  setSelectedAddressId("");
                   setErrors((current) => ({
                     ...current,
                     addressLine1: undefined,
@@ -327,8 +426,8 @@ export function CheckoutPageContent() {
                 Special instructions
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Optional notes for delivery — gate code, preferred time, landmark
-                details, and similar.
+                Optional notes for delivery — gate code, preferred time,
+                landmark details, and similar.
               </p>
             </div>
             <div className="space-y-1.5">
@@ -357,7 +456,8 @@ export function CheckoutPageContent() {
                 Payment method
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Selection only. No payment is processed.
+                Cash on Delivery places the order immediately. bKash redirects
+                you to complete payment.
               </p>
             </div>
             <fieldset className="space-y-3">

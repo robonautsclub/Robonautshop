@@ -6,6 +6,7 @@ import { nextCookies } from "better-auth/next-js";
 import type { Database } from "@/lib/db";
 import { getRequestDb } from "@/lib/db/request";
 import * as schema from "@/lib/db/schema";
+import { sendWelcomeEmail } from "@/lib/email/send";
 
 /**
  * Social providers are registered only when their env vars are actually
@@ -81,6 +82,16 @@ export function buildAuth(db: Database, options: { withNextCookies: boolean }) {
           required: false,
           input: false,
           defaultValue: "CUSTOMER",
+        },
+      },
+    },
+    databaseHooks: {
+      user: {
+        create: {
+          after: async (user) => {
+            // Welcome mail is best-effort — never block signup on Resend.
+            void sendWelcomeEmail({ to: user.email, name: user.name });
+          },
         },
       },
     },

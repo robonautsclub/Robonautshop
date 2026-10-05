@@ -41,7 +41,7 @@ export function AccountPageContent() {
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">Account</h1>
             <p className="mt-2 text-muted-foreground">
-              Your profile for this browser session.
+              Your Robonautshop profile and order history.
             </p>
           </div>
           <Button
@@ -84,15 +84,18 @@ export function AccountPageContent() {
           >
             <h2 className="font-medium tracking-tight">Addresses</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Manage Bangladesh delivery addresses (session UI only).
+              Manage saved Bangladesh delivery addresses.
             </p>
           </Link>
-          <div className="rounded-xl border border-dashed p-5">
+          <Link
+            href="/account/orders"
+            className="block rounded-xl border p-5 hover:border-foreground/20"
+          >
             <h2 className="font-medium tracking-tight">Orders</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Order history comes in a later phase.
+              View order history and repay failed bKash attempts.
             </p>
-          </div>
+          </Link>
         </div>
       </div>
     </PageContainer>

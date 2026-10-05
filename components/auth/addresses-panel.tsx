@@ -4,22 +4,31 @@ import { type FormEvent, useState } from "react";
 
 import { fieldClassName } from "@/components/auth/auth-form-shell";
 import { Button } from "@/components/ui/button";
+import {
+  createMyAddressAction,
+  deleteMyAddressAction,
+} from "@/lib/account/address-actions";
+import type { UserAddressRecord } from "@/lib/account/address-queries";
 import { addressSchema, type AddressInput } from "@/lib/auth/schemas";
 
 type FieldErrors = Partial<Record<keyof AddressInput | "form", string>>;
 
-type SavedAddress = AddressInput & { id: string };
+type AddressesPanelProps = {
+  initialAddresses: UserAddressRecord[];
+};
 
-export function AddressesPanel() {
-  const [addresses, setAddresses] = useState<SavedAddress[]>([]);
+export function AddressesPanel({ initialAddresses }: AddressesPanelProps) {
+  const [addresses, setAddresses] = useState<UserAddressRecord[]>(initialAddresses);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus(null);
 
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
     const parsed = addressSchema.safeParse({
       fullName: formData.get("fullName"),
       phone: formData.get("phone"),
@@ -49,16 +58,49 @@ export function AddressesPanel() {
     }
 
     setErrors({});
-    setAddresses((current) => [
-      ...current,
-      { ...parsed.data, id: crypto.randomUUID() },
-    ]);
-    setStatus("Address saved in this browser session only. Nothing was persisted.");
-    event.currentTarget.reset();
+    setPending(true);
+    const result = await createMyAddressAction(parsed.data);
+    setPending(false);
+
+    if (!result.ok) {
+      setErrors({
+        form: result.error,
+        ...result.fieldErrors,
+      });
+      return;
+    }
+
+    setAddresses((current) => {
+      const withoutDefault = result.address.isDefault
+        ? current.map((row) => ({ ...row, isDefault: false }))
+        : current;
+      return [result.address, ...withoutDefault];
+    });
+    setStatus("Address saved.");
+    form.reset();
   }
 
-  function removeAddress(id: string) {
-    setAddresses((current) => current.filter((address) => address.id !== id));
+  async function removeAddress(id: string) {
+    setStatus(null);
+    setPending(true);
+    const result = await deleteMyAddressAction(id);
+    setPending(false);
+
+    if (!result.ok) {
+      setErrors({ form: result.error });
+      return;
+    }
+
+    setAddresses((current) => {
+      const next = current.filter((address) => address.id !== id);
+      if (next.length > 0 && !next.some((row) => row.isDefault)) {
+        return next.map((row, index) =>
+          index === 0 ? { ...row, isDefault: true } : row,
+        );
+      }
+      return next;
+    });
+    setStatus("Address removed.");
   }
 
   return (
@@ -67,8 +109,7 @@ export function AddressesPanel() {
         <div>
           <h2 className="text-lg font-semibold tracking-tight">Add address</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Bangladesh-friendly fields. Local React state only — refresh clears
-            the list.
+            Bangladesh-friendly fields. Saved to your account in the database.
           </p>
         </div>
 
@@ -162,7 +203,14 @@ export function AddressesPanel() {
           </div>
         </div>
 
-        <Button type="submit">Save address (session only)</Button>
+        <Button type="submit" disabled={pending}>
+          {pending ? "Saving…" : "Save address"}
+        </Button>
+        {errors.form ? (
+          <p className="text-sm text-destructive" role="alert">
+            {errors.form}
+          </p>
+        ) : null}
         {status ? (
           <p className="text-sm text-muted-foreground" role="status">
             {status}
@@ -180,10 +228,15 @@ export function AddressesPanel() {
           <ul className="space-y-3">
             {addresses.map((address) => (
               <li key={address.id} className="rounded-xl border p-4">
-                <p className="font-medium">{address.fullName}</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {address.phone}
-                </p>
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <p className="font-medium">{address.fullName}</p>
+                  {address.isDefault ? (
+                    <span className="text-xs font-medium text-muted-foreground">
+                      Default
+                    </span>
+                  ) : null}
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground">{address.phone}</p>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {address.addressLine1}
                   {address.addressLine2 ? `, ${address.addressLine2}` : ""}
@@ -197,6 +250,7 @@ export function AddressesPanel() {
                   variant="ghost"
                   size="sm"
                   className="mt-3"
+                  disabled={pending}
                   onClick={() => removeAddress(address.id)}
                 >
                   Remove

@@ -18,7 +18,7 @@ pnpm lint
 pnpm typecheck
 ```
 
-Copy `.env.example` to `.env` and fill in `BETTER_AUTH_SECRET`/`BETTER_AUTH_URL` before running auth-dependent features locally. For bKash Checkout, also set the `BKASH_CHECKOUT_URL_*` variables. Do not commit `.env` or `.env.local`.
+Copy `.env.example` to `.env` and fill in `BETTER_AUTH_SECRET`/`BETTER_AUTH_URL` before running auth-dependent features locally. For bKash Checkout, also set the `BKASH_CHECKOUT_URL_*` variables. For transactional email (welcome + order confirmation), set `RESEND_API_KEY` to your real Resend API key (replace any `re_xxxxxxxxx` placeholder) and optionally `RESEND_FROM_EMAIL`. Do not commit `.env` or `.env.local`.
 
 ## Cloudflare deployment
 
@@ -39,7 +39,7 @@ Every storefront and admin page reads from D1 at request time, so these routes r
 
 ### Database (D1 + Drizzle)
 
-- Schema: `lib/db/schema/` — one file per table (`users`, `categories`, `products`, `product-variants`, `inventory`, `product-images`, `robot-projects`, `project-components`, `kits`, `kit-components`, `cart-items`, `orders`, `order-items`, `bkash_tokens`, plus the infra-only `health`), re-exported from `index.ts`. The catalog tables mirror the frontend types in `lib/catalog/types.ts`.
+- Schema: `lib/db/schema/` — one file per table (`users`, `categories`, `products`, `product-variants`, `inventory`, `product-images`, `robot-projects`, `project-components`, `kits`, `kit-components`, `cart-items`, `orders`, `order-items`, `user_addresses`, `bkash_tokens`, `bkash_pending_payments`, plus the infra-only `health`), re-exported from `index.ts`. The catalog tables mirror the frontend types in `lib/catalog/types.ts`.
 - Client: `createDb(d1)` in `lib/db/index.ts`; `getRequestDb()` in `lib/db/request.ts` is the one place server code (Server Components, Server Actions) gets a request-bound instance.
 - `lib/catalog/queries.ts` is the one D1-backed catalog read layer — storefront pages and the admin dashboard both go through it (`lib/admin/catalog.ts` wraps it for admin-only views that include DRAFT/ARCHIVED rows).
 
@@ -66,9 +66,9 @@ pnpm db:seed:remote      # same, against the deployed D1 — development data on
 - Guests: cart lines live in `localStorage` only (`lib/cart/`).
 - Signed-in customers: the cart is server-owned, persisted in D1 against the user's id (`lib/server-cart/`), loaded/saved through Server Actions (`lib/server-cart/actions.ts`).
 - On customer sign-in, any guest cart lines are merged into the server cart (same quantities-sum rule either way — `mergeCartLines()` in `lib/cart/calculations.ts`); admin sessions never get a cart of their own.
-- Placing an order (`placeOrderAction`) re-reads the server cart and re-validates every line's price and stock straight from D1 — nothing from the client is trusted for money or availability. Orders (`orders` + `order_items`) have separate `status` and `paymentStatus` columns.
-- **bKash Checkout (URL)** (`lib/payments/bkash/`): when the customer chooses bKash, the server validates the cart and calls Create Payment (`mode: "0011"`) but **does not insert an order** until payment succeeds. Checkout details are staged in `bkash_pending_payments`; the cart stays until the callback runs Execute Payment, then a `PAID` order is written and the cart is cleared. Failure/cancel discards the staging row only — no PENDING order is stored.
-- COD and Nagad still create orders immediately without a live payment redirect (Nagad remains a placeholder).
+- Placing an order (`placeOrderAction`) re-reads the server cart and re-validates every line's price and stock straight from D1 — nothing from the client is trusted for money or availability. Orders (`orders` + `order_items`) have separate `status` and `paymentStatus` columns. Shipping addresses used at checkout are upserted into `user_addresses`; `/account/orders` lists the customer's real orders.
+- **bKash Checkout (URL)** (`lib/payments/bkash/`): when the customer chooses bKash, the server validates the cart and calls Create Payment (`mode: "0011"`). Checkout details are staged in `bkash_pending_payments` until the callback. Success runs Execute Payment and writes a `PAID` order. Failure/cancel persists an unpaid order (`paymentStatus` `FAILED` / `CANCELLED`) so the customer can **Pay again with bKash** from `/account/orders` (prices/stock re-validated server-side).
+- COD and Nagad still create orders immediately without a live payment redirect (Nagad remains a placeholder). Order confirmation email (and welcome email on signup) send via Resend when `RESEND_API_KEY` is set (`lib/email/`).
 
 ### Object storage (R2)
 

@@ -230,3 +230,7 @@ Next.js special files for loading, errors, auth status pages, and sitemap. UI sh
 ## Phase 16 — Payments
 
 - [x] 101 [bKash Checkout URL](phase-16-payments/101-bkash-checkout-url.md)
+
+## Phase 17 — Customer account & post-purchase
+
+- [x] 102 [Orders, addresses, bKash repay & emails](phase-17-customer-account/102-orders-addresses-repay-emails.md)

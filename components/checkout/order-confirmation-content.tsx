@@ -33,7 +33,7 @@ export function OrderConfirmationContent({
       : order.paymentMethod === "BKASH" && order.paymentStatus === "PENDING"
         ? "Waiting for bKash payment. If you closed the bKash window, return to checkout and try again."
         : order.paymentStatus === "FAILED" || order.paymentStatus === "CANCELLED"
-          ? "No charge was completed. You can place a new order from checkout when you’re ready."
+          ? "No charge was completed. You can pay again with bKash from your orders page."
           : "We’ll update the status here as it’s processed. Cash on Delivery and other unpaid methods stay pending until collected.";
 
   return (
@@ -132,14 +132,25 @@ export function OrderConfirmationContent({
             </div>
           </div>
           <div className="mt-4 flex flex-col gap-2">
-            <Link href="/products" className={cn(buttonVariants(), "w-full")}>
-              Continue shopping
-            </Link>
+            {(order.paymentStatus === "FAILED" ||
+              order.paymentStatus === "CANCELLED") &&
+            order.paymentMethod === "BKASH" ? (
+              <Link
+                href={`/account/orders?orderId=${order.id}`}
+                className={cn(buttonVariants(), "w-full")}
+              >
+                Pay again with bKash
+              </Link>
+            ) : (
+              <Link href="/products" className={cn(buttonVariants(), "w-full")}>
+                Continue shopping
+              </Link>
+            )}
             <Link
-              href="/account"
+              href="/account/orders"
               className={cn(buttonVariants({ variant: "outline" }), "w-full")}
             >
-              Go to account
+              View orders
             </Link>
           </div>
         </aside>

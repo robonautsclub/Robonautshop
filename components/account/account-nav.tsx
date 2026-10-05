@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 const accountLinks = [
   { href: "/account", label: "Overview", exact: true },
   { href: "/account/addresses", label: "Addresses", exact: false },
-  { href: "/account/orders", label: "Orders", exact: false, disabled: true },
+  { href: "/account/orders", label: "Orders", exact: false },
 ] as const;
 
 type AccountNavProps = {
@@ -19,18 +19,6 @@ export function AccountNav({ pathname }: AccountNavProps) {
         const active = link.exact
           ? pathname === link.href
           : pathname === link.href || pathname.startsWith(`${link.href}/`);
-
-        if ("disabled" in link && link.disabled) {
-          return (
-            <span
-              key={link.href}
-              className="rounded-lg border border-dashed px-3 py-1.5 text-sm text-muted-foreground"
-              title="Orders UI comes in a later phase"
-            >
-              {link.label}
-            </span>
-          );
-        }
 
         return (
           <Link

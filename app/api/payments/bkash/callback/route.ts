@@ -7,8 +7,8 @@ import {
   queryBkashPayment,
 } from "@/lib/payments/bkash";
 import {
-  discardBkashPendingPayment,
   finalizeBkashPaidOrder,
+  finalizeBkashUnpaidOrder,
   getBkashPendingByPaymentId,
   getOrderByBkashPaymentId,
 } from "@/lib/server-cart/order-queries";
@@ -31,12 +31,23 @@ function redirectToCheckout(error: string): NextResponse {
   return NextResponse.redirect(url);
 }
 
+function redirectToAccountOrders(orderId?: string, error?: string): NextResponse {
+  const url = new URL("/account/orders", siteOrigin());
+  if (orderId) {
+    url.searchParams.set("orderId", orderId);
+  }
+  if (error) {
+    url.searchParams.set("paymentError", error);
+  }
+  return NextResponse.redirect(url);
+}
+
 /**
  * bKash Checkout (URL) callback.
  *
- * Orders are created only after Execute Payment (or Query) confirms
- * Completed. Failure/cancel discards the staged pending row and leaves the
- * cart unchanged — no PENDING order is written.
+ * Success: Execute (or Query) → PAID order.
+ * Failure/cancel: persist unpaid order (FAILED/CANCELLED) for repay in
+ * /account/orders — do not silently discard the attempt (task 102).
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -50,23 +61,36 @@ export async function GET(request: Request) {
   const db = await getRequestDb();
 
   const existingOrder = await getOrderByBkashPaymentId(db, paymentID);
-  if (existingOrder) {
+  if (existingOrder?.paymentStatus === "PAID") {
     return redirectToConfirmation(existingOrder.id);
   }
 
   const pending = await getBkashPendingByPaymentId(db, paymentID);
-  if (!pending) {
+  // Repay path: order already exists with this paymentID, no pending row.
+  if (!pending && !existingOrder) {
     return redirectToCheckout("We could not find that bKash payment.");
   }
 
   if (status === "failure" || status === "failed") {
-    await discardBkashPendingPayment(db, paymentID);
-    return redirectToCheckout("bKash payment failed. Your cart is unchanged — try again when ready.");
+    const result = await finalizeBkashUnpaidOrder(db, paymentID, "FAILED");
+    if ("error" in result) {
+      return redirectToCheckout(result.error);
+    }
+    return redirectToAccountOrders(
+      result.orderId,
+      "bKash payment failed. You can pay again from your orders.",
+    );
   }
 
   if (status === "cancel" || status === "cancelled" || status === "canceled") {
-    await discardBkashPendingPayment(db, paymentID);
-    return redirectToCheckout("bKash payment was cancelled. Your cart is unchanged.");
+    const result = await finalizeBkashUnpaidOrder(db, paymentID, "CANCELLED");
+    if ("error" in result) {
+      return redirectToCheckout(result.error);
+    }
+    return redirectToAccountOrders(
+      result.orderId,
+      "bKash payment was cancelled. You can pay again from your orders.",
+    );
   }
 
   try {
@@ -90,13 +114,16 @@ export async function GET(request: Request) {
       // fall through
     }
 
-    await discardBkashPendingPayment(db, paymentID);
+    const unpaid = await finalizeBkashUnpaidOrder(db, paymentID, "FAILED");
+    if ("error" in unpaid) {
+      return redirectToCheckout(unpaid.error);
+    }
 
     const message =
       executeError instanceof BkashApiError
         ? executeError.message
         : "bKash payment could not be confirmed.";
 
-    return redirectToCheckout(message);
+    return redirectToAccountOrders(unpaid.orderId, message);
   }
 }

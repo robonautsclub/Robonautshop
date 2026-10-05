@@ -10,11 +10,15 @@ import {
 } from "@/lib/server-cart/queries";
 import {
   getOrderForCustomer,
+  listOrdersForCustomer,
   placeOrderFromServerCart,
+  repayBkashOrder,
+  type CustomerOrderSummary,
   type OrderItemRecord,
   type OrderRecord,
   type PlaceOrderInput,
   type PlaceOrderResult,
+  type RepayBkashResult,
 } from "@/lib/server-cart/order-queries";
 
 /**
@@ -82,4 +86,26 @@ export async function getMyOrderAction(
 
   const db = await getRequestDb();
   return getOrderForCustomer(db, userId, orderId);
+}
+
+export async function getMyOrdersAction(): Promise<CustomerOrderSummary[]> {
+  const userId = await requireUserId();
+  if (!userId) {
+    return [];
+  }
+
+  const db = await getRequestDb();
+  return listOrdersForCustomer(db, userId);
+}
+
+export async function repayBkashOrderAction(
+  orderId: string,
+): Promise<RepayBkashResult> {
+  const userId = await requireUserId();
+  if (!userId) {
+    return { ok: false, error: "You must be signed in to repay an order." };
+  }
+
+  const db = await getRequestDb();
+  return repayBkashOrder(db, userId, orderId);
 }
