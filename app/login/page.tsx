@@ -10,18 +10,15 @@ export const metadata: Metadata = {
 };
 
 /**
- * Admin-only sign-in — email and password only, never Google/Microsoft
- * (tasks/phase-12-wire-up/77d-split-login-uis.md and
- * tasks/phase-12-wire-up/79a-admin-route-protection.md). Customers use
- * /user/login instead; staff navigate here manually. Intentionally outside
- * both the (store) and admin route groups, so it gets neither the
- * storefront nor the admin chrome.
+ * Admin sign-in. Customers use /user/login instead; staff navigate here
+ * manually. Intentionally outside both the (store) and admin route groups,
+ * so it gets neither the storefront nor the admin chrome.
  */
 export default function AdminLoginPage() {
   return (
     <AuthFormShell
       title="Admin sign-in"
-      description="Email and password only — no Google or Microsoft."
+      description="Sign in to manage the Robonautshop store."
       closeHref="/"
     >
       <Suspense>

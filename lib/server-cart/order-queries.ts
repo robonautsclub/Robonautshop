@@ -751,6 +751,65 @@ export async function listOrdersForCustomer(
   }));
 }
 
+export type AdminOrderDetail = {
+  order: OrderRecord;
+  items: OrderItemRecord[];
+  customer: { name: string; email: string };
+};
+
+/**
+ * List all real orders for the admin orders table (newest first).
+ * Not scoped to a customer — admin-only callers must gate access.
+ */
+export async function listOrdersForAdmin(
+  db: Database,
+): Promise<AdminOrderDetail[]> {
+  const orderRows = await db
+    .select()
+    .from(orders)
+    .orderBy(desc(orders.createdAt));
+
+  if (orderRows.length === 0) {
+    return [];
+  }
+
+  const orderIds = orderRows.map((row) => row.id);
+  const userIds = [...new Set(orderRows.map((row) => row.userId))];
+
+  const [itemRows, userRows] = await Promise.all([
+    db.select().from(orderItems).where(inArray(orderItems.orderId, orderIds)),
+    db
+      .select({ id: users.id, email: users.email, name: users.name })
+      .from(users)
+      .where(inArray(users.id, userIds)),
+  ]);
+
+  const itemsByOrder = new Map<string, OrderItemRecord[]>();
+  for (const item of itemRows) {
+    const list = itemsByOrder.get(item.orderId) ?? [];
+    list.push(item);
+    itemsByOrder.set(item.orderId, list);
+  }
+
+  const usersById = new Map(
+    userRows.map((user) => [user.id, user] as const),
+  );
+
+  return orderRows.flatMap((order) => {
+    const user = usersById.get(order.userId);
+    if (!user?.email) {
+      return [];
+    }
+    return [
+      {
+        order,
+        items: itemsByOrder.get(order.id) ?? [],
+        customer: { name: user.name, email: user.email },
+      },
+    ];
+  });
+}
+
 /**
  * Admin lookup — not scoped to a customer userId.
  * Used for on-demand invoice generation and real-order detail fallback.
@@ -758,11 +817,7 @@ export async function listOrdersForCustomer(
 export async function getOrderForAdmin(
   db: Database,
   orderId: string,
-): Promise<{
-  order: OrderRecord;
-  items: OrderItemRecord[];
-  customer: { name: string; email: string };
-} | null> {
+): Promise<AdminOrderDetail | null> {
   const orderRows = await db
     .select()
     .from(orders)

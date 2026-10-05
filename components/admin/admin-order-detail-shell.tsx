@@ -14,6 +14,7 @@ import type {
   AdminOrderStatus,
   AdminPaymentStatus,
 } from "@/lib/admin";
+import { formatAdminDateTime } from "@/lib/admin/format-date";
 import { formatBdt } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 
@@ -40,35 +41,26 @@ function paymentTone(status: AdminPaymentStatus) {
   return "warning" as const;
 }
 
-export function AdminOrderDetailShell({
-  order,
-  invoiceAvailable = false,
-}: {
-  order: AdminOrder;
-  /** True when this detail is a real D1 order (invoice PDF can be generated). */
-  invoiceAvailable?: boolean;
-}) {
+export function AdminOrderDetailShell({ order }: { order: AdminOrder }) {
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title={order.id}
         description={
-          invoiceAvailable
-            ? "Real order detail. Invoice is generated on demand (not stored)."
-            : "Demo order detail shell. Status changes are not available yet."
+          order.invoiceAvailable
+            ? "Real order detail. Receipt is generated on demand (not stored)."
+            : "Demo order detail. Receipt is generated on demand (not stored)."
         }
         actions={
           <div className="flex flex-wrap items-center gap-2">
-            {invoiceAvailable ? (
-              <a
-                href={`/admin/orders/${order.id}/invoice`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={cn(buttonVariants({ size: "sm" }))}
-              >
-                Invoice
-              </a>
-            ) : null}
+            <a
+              href={`/admin/orders/${order.id}/invoice`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(buttonVariants({ size: "sm" }))}
+            >
+              Download receipt
+            </a>
             <Link
               href="/admin/orders"
               className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
@@ -98,7 +90,7 @@ export function AdminOrderDetailShell({
             <div className="flex justify-between gap-3">
               <dt className="text-muted-foreground">Placed</dt>
               <dd className="font-medium">
-                {new Date(order.placedAt).toLocaleString()}
+                {formatAdminDateTime(order.placedAt)}
               </dd>
             </div>
           </dl>

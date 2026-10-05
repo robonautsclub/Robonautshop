@@ -44,6 +44,8 @@ export type AdminOrder = {
   total: number;
   lines: AdminOrderLine[];
   specialInstructions?: string;
+  /** True for real D1 orders — receipt/invoice PDF can be generated on demand. */
+  invoiceAvailable?: boolean;
 };
 
 export const mockAdminOrders: AdminOrder[] = [

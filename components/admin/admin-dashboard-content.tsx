@@ -17,6 +17,7 @@ import {
   listAdminInventory,
   listAdminOrders,
 } from "@/lib/admin";
+import { formatAdminDate } from "@/lib/admin/format-date";
 import { formatBdt } from "@/lib/catalog";
 import { getRequestDb } from "@/lib/db/request";
 import { cn } from "@/lib/utils";
@@ -232,7 +233,7 @@ export async function AdminDashboardContent() {
                       {order.id}
                     </Link>
                     <p className="text-xs text-muted-foreground">
-                      {new Date(order.placedAt).toLocaleDateString()}
+                      {formatAdminDate(order.placedAt)}
                     </p>
                   </AdminTd>
                   <AdminTd>

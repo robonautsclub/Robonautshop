@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
 
+import { getAdminOrderById } from "@/lib/admin";
 import { requireAdminSession } from "@/lib/auth/session";
 import { getRequestDb } from "@/lib/db/request";
-import { orderInvoiceFromOrder, invoicePdfFilename } from "@/lib/invoice/from-order";
+import {
+  invoicePdfFilename,
+  orderInvoiceFromAdminOrder,
+  orderInvoiceFromOrder,
+} from "@/lib/invoice/from-order";
 import { renderOrderInvoicePdf } from "@/lib/invoice/pdf";
+import type { OrderInvoice } from "@/lib/invoice/types";
 import { getOrderForAdmin } from "@/lib/server-cart/order-queries";
 
 type InvoiceRouteProps = {
@@ -11,22 +17,30 @@ type InvoiceRouteProps = {
 };
 
 /**
- * On-demand PDF invoice for a real D1 order.
+ * On-demand PDF receipt for a real D1 order, or a demo fixture order.
  * Bytes are generated in memory — never stored in R2.
- * Mock admin order ids (e.g. ADM-1001) 404 here by design.
  */
 export async function GET(_request: Request, { params }: InvoiceRouteProps) {
   await requireAdminSession();
 
   const { id } = await params;
-  const db = await getRequestDb();
-  const result = await getOrderForAdmin(db, id);
+  let invoice: OrderInvoice | null = null;
 
-  if (!result) {
+  const db = await getRequestDb();
+  const real = await getOrderForAdmin(db, id);
+  if (real) {
+    invoice = orderInvoiceFromOrder(real.order, real.items, real.customer);
+  } else {
+    const mock = getAdminOrderById(id);
+    if (mock) {
+      invoice = orderInvoiceFromAdminOrder(mock);
+    }
+  }
+
+  if (!invoice) {
     return new NextResponse("Invoice not found", { status: 404 });
   }
 
-  const invoice = orderInvoiceFromOrder(result.order, result.items, result.customer);
   const pdfBytes = await renderOrderInvoicePdf(invoice);
   const filename = invoicePdfFilename(invoice.orderId);
 

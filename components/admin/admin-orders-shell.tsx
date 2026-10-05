@@ -28,6 +28,7 @@ import {
   type AdminOrderStatus,
   type AdminPaymentStatus,
 } from "@/lib/admin";
+import { formatAdminDateTime } from "@/lib/admin/format-date";
 import { formatBdt, type Product } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 
@@ -117,10 +118,10 @@ export function AdminOrdersShell({
     <div className="space-y-6">
       <AdminPageHeader
         title="Orders"
-        description={`${localOrders.length} demo orders · cancel releases booked stock.`}
+        description={`${localOrders.length} orders · download receipt on real orders · cancel releases booked stock on demos.`}
         toolbar={
           <>
-            <AdminTableToolbarSearch placeholder="Search orders (demo)" />
+            <AdminTableToolbarSearch placeholder="Search orders" />
             <p className="text-xs text-muted-foreground">
               Order status and payment status stay separate
             </p>
@@ -148,7 +149,7 @@ export function AdminOrdersShell({
                   <div>
                     <p className="font-medium">{order.id}</p>
                     <p className="text-xs text-muted-foreground">
-                      {new Date(order.placedAt).toLocaleString()}
+                      {formatAdminDateTime(order.placedAt)}
                     </p>
                   </div>
                 </AdminTd>
@@ -194,6 +195,14 @@ export function AdminOrdersShell({
                     >
                       View
                     </Link>
+                    <a
+                      href={`/admin/orders/${order.id}/invoice`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={cn(buttonVariants({ size: "sm" }))}
+                    >
+                      Receipt
+                    </a>
                     {order.orderStatus !== "CANCELLED" ? (
                       <AdminDeleteTrigger
                         itemLabel={`order ${order.id}`}
