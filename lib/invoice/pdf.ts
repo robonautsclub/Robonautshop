@@ -1,6 +1,5 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 
-import { formatBdt } from "@/lib/catalog/money";
 import { invoicePdfFilename, shortOrderId } from "@/lib/invoice/from-order";
 import type { OrderInvoice } from "@/lib/invoice/types";
 
@@ -15,15 +14,41 @@ const line = rgb(0.89, 0.89, 0.91);
 const headerBg = rgb(0.09, 0.09, 0.09);
 const white = rgb(1, 1, 1);
 
+/**
+ * Helvetica (WinAnsi) cannot encode ৳ or many Unicode punctuation marks.
+ * Keep PDF amounts ASCII-safe; HTML email still uses formatBdt().
+ */
+function formatBdtPdf(amount: number): string {
+  return `BDT ${amount.toLocaleString("en-BD")}`;
+}
+
+/** Map common Unicode to WinAnsi-safe ASCII for StandardFonts. */
+function toWinAnsi(text: string): string {
+  return text
+    .replaceAll("৳", "BDT ")
+    .replaceAll("—", "-")
+    .replaceAll("–", "-")
+    .replaceAll("−", "-")
+    .replaceAll("·", "|")
+    .replaceAll("…", "...")
+    .replaceAll("’", "'")
+    .replaceAll("‘", "'")
+    .replaceAll("“", '"')
+    .replaceAll("”", '"')
+    .replace(/[^\x20-\x7E]/g, "?");
+}
+
 function formatInvoiceDate(iso: string): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) {
     return iso;
   }
-  return date.toLocaleDateString("en-BD", {
+  // ASCII months only — avoids locale-specific Unicode in PDF fonts.
+  return date.toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
+    timeZone: "UTC",
   });
 }
 
@@ -36,18 +61,19 @@ function drawText(
   size: number,
   color = ink,
 ) {
-  page.drawText(text, { x, y, size, font, color });
+  page.drawText(toWinAnsi(text), { x, y, size, font, color });
 }
 
 function truncate(font: PDFFont, text: string, size: number, maxWidth: number): string {
-  if (font.widthOfTextAtSize(text, size) <= maxWidth) {
-    return text;
+  const safe = toWinAnsi(text);
+  if (font.widthOfTextAtSize(safe, size) <= maxWidth) {
+    return safe;
   }
-  let truncated = text;
-  while (truncated.length > 1 && font.widthOfTextAtSize(`${truncated}…`, size) > maxWidth) {
+  let truncated = safe;
+  while (truncated.length > 1 && font.widthOfTextAtSize(`${truncated}...`, size) > maxWidth) {
     truncated = truncated.slice(0, -1);
   }
-  return `${truncated}…`;
+  return `${truncated}...`;
 }
 
 /**
@@ -77,11 +103,11 @@ export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint
     height: 110,
     color: headerBg,
   });
-  drawText(page, "ROBONAUTSSHOP", MARGIN, PAGE_HEIGHT - 40, regular, 9, rgb(0.64, 0.64, 0.64));
+  drawText(page, "ROBONAUTSHOP", MARGIN, PAGE_HEIGHT - 40, regular, 9, rgb(0.64, 0.64, 0.64));
   drawText(page, "Invoice / Order confirmation", MARGIN, PAGE_HEIGHT - 64, bold, 18, white);
   drawText(
     page,
-    `Order ${shortOrderId(invoice.orderId)}  ·  ${formatInvoiceDate(invoice.createdAt)}`,
+    `Order ${shortOrderId(invoice.orderId)}  |  ${formatInvoiceDate(invoice.createdAt)}`,
     MARGIN,
     PAGE_HEIGHT - 86,
     regular,
@@ -92,7 +118,7 @@ export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint
 
   drawText(
     page,
-    `Hi ${invoice.customerName.trim() || "there"}, thanks for your order. Here's your invoice summary.`,
+    `Hi ${invoice.customerName.trim() || "there"}, thanks for your order. Here is your invoice summary.`,
     MARGIN,
     y,
     regular,
@@ -109,7 +135,7 @@ export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint
   const metaLeft = [
     `Order ID: ${invoice.orderId}`,
     `Status: ${invoice.orderStatus}`,
-    `Payment: ${invoice.paymentMethod} · ${invoice.paymentStatus}`,
+    `Payment: ${invoice.paymentMethod} | ${invoice.paymentStatus}`,
   ];
   const metaRight = [invoice.customerName, invoice.customerEmail];
 
@@ -176,14 +202,14 @@ export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint
     const qty = String(item.quantity);
     drawText(page, qty, colQty + 4, y - 4, regular, 10);
 
-    const unit = formatBdt(item.unitPrice);
+    const unit = formatBdtPdf(item.unitPrice);
     drawText(page, unit, colUnit, y - 4, regular, 10);
 
-    const total = formatBdt(item.lineTotal);
+    const total = formatBdtPdf(item.lineTotal);
     drawText(
       page,
       total,
-      colTotal - bold.widthOfTextAtSize(total, 10),
+      colTotal - bold.widthOfTextAtSize(toWinAnsi(total), 10),
       y - 4,
       bold,
       10,
@@ -208,18 +234,26 @@ export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint
   const drawTotalRow = (label: string, value: string, strong = false) => {
     const font = strong ? bold : regular;
     const size = strong ? 12 : 10;
+    const safeValue = toWinAnsi(value);
     drawText(page, label, totalsX, y, font, size, strong ? ink : muted);
-    drawText(page, value, valueX - font.widthOfTextAtSize(value, size), y, font, size);
+    drawText(
+      page,
+      safeValue,
+      valueX - font.widthOfTextAtSize(safeValue, size),
+      y,
+      font,
+      size,
+    );
     y -= strong ? 18 : 16;
   };
 
-  drawTotalRow("Subtotal", formatBdt(invoice.subtotal));
-  drawTotalRow("Delivery", formatBdt(invoice.shippingTotal));
+  drawTotalRow("Subtotal", formatBdtPdf(invoice.subtotal));
+  drawTotalRow("Delivery", formatBdtPdf(invoice.shippingTotal));
   if (invoice.discountTotal > 0) {
     const label = invoice.couponCode
       ? `Discount (${invoice.couponCode})`
       : "Discount";
-    drawTotalRow(label, `−${formatBdt(invoice.discountTotal)}`);
+    drawTotalRow(label, `-${formatBdtPdf(invoice.discountTotal)}`);
   }
   page.drawLine({
     start: { x: totalsX, y: y + 8 },
@@ -227,7 +261,7 @@ export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint
     thickness: 0.75,
     color: line,
   });
-  drawTotalRow("Total", formatBdt(invoice.total), true);
+  drawTotalRow("Total", formatBdtPdf(invoice.total), true);
 
   y -= 12;
   ensureSpace(100);
@@ -256,7 +290,7 @@ export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint
 
   y -= 20;
   ensureSpace(20);
-  drawText(page, "— Robonautsshop", MARGIN, y, regular, 9, muted);
+  drawText(page, "- Robonautshop", MARGIN, y, regular, 9, muted);
 
   return doc.save();
 }

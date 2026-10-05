@@ -61,7 +61,7 @@ export function orderInvoiceFromAdminOrder(order: AdminOrder): OrderInvoice {
     couponCode: null,
     total: order.total,
     shippingFullName: order.customerName,
-    shippingPhone: "—",
+    shippingPhone: "-",
     shippingAddressLine1: order.city,
     shippingAddressLine2: null,
     shippingCity: order.city,
