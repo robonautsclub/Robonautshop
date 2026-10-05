@@ -22,6 +22,7 @@ export default function AdminLoginPage() {
     <AuthFormShell
       title="Admin sign-in"
       description="Email and password only — no Google or Microsoft."
+      closeHref="/"
     >
       <Suspense>
         <LoginForm redirectTo="/admin" />

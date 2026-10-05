@@ -1,14 +1,18 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { XIcon } from "lucide-react";
 
 import { SiteLogo } from "@/components/brand/site-logo";
 import { PageContainer } from "@/components/layout/page-container";
+import { Button } from "@/components/ui/button";
 
 type AuthFormShellProps = {
   title: string;
   description: string;
   children: ReactNode;
   footer?: ReactNode;
+  /** When set, shows a top-right close control that navigates here (e.g. "/"). */
+  closeHref?: string;
 };
 
 export function AuthFormShell({
@@ -16,9 +20,22 @@ export function AuthFormShell({
   description,
   children,
   footer,
+  closeHref,
 }: AuthFormShellProps) {
   return (
-    <PageContainer as="section" className="py-10">
+    <PageContainer as="section" className="relative py-10">
+      {closeHref ? (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-4 right-8 sm:right-12 lg:right-20 xl:right-28"
+          aria-label="Close and go to home"
+          nativeButton={false}
+          render={<Link href={closeHref} />}
+        >
+          <XIcon className="size-5" />
+        </Button>
+      ) : null}
       <div className="mx-auto w-full max-w-md">
         <SiteLogo href="/" size="sm" className="mb-6" />
         <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
