@@ -1,5 +1,6 @@
 import { formatBdt } from "@/lib/catalog/money";
 import { getResendClient, getResendFromAddress } from "@/lib/email/client";
+import { escapeHtml } from "@/lib/email/html";
 
 export type OrderEmailLine = {
   productName: string;
@@ -199,12 +200,4 @@ export async function sendLowStockAlertEmail(lines: LowStockAlertLine[]): Promis
       <p style="margin-top:16px;">— Robonautshop inventory alerts</p>
     `,
   });
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
 }
