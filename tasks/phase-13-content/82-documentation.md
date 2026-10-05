@@ -1,6 +1,6 @@
 # Task 82 — Documentation
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

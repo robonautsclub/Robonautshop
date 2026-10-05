@@ -1,6 +1,6 @@
 # Task 84 — Code examples
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

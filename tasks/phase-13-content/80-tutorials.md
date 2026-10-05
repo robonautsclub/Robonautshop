@@ -1,6 +1,6 @@
 # Task 80 — Tutorials
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

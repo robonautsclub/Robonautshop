@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { CatalogCoverImage } from "@/components/catalog/catalog-cover-image";
 import { ComponentRequirementsList } from "@/components/catalog/component-requirements-list";
 import { SkillLevelBadge } from "@/components/catalog/skill-level-badge";
+import { CodeExampleBlocks } from "@/components/content/code-example-blocks";
 import { PageContainer } from "@/components/layout/page-container";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -14,6 +15,10 @@ import {
   getProjectRequirementLines,
   sumRequirementLineTotals,
 } from "@/lib/catalog";
+import {
+  getCodeExamplesForProjectSlug,
+  getRobotGuideByProjectSlug,
+} from "@/lib/content";
 import { getRequestDb } from "@/lib/db/request";
 import { cn } from "@/lib/utils";
 
@@ -54,6 +59,8 @@ export default async function ProjectDetailPage({
   const optionalLines = lines.filter((line) => line.optional);
   const requiredTotal = sumRequirementLineTotals(requiredLines);
   const linkedKit = await getProjectLinkedKit(db, project.id);
+  const guide = getRobotGuideByProjectSlug(project.slug);
+  const codeExamples = getCodeExamplesForProjectSlug(project.slug);
 
   return (
     <PageContainer as="section" className="py-10">
@@ -112,10 +119,23 @@ export default async function ProjectDetailPage({
                 View {linkedKit.name}
               </Link>
             ) : null}
+            {guide ? (
+              <Link
+                href={`/guides/${guide.slug}`}
+                className={cn(
+                  buttonVariants({ variant: "outline" }),
+                  linkedKit ? "mt-2" : "mt-4",
+                )}
+              >
+                Read build guide
+              </Link>
+            ) : null}
             <Link
               href={`/builder/${project.slug}`}
               className={cn(
-                buttonVariants({ variant: linkedKit ? "ghost" : "outline" }),
+                buttonVariants({
+                  variant: linkedKit || guide ? "ghost" : "outline",
+                }),
                 "mt-2",
               )}
             >
@@ -148,6 +168,8 @@ export default async function ProjectDetailPage({
           </div>
         ) : null}
       </div>
+
+      <CodeExampleBlocks examples={codeExamples} heading="Project code examples" />
     </PageContainer>
   );
 }

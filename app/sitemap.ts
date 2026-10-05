@@ -6,6 +6,11 @@ import {
   getProducts,
   getProjects,
 } from "@/lib/catalog";
+import {
+  getDocPages,
+  getRobotGuides,
+  getTutorials,
+} from "@/lib/content";
 import { getRequestDb } from "@/lib/db/request";
 import { getSiteUrl } from "@/lib/site-url";
 
@@ -24,6 +29,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/categories",
     "/kits",
     "/projects",
+    "/tutorials",
+    "/guides",
+    "/docs",
     "/builder",
   ].map((path) => ({
     url: `${base}${path}`,
@@ -67,11 +75,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  const tutorialRoutes = getTutorials().map((tutorial) => ({
+    url: `${base}/tutorials/${tutorial.slug}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
+  }));
+
+  const guideRoutes = getRobotGuides().map((guide) => ({
+    url: `${base}/guides/${guide.slug}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
+  }));
+
+  const docRoutes = getDocPages().map((page) => ({
+    url: `${base}/docs/${page.slug}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.4,
+  }));
+
   return [
     ...staticRoutes,
     ...categoryRoutes,
     ...productRoutes,
     ...kitRoutes,
     ...projectRoutes,
+    ...tutorialRoutes,
+    ...guideRoutes,
+    ...docRoutes,
   ];
 }

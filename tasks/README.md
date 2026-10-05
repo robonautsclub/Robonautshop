@@ -197,11 +197,11 @@ Superseded stubs (do not implement): [77](phase-12-wire-up/77-real-auth.md), [79
 
 ## Phase 13 — Content
 
-- [ ] 80 [Tutorials](phase-13-content/80-tutorials.md)
-- [ ] 81 [Robot guides](phase-13-content/81-robot-guides.md)
-- [ ] 82 [Documentation](phase-13-content/82-documentation.md)
-- [ ] 83 [Datasheets](phase-13-content/83-datasheets.md)
-- [ ] 84 [Code examples](phase-13-content/84-code-examples.md)
+- [x] 80 [Tutorials](phase-13-content/80-tutorials.md)
+- [x] 81 [Robot guides](phase-13-content/81-robot-guides.md)
+- [x] 82 [Documentation](phase-13-content/82-documentation.md)
+- [x] 83 [Datasheets](phase-13-content/83-datasheets.md)
+- [x] 84 [Code examples](phase-13-content/84-code-examples.md)
 
 ## Phase 14 — Advanced
 

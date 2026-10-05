@@ -1,6 +1,6 @@
 # Task 81 — Robot guides
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

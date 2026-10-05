@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { CodeExampleBlocks } from "@/components/content/code-example-blocks";
+import { ProductDatasheets } from "@/components/content/product-datasheets";
 import { PageContainer } from "@/components/layout/page-container";
 import {
   CatalogEmptyState,
@@ -15,6 +17,10 @@ import {
   getProductCardModels,
   getRelatedProducts,
 } from "@/lib/catalog";
+import {
+  getCodeExamplesForProductSlug,
+  getDatasheetsForProductSlug,
+} from "@/lib/content";
 import { getRequestDb } from "@/lib/db/request";
 
 type ProductDetailPageProps = {
@@ -53,6 +59,8 @@ export default async function ProductDetailPage({
   const relatedCards = await getProductCardModels(db, related);
   const primaryImage = product.images[0];
   const specificationEntries = Object.entries(product.specifications);
+  const datasheets = getDatasheetsForProductSlug(product.slug);
+  const codeExamples = getCodeExamplesForProductSlug(product.slug);
 
   return (
     <PageContainer as="section" className="py-10">
@@ -152,6 +160,9 @@ export default async function ProductDetailPage({
           )}
         </div>
       </div>
+
+      <ProductDatasheets datasheets={datasheets} />
+      <CodeExampleBlocks examples={codeExamples} />
 
       <div className="mt-14">
         <h2 className="text-xl font-semibold tracking-tight">

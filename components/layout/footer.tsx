@@ -8,6 +8,9 @@ import { storeNavLinks } from "@/components/layout/nav-links";
 import { cn } from "@/lib/utils";
 
 const helpLinks = [
+  { href: "/docs", label: "Help & docs" },
+  { href: "/guides", label: "Robot guides" },
+  { href: "/tutorials", label: "Tutorials" },
   { href: "/cart", label: "Cart" },
   { href: "/account", label: "Account" },
   { href: "/account/orders", label: "Order tracking" },

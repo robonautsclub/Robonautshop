@@ -1,6 +1,6 @@
 # Task 83 — Datasheets
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 
