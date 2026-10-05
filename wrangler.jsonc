@@ -24,5 +24,8 @@
   ],
   "observability": {
     "enabled": true
+  },
+  "vars": {
+    "NEXT_PUBLIC_SITE_URL": "https://robonautsshop.com/"
   }
 }
