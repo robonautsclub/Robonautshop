@@ -79,7 +79,7 @@ export default async function HomePage() {
               Featured products
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Popular parts from the mock catalog.
+              Popular parts.
             </p>
           </div>
           <Link

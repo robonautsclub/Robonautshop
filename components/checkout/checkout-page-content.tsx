@@ -53,7 +53,7 @@ export function CheckoutPageContent() {
   const [pinnedLocation, setPinnedLocation] = useState<MapCoordinates | null>(
     null,
   );
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodId>("COD");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodId>("BKASH");
   const [specialInstructions, setSpecialInstructions] = useState("");
   const [errors, setErrors] = useState<AddressErrors>({});
   const [status, setStatus] = useState<string | null>(null);
@@ -242,8 +242,8 @@ export function CheckoutPageContent() {
       <div className="mb-8">
         <h1 className="text-3xl font-semibold tracking-tight">Checkout</h1>
         <p className="mt-2 text-muted-foreground">
-          Choose Cash on Delivery or pay online with bKash Checkout. Prices and
-          stock are confirmed on the server when you place the order.
+          Pay with bKash Checkout. Prices and stock are confirmed on the server
+          when you place the order.
         </p>
         {(errors.form || paymentErrorFromUrl) && (
           <p className="mt-3 text-sm text-destructive" role="alert">
@@ -438,7 +438,7 @@ export function CheckoutPageContent() {
                 Delivery charge
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Mock city-based charge — not a Pathao/Steadfast quote.
+                City-based delivery charge.
               </p>
             </div>
             <div className="rounded-lg bg-muted/40 px-4 py-3 text-sm">
@@ -488,8 +488,7 @@ export function CheckoutPageContent() {
                 Payment method
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Cash on Delivery places the order immediately. bKash redirects
-                you to complete payment.
+                You will be redirected to bKash to complete payment.
               </p>
             </div>
             <fieldset className="space-y-3">

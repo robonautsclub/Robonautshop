@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Admin",
-  description: "Robonautsshop admin UI shell.",
+  description: "Robonautsshop admin.",
   robots: {
     index: false,
     follow: false,

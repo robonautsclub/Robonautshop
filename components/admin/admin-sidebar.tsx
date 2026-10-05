@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { AdminNav } from "@/components/admin/admin-nav";
-import { AdminShellNote } from "@/components/admin/admin-shell-note";
 import { AdminSidebarLogout } from "@/components/admin/admin-sidebar-logout";
 import { SiteLogo } from "@/components/brand/site-logo";
 import { cn } from "@/lib/utils";
@@ -19,9 +18,6 @@ export function AdminSidebar({ onNavigate, className }: AdminSidebarProps) {
           <SiteLogo href={null} size="sm" />
           <p className="text-sm font-semibold tracking-tight">Admin</p>
         </Link>
-        <div className="mt-3">
-          <AdminShellNote />
-        </div>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-3 py-4">

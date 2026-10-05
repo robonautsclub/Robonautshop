@@ -32,7 +32,7 @@ export function AdminConfirmDeleteDialog({
       title={title}
       description={
         description ??
-        `Are you sure you want to delete ${itemLabel}? This demo action cannot be undone in the UI.`
+        `Are you sure you want to delete ${itemLabel}? This cannot be undone.`
       }
       className="sm:max-w-md"
     >

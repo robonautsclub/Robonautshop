@@ -41,7 +41,7 @@ export async function AdminFinancesContent() {
     {
       label: "Sales (paid)",
       value: formatBdt(finance.salesPaidBdt),
-      hint: `${finance.salesPaidOrderCount} paid demo orders`,
+      hint: `${finance.salesPaidOrderCount} paid orders`,
       tone: "success" as const,
     },
     {
@@ -56,7 +56,7 @@ export async function AdminFinancesContent() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Finances"
-        description="Demo totals from mock inventory and orders — not live accounting."
+        description="Order and payment totals."
         actions={
           <Link
             href="/admin/orders"
@@ -94,7 +94,7 @@ export async function AdminFinancesContent() {
         </p>
         {codPending.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">
-            No COD receivables in the demo fixture.
+            No COD receivables.
           </p>
         ) : (
           <AdminTable className="mt-4">
@@ -139,7 +139,7 @@ export async function AdminFinancesContent() {
       <section className="rounded-xl border p-5">
         <h2 className="text-lg font-semibold tracking-tight">Paid sales</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Demo orders marked PAID (bKash, Nagad, or collected COD).
+          Orders marked PAID.
         </p>
         <AdminTable className="mt-4">
           <AdminTableHead>

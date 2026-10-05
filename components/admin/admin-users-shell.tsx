@@ -49,7 +49,7 @@ export function AdminUsersShell({
     <div className="space-y-6">
       <AdminPageHeader
         title="Users"
-        description={`${rows.length} demo users · Delete always asks for confirmation. Roles are UI-only until real ADMIN auth.`}
+        description={`${rows.length} users · Delete always asks for confirmation.`}
         actions={
           <Button type="button" size="sm" onClick={() => setShowCreate(true)}>
             Invite user
@@ -57,9 +57,9 @@ export function AdminUsersShell({
         }
         toolbar={
           <>
-            <AdminTableToolbarSearch placeholder="Search users (demo)" />
+            <AdminTableToolbarSearch placeholder="Search users" />
             <p className="text-xs text-muted-foreground">
-              No logout control in admin chrome
+              Manage staff accounts and roles.
             </p>
           </>
         }
@@ -119,7 +119,7 @@ export function AdminUsersShell({
                 <AdminDeleteTrigger
                   itemLabel={`the user “${user.name}”`}
                   title="Delete user?"
-                  description={`Are you sure you want to delete “${user.name}”? Demo only — this removes them from the admin list in this session.`}
+                  description={`Are you sure you want to delete “${user.name}”? This removes it from the list.`}
                   buttonLabel="Delete"
                   buttonVariant="destructive"
                   onConfirm={() => {
@@ -127,7 +127,7 @@ export function AdminUsersShell({
                       current.filter((row) => row.id !== user.id),
                     );
                     setStatus(
-                      `Demo only — “${user.name}” was removed from this list.`,
+                      `“${user.name}” was removed.`,
                     );
                   }}
                 />

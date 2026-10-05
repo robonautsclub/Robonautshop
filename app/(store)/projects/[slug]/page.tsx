@@ -151,7 +151,7 @@ export default async function ProjectDetailPage({
             Required components
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Quantities, live stock from the mock inventory, and line prices.
+            Quantities, live stock, and line prices.
           </p>
           <ComponentRequirementsList className="mt-6" lines={requiredLines} />
         </div>

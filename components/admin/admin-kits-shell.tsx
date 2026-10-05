@@ -87,7 +87,7 @@ export function AdminKitsShell({
         }
         toolbar={
           <>
-            <AdminTableToolbarSearch placeholder="Search kits (demo)" />
+            <AdminTableToolbarSearch placeholder="Search kits" />
             <p className="text-xs text-muted-foreground">
               No creating parts inside Kits
             </p>
@@ -136,7 +136,7 @@ export function AdminKitsShell({
                   <AdminDeleteTrigger
                     itemLabel={`the kit “${kit.name}”`}
                     title="Delete kit?"
-                    description={`Are you sure you want to delete “${kit.name}”? Demo only — this removes it from the admin list in this session.`}
+                    description={`Are you sure you want to delete “${kit.name}”? This removes it from the list.`}
                     buttonLabel="Delete"
                     buttonVariant="destructive"
                     onConfirm={() => {
@@ -144,7 +144,7 @@ export function AdminKitsShell({
                         current.filter((row) => row.id !== kit.id),
                       );
                       setStatus(
-                        `Demo only — “${kit.name}” was removed from this list.`,
+                        `“${kit.name}” was removed.`,
                       );
                     }}
                   />

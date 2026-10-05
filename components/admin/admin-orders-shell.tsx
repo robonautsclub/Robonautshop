@@ -84,7 +84,7 @@ export function AdminOrdersShell({
       ),
     );
     setMessage(
-      `Demo only — ${order.id} cancelled. Booked units released back to available.`,
+      `${order.id} cancelled. Booked units released back to available.`,
     );
   }
 
@@ -111,14 +111,14 @@ export function AdminOrdersShell({
           : item,
       ),
     );
-    setMessage(`Demo only — ${order.id} booked again against stock.`);
+    setMessage(`${order.id} booked again against stock.`);
   }
 
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Orders"
-        description={`${localOrders.length} orders · download receipt on real orders · cancel releases booked stock on demos.`}
+        description={`${localOrders.length} orders · download receipt · cancel releases booked stock.`}
         toolbar={
           <>
             <AdminTableToolbarSearch placeholder="Search orders" />
@@ -220,7 +220,7 @@ export function AdminOrdersShell({
                         variant="outline"
                         onClick={() => rebookOrder(order)}
                       >
-                        Rebook demo
+                        Rebook
                       </Button>
                     )}
                   </div>

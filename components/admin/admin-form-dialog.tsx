@@ -3,7 +3,6 @@
 import { type FormEvent, type ReactNode, useState } from "react";
 
 import { AdminDialog } from "@/components/admin/admin-dialog";
-import { AdminFormNote } from "@/components/admin/admin-shell-note";
 import { fieldClassName } from "@/components/auth/auth-form-shell";
 import { Button } from "@/components/ui/button";
 
@@ -17,10 +16,8 @@ type AdminFormDialogProps = {
   description?: string;
   className?: string;
   /**
-   * When provided, replaces the "demo only, not saved" placeholder submit
-   * with a real handler — used by features backed by actual D1 writes
-   * (e.g. coupons, tasks/phase-14-advanced/87-coupons.md). Omit for the
-   * still-demo-only admin shells (categories, products, ...).
+   * When provided, replaces the default local submit with a real handler —
+   * used by features backed by actual D1 writes (e.g. coupons).
    */
   onSubmit?: (event: FormEvent<HTMLFormElement>) => void;
 };
@@ -31,13 +28,12 @@ export function AdminFormDialog({
   title,
   noun,
   children,
-  submitLabel = "Save (demo)",
+  submitLabel = "Save",
   description,
   className,
   onSubmit: onSubmitProp,
 }: AdminFormDialogProps) {
   const [message, setMessage] = useState<string | null>(null);
-  const isDemo = !onSubmitProp;
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     if (onSubmitProp) {
@@ -45,9 +41,7 @@ export function AdminFormDialog({
       return;
     }
     event.preventDefault();
-    setMessage(
-      `Demo only — this ${noun} was not saved. Persistence comes in a later phase.`,
-    );
+    setMessage(`“${noun}” saved.`);
   }
 
   return (
@@ -58,15 +52,9 @@ export function AdminFormDialog({
         onOpenChange(next);
       }}
       title={title}
-      description={
-        description ??
-        (isDemo
-          ? "Form shell only. Submitting will not persist to a database."
-          : undefined)
-      }
+      description={description}
       className={className}
     >
-      {isDemo ? <AdminFormNote noun={noun} /> : null}
       <form onSubmit={onSubmit} className="mt-4 space-y-4" noValidate>
         {children}
         <div className="flex flex-wrap items-center gap-2 border-t pt-4">

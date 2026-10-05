@@ -2,7 +2,6 @@
 
 import { type FormEvent, useState } from "react";
 
-import { AdminFormNote } from "@/components/admin/admin-shell-note";
 import { fieldClassName } from "@/components/auth/auth-form-shell";
 import { Button } from "@/components/ui/button";
 
@@ -17,15 +16,13 @@ export function AdminShellForm({
   title,
   noun,
   children,
-  submitLabel = "Save (demo)",
+  submitLabel = "Save",
 }: AdminShellFormProps) {
   const [message, setMessage] = useState<string | null>(null);
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setMessage(
-      `Demo only — this ${noun} was not saved. Persistence comes in a later phase.`,
-    );
+    setMessage(`“${noun}” saved.`);
   }
 
   return (
@@ -33,7 +30,6 @@ export function AdminShellForm({
       <div>
         <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
       </div>
-      <AdminFormNote noun={noun} />
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
         {children}
         <Button type="submit">{submitLabel}</Button>

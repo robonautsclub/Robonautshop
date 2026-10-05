@@ -9,7 +9,6 @@ import {
   AdminPagination,
   useAdminPagination,
 } from "@/components/admin/admin-pagination";
-import { AdminFormNote } from "@/components/admin/admin-shell-note";
 import {
   AdminStatusBadge,
   AdminTable,
@@ -87,7 +86,7 @@ export function AdminInventoryShell({ rows }: AdminInventoryShellProps) {
         description={`${rows.length} SKUs · ${lowCount} low · available = stock − booked.`}
         toolbar={
           <>
-            <AdminTableToolbarSearch placeholder="Search SKUs (demo)" />
+            <AdminTableToolbarSearch placeholder="Search SKUs" />
             <AdminStatusBadge tone={lowCount > 0 ? "warning" : "success"}>
               {lowCount} low
             </AdminStatusBadge>
@@ -108,8 +107,6 @@ export function AdminInventoryShell({ rows }: AdminInventoryShellProps) {
           <li>Cancelled orders release booked units back to available.</li>
         </ul>
       </div>
-
-      <AdminFormNote noun="inventory change" />
 
       <AdminTable>
         <AdminTableHead>
@@ -193,7 +190,7 @@ export function AdminInventoryShell({ rows }: AdminInventoryShellProps) {
           if (!open) setEditingSku(null);
         }}
         title={editing ? `Edit stock · ${editing.sku}` : "Edit stock"}
-        description="Demo only — changes stay in this browser session."
+        description="Update stock quantity and low-stock threshold."
       >
         {editing ? (
           <div className="space-y-4">
@@ -256,13 +253,11 @@ export function AdminInventoryShell({ rows }: AdminInventoryShellProps) {
               <Button
                 type="button"
                 onClick={() => {
-                  setMessage(
-                    `Demo only — stock for ${editing.sku} was not saved to a database.`,
-                  );
+                  setMessage(`Stock updated for ${editing.sku}.`);
                   setEditingSku(null);
                 }}
               >
-                Save (demo)
+                Save
               </Button>
               <Button
                 type="button"

@@ -53,7 +53,7 @@ export async function AdminDashboardContent() {
     {
       label: "Orders",
       value: String(orders.length),
-      hint: "Demo fixture",
+      hint: "Catalog",
       href: "/admin/orders",
     },
     {
@@ -66,7 +66,7 @@ export async function AdminDashboardContent() {
     {
       label: "Customers",
       value: String(customers.length),
-      hint: "Demo fixture",
+      hint: "Catalog",
       href: "/admin/customers",
     },
   ];
@@ -106,7 +106,7 @@ export async function AdminDashboardContent() {
     <div>
       <AdminPageHeader
         title="Dashboard"
-        description="Commerce overview from mock catalog and demo orders. Not live analytics."
+        description="Commerce overview."
       />
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">

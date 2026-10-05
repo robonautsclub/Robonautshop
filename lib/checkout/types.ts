@@ -1,4 +1,4 @@
-export type PaymentMethodId = "COD" | "BKASH" | "NAGAD";
+export type PaymentMethodId = "BKASH";
 
 export const PAYMENT_METHODS: Array<{
   id: PaymentMethodId;
@@ -6,19 +6,10 @@ export const PAYMENT_METHODS: Array<{
   description: string;
 }> = [
   {
-    id: "COD",
-    label: "Cash on Delivery",
-    description: "Pay when your order arrives. No online charge in this demo.",
-  },
-  {
     id: "BKASH",
     label: "bKash",
-    description: "Pay with bKash Checkout. You will be redirected to bKash to complete payment.",
-  },
-  {
-    id: "NAGAD",
-    label: "Nagad",
-    description: "Placeholder only — no Nagad payment is processed.",
+    description:
+      "Pay with bKash Checkout. You will be redirected to bKash to complete payment.",
   },
 ];
 
@@ -28,7 +19,7 @@ export type ShippingEstimate = {
   note: string;
 };
 
-/** Simple mock estimate. Not a courier API. */
+/** Simple city-based delivery estimate. */
 export function estimateShippingBdt(city: string): ShippingEstimate {
   const normalized = city.trim().toLowerCase();
 
@@ -51,14 +42,13 @@ export function estimateShippingBdt(city: string): ShippingEstimate {
     return {
       method: "Dhaka metro delivery",
       amount: 80,
-      note: "Mock delivery charge for Dhaka areas. Not a live courier quote.",
+      note: "Delivery charge for Dhaka areas.",
     };
   }
 
   return {
     method: "Outside Dhaka delivery",
     amount: 130,
-    note: "Mock delivery charge for outside Dhaka. Not a live courier quote.",
+    note: "Delivery charge for outside Dhaka.",
   };
 }
-

@@ -46,11 +46,7 @@ export function AdminOrderDetailShell({ order }: { order: AdminOrder }) {
     <div className="space-y-6">
       <AdminPageHeader
         title={order.id}
-        description={
-          order.invoiceAvailable
-            ? "Real order detail. Receipt is generated on demand (not stored)."
-            : "Demo order detail. Receipt is generated on demand (not stored)."
-        }
+        description="Order detail. Download receipt to generate a PDF."
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <a
@@ -124,8 +120,7 @@ export function AdminOrderDetailShell({ order }: { order: AdminOrder }) {
             Payment method: {order.paymentMethod}
           </p>
           <p className="text-xs text-muted-foreground">
-            Demo fixture only — order and payment status stay separate for the
-            future real system.
+            Order status and payment status are tracked separately.
           </p>
         </section>
       </div>

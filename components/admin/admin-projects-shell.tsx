@@ -99,7 +99,7 @@ export function AdminProjectsShell({
         }
         toolbar={
           <>
-            <AdminTableToolbarSearch placeholder="Search projects (demo)" />
+            <AdminTableToolbarSearch placeholder="Search projects" />
             <p className="text-xs text-muted-foreground">
               Add product first, then attach here
             </p>
@@ -154,7 +154,7 @@ export function AdminProjectsShell({
                   <AdminDeleteTrigger
                     itemLabel={`the project “${project.name}”`}
                     title="Delete project?"
-                    description={`Are you sure you want to delete “${project.name}”? Demo only — this removes it from the admin list in this session.`}
+                    description={`Are you sure you want to delete “${project.name}”? This removes it from the list.`}
                     buttonLabel="Delete"
                     buttonVariant="destructive"
                     onConfirm={() => {
@@ -162,7 +162,7 @@ export function AdminProjectsShell({
                         current.filter((row) => row.id !== project.id),
                       );
                       setStatus(
-                        `Demo only — “${project.name}” was removed from this list.`,
+                        `“${project.name}” was removed.`,
                       );
                     }}
                   />

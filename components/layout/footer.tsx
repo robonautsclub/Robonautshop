@@ -24,23 +24,6 @@ const paymentMethods = [
     className:
       "border-[#E2136E]/25 bg-[#E2136E]/10 text-[#9B0B4A] dark:text-[#FF7AB5]",
   },
-  {
-    id: "nagad",
-    label: "Nagad",
-    className:
-      "border-[#F68712]/30 bg-[#F68712]/10 text-[#9A4E00] dark:text-[#FFB86A]",
-  },
-  {
-    id: "cod",
-    label: "Cash on Delivery",
-    className: "border-foreground/15 bg-muted/60 text-foreground",
-  },
-  {
-    id: "sslcommerz",
-    label: "SSLCOMMERZ",
-    className:
-      "border-sky-500/25 bg-sky-500/10 text-sky-800 dark:text-sky-300",
-  },
 ] as const;
 
 function FooterLink({
@@ -140,40 +123,26 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="space-y-2.5 rounded-xl border bg-background/70 p-3.5 sm:p-4">
-          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-xs font-semibold tracking-[0.14em] text-foreground/80 uppercase">
-                Payment methods
-              </p>
-              <p className="mt-0.5 text-sm text-muted-foreground">
-                bKash, Nagad, Cash on Delivery, or SSLCOMMERZ when live.
-              </p>
-            </div>
-            <p className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-              <Lock className="size-3.5" aria-hidden />
-              Payment secrets stay with the gateway
-            </p>
-          </div>
-
-          <ul className="flex flex-wrap gap-2" aria-label="Accepted payments">
-            {paymentMethods.map((method) => (
-              <li key={method.id}>
+        <div className="flex flex-col gap-2 border-t pt-4 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            <p>© {year} Robonautsshop</p>
+            <span className="hidden h-3 w-px bg-border sm:inline-block" aria-hidden />
+            <p className="inline-flex items-center gap-1.5 text-xs">
+              <Lock className="size-3 shrink-0" aria-hidden />
+              <span>Pay with</span>
+              {paymentMethods.map((method) => (
                 <span
+                  key={method.id}
                   className={cn(
-                    "inline-flex h-8 items-center rounded-lg border px-2.5 text-xs font-semibold tracking-tight",
+                    "inline-flex h-5 items-center rounded border px-1.5 text-[10px] font-semibold tracking-tight",
                     method.className,
                   )}
                 >
                   {method.label}
                 </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="flex flex-col gap-1.5 border-t pt-4 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© {year} Robonautsshop</p>
+              ))}
+            </p>
+          </div>
           <p className="sm:text-right">
             Developed by{" "}
             <a

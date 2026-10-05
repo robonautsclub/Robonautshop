@@ -34,7 +34,7 @@ export function OrderConfirmationContent({
         ? "Waiting for bKash payment. If you closed the bKash window, return to checkout and try again."
         : order.paymentStatus === "FAILED" || order.paymentStatus === "CANCELLED"
           ? "No charge was completed. You can pay again with bKash from your orders page."
-          : "We’ll update the status here as it’s processed. Cash on Delivery and other unpaid methods stay pending until collected.";
+          : "We’ll update the status here as the order is processed.";
 
   return (
     <PageContainer as="section" className="py-10">

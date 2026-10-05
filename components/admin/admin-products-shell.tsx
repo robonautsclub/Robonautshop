@@ -67,7 +67,7 @@ export function AdminProductsShell({
         }
         toolbar={
           <>
-            <AdminTableToolbarSearch placeholder="Search products (demo)" />
+            <AdminTableToolbarSearch placeholder="Search products" />
             <p className="text-xs text-muted-foreground">
               Products must exist before Kits can use them
             </p>
@@ -119,7 +119,7 @@ export function AdminProductsShell({
                   <AdminDeleteTrigger
                     itemLabel={`the product “${product.name}”`}
                     title="Delete product?"
-                    description={`Are you sure you want to delete “${product.name}”? Demo only — this removes it from the admin list in this session.`}
+                    description={`Are you sure you want to delete “${product.name}”? This removes it from the list.`}
                     buttonLabel="Delete"
                     buttonVariant="destructive"
                     onConfirm={() => {
@@ -127,7 +127,7 @@ export function AdminProductsShell({
                         current.filter((row) => row.id !== product.id),
                       );
                       setStatus(
-                        `Demo only — “${product.name}” was removed from this list.`,
+                        `“${product.name}” was removed.`,
                       );
                     }}
                   />

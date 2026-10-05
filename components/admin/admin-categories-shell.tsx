@@ -56,7 +56,7 @@ export function AdminCategoriesShell({
         }
         toolbar={
           <>
-            <AdminTableToolbarSearch placeholder="Search categories (demo)" />
+            <AdminTableToolbarSearch placeholder="Search categories" />
             <p className="text-xs text-muted-foreground">
               Sorted by catalog sort order
             </p>
@@ -102,7 +102,7 @@ export function AdminCategoriesShell({
                   <AdminDeleteTrigger
                     itemLabel={`the category “${category.name}”`}
                     title="Delete category?"
-                    description={`Are you sure you want to delete “${category.name}”? Demo only — this removes it from the admin list in this session.`}
+                    description={`Are you sure you want to delete “${category.name}”? This removes it from the list.`}
                     buttonLabel="Delete"
                     buttonVariant="destructive"
                     onConfirm={() => {
@@ -110,7 +110,7 @@ export function AdminCategoriesShell({
                         current.filter((row) => row.id !== category.id),
                       );
                       setStatus(
-                        `Demo only — “${category.name}” was removed from this list.`,
+                        `“${category.name}” was removed.`,
                       );
                     }}
                   />

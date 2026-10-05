@@ -143,14 +143,12 @@ export const docPages: DocPage[] = [
   {
     id: "doc-payments",
     slug: "payments",
-    title: "Payments (bKash, COD, and more)",
+    title: "Payments (bKash)",
     section: "Checkout",
-    shortDescription: "How payment methods work on Robonautsshop.",
+    shortDescription: "How payment works on Robonautshop.",
     body: [
-      "Cash on Delivery: pay the courier when your parcel arrives. The order stays pending payment until collected.",
       "bKash Checkout: you are redirected to bKash; the order is confirmed only after payment succeeds.",
       "Never send payment to personal numbers posted outside the official checkout flow.",
-      "Nagad and other gateways may appear as placeholders until they are fully wired.",
     ],
   },
   {

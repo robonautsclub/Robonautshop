@@ -30,12 +30,12 @@ export function AdminCustomersShell({
     <div className="space-y-6">
       <AdminPageHeader
         title="Customers"
-        description={`${rows.length} demo customers · Delete always asks for confirmation.`}
+        description={`${rows.length} customers · Delete always asks for confirmation.`}
         toolbar={
           <>
-            <AdminTableToolbarSearch placeholder="Search customers (demo)" />
+            <AdminTableToolbarSearch placeholder="Search customers" />
             <p className="text-xs text-muted-foreground">
-              Static fixture rows only
+              Customer records
             </p>
           </>
         }
@@ -71,7 +71,7 @@ export function AdminCustomersShell({
                 <AdminDeleteTrigger
                   itemLabel={`the customer “${customer.name}”`}
                   title="Delete customer?"
-                  description={`Are you sure you want to delete “${customer.name}”? Demo only — this removes them from the admin list in this session.`}
+                  description={`Are you sure you want to delete “${customer.name}”? This removes it from the list.`}
                   buttonLabel="Delete"
                   buttonVariant="destructive"
                   onConfirm={() => {
@@ -79,7 +79,7 @@ export function AdminCustomersShell({
                       current.filter((row) => row.id !== customer.id),
                     );
                     setStatus(
-                      `Demo only — “${customer.name}” was removed from this list.`,
+                      `“${customer.name}” was removed.`,
                     );
                   }}
                 />

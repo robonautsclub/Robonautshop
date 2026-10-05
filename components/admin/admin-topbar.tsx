@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { ExternalLink, Search } from "lucide-react";
 
 import { AdminMobileNav } from "@/components/admin/admin-mobile-nav";
-import { AdminShellNote } from "@/components/admin/admin-shell-note";
 import { SiteLogo } from "@/components/brand/site-logo";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { getAdminSectionLabel } from "@/lib/admin";
@@ -33,9 +32,6 @@ export function AdminTopbar() {
             </p>
             <p className="truncate text-sm font-medium lg:hidden">{section}</p>
           </div>
-          <div className="mt-0.5 lg:hidden">
-            <AdminShellNote compact />
-          </div>
         </div>
       </div>
 
@@ -46,7 +42,7 @@ export function AdminTopbar() {
           size="sm"
           className="hidden text-muted-foreground md:inline-flex"
           disabled
-          title="Search comes in a later phase"
+          title="Search"
         >
           <Search className="size-3.5" aria-hidden />
           Search
