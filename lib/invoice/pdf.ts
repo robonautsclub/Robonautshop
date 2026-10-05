@@ -1,6 +1,14 @@
-import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
+import {
+  PDFDocument,
+  StandardFonts,
+  rgb,
+  type PDFFont,
+  type PDFImage,
+  type PDFPage,
+} from "pdf-lib";
 
 import { invoicePdfFilename, shortOrderId } from "@/lib/invoice/from-order";
+import { INVOICE_LOGO_PNG_BASE64 } from "@/lib/invoice/logo-base64";
 import type { OrderInvoice } from "@/lib/invoice/types";
 
 const PAGE_WIDTH = 595.28;
@@ -8,11 +16,12 @@ const PAGE_HEIGHT = 841.89;
 const MARGIN = 48;
 const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2;
 
-const ink = rgb(0.09, 0.09, 0.09);
-const muted = rgb(0.45, 0.45, 0.45);
-const line = rgb(0.89, 0.89, 0.91);
-const headerBg = rgb(0.09, 0.09, 0.09);
-const white = rgb(1, 1, 1);
+/** Brand blue from the Robonautshop logo — no black fills. */
+const brand = rgb(0.145, 0.325, 0.722);
+const brandSoft = rgb(0.9, 0.93, 0.98);
+const ink = rgb(0.18, 0.22, 0.3);
+const muted = rgb(0.45, 0.5, 0.58);
+const line = rgb(0.86, 0.89, 0.93);
 
 /**
  * Helvetica (WinAnsi) cannot encode ৳ or many Unicode punctuation marks.
@@ -43,7 +52,6 @@ function formatInvoiceDate(iso: string): string {
   if (Number.isNaN(date.getTime())) {
     return iso;
   }
-  // ASCII months only — avoids locale-specific Unicode in PDF fonts.
   return date.toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
@@ -76,14 +84,31 @@ function truncate(font: PDFFont, text: string, size: number, maxWidth: number): 
   return `${truncated}...`;
 }
 
+/** Workers-safe base64 decode (no Node Buffer required). */
+function base64ToBytes(base64: string): Uint8Array {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
 /**
- * On-the-fly PDF invoice matching the HTML invoice sections.
+ * On-the-fly PDF invoice — clean layout with logo and blue accents (no black).
  * Returns raw PDF bytes — never stored in R2.
  */
 export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   const regular = await doc.embedFont(StandardFonts.Helvetica);
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+
+  let logo: PDFImage | null = null;
+  try {
+    logo = await doc.embedPng(base64ToBytes(INVOICE_LOGO_PNG_BASE64));
+  } catch (error) {
+    console.error("[invoice] Failed to embed logo PNG:", error);
+  }
 
   let page = doc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
   let y = PAGE_HEIGHT - MARGIN;
@@ -95,26 +120,41 @@ export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint
     }
   };
 
-  // Header bar
-  page.drawRectangle({
-    x: 0,
-    y: PAGE_HEIGHT - 110,
-    width: PAGE_WIDTH,
-    height: 110,
-    color: headerBg,
-  });
-  drawText(page, "ROBONAUTSHOP", MARGIN, PAGE_HEIGHT - 40, regular, 9, rgb(0.64, 0.64, 0.64));
-  drawText(page, "Invoice / Order confirmation", MARGIN, PAGE_HEIGHT - 64, bold, 18, white);
+  // ---- Header: logo + brand + title (white background, blue accent) ----
+  const logoSize = 44;
+  if (logo) {
+    page.drawImage(logo, {
+      x: MARGIN,
+      y: y - logoSize + 6,
+      width: logoSize,
+      height: logoSize,
+    });
+  }
+
+  const textX = MARGIN + (logo ? logoSize + 12 : 0);
+  drawText(page, "Robonautshop", textX, y - 6, bold, 16, brand);
+  drawText(page, "Invoice / Order confirmation", textX, y - 26, bold, 12, ink);
   drawText(
     page,
     `Order ${shortOrderId(invoice.orderId)}  |  ${formatInvoiceDate(invoice.createdAt)}`,
-    MARGIN,
-    PAGE_HEIGHT - 86,
+    textX,
+    y - 42,
     regular,
     10,
-    rgb(0.83, 0.83, 0.83),
+    muted,
   );
-  y = PAGE_HEIGHT - 140;
+
+  y -= 58;
+
+  // Blue accent line
+  page.drawRectangle({
+    x: MARGIN,
+    y,
+    width: CONTENT_WIDTH,
+    height: 2.5,
+    color: brand,
+  });
+  y -= 20;
 
   drawText(
     page,
@@ -128,8 +168,8 @@ export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint
   y -= 28;
 
   // Meta columns
-  drawText(page, "ORDER DETAILS", MARGIN, y, bold, 8, muted);
-  drawText(page, "BILL TO", MARGIN + CONTENT_WIDTH / 2, y, bold, 8, muted);
+  drawText(page, "ORDER DETAILS", MARGIN, y, bold, 8, brand);
+  drawText(page, "BILL TO", MARGIN + CONTENT_WIDTH / 2, y, bold, 8, brand);
   y -= 16;
 
   const metaLeft = [
@@ -164,7 +204,7 @@ export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint
   }
   y -= 16;
 
-  // Table header
+  // Table header — soft blue, not black
   const colItem = MARGIN;
   const colQty = MARGIN + 280;
   const colUnit = MARGIN + 340;
@@ -176,11 +216,11 @@ export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint
     y: y - 6,
     width: CONTENT_WIDTH,
     height: 22,
-    color: rgb(0.98, 0.98, 0.98),
+    color: brandSoft,
   });
-  drawText(page, "ITEM", colItem + 8, y, bold, 8, muted);
-  drawText(page, "QTY", colQty, y, bold, 8, muted);
-  drawText(page, "UNIT", colUnit, y, bold, 8, muted);
+  drawText(page, "ITEM", colItem + 8, y, bold, 8, brand);
+  drawText(page, "QTY", colQty, y, bold, 8, brand);
+  drawText(page, "UNIT", colUnit, y, bold, 8, brand);
   const totalLabel = "TOTAL";
   drawText(
     page,
@@ -189,7 +229,7 @@ export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint
     y,
     bold,
     8,
-    muted,
+    brand,
   );
   y -= 24;
 
@@ -199,17 +239,17 @@ export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint
     drawText(page, name, colItem + 8, y, bold, 10);
     drawText(page, `SKU ${item.sku}`, colItem + 8, y - 12, regular, 8, muted);
 
-    const qty = String(item.quantity);
-    drawText(page, qty, colQty + 4, y - 4, regular, 10);
+    drawText(page, String(item.quantity), colQty + 4, y - 4, regular, 10);
 
     const unit = formatBdtPdf(item.unitPrice);
     drawText(page, unit, colUnit, y - 4, regular, 10);
 
     const total = formatBdtPdf(item.lineTotal);
+    const safeTotal = toWinAnsi(total);
     drawText(
       page,
-      total,
-      colTotal - bold.widthOfTextAtSize(toWinAnsi(total), 10),
+      safeTotal,
+      colTotal - bold.widthOfTextAtSize(safeTotal, 10),
       y - 4,
       bold,
       10,
@@ -235,7 +275,7 @@ export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint
     const font = strong ? bold : regular;
     const size = strong ? 12 : 10;
     const safeValue = toWinAnsi(value);
-    drawText(page, label, totalsX, y, font, size, strong ? ink : muted);
+    drawText(page, label, totalsX, y, font, size, strong ? brand : muted);
     drawText(
       page,
       safeValue,
@@ -243,6 +283,7 @@ export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint
       y,
       font,
       size,
+      strong ? brand : ink,
     );
     y -= strong ? 18 : 16;
   };
@@ -259,7 +300,7 @@ export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint
     start: { x: totalsX, y: y + 8 },
     end: { x: valueX, y: y + 8 },
     thickness: 0.75,
-    color: line,
+    color: brand,
   });
   drawTotalRow("Total", formatBdtPdf(invoice.total), true);
 
@@ -271,7 +312,7 @@ export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint
     thickness: 0.5,
     color: line,
   });
-  drawText(page, "DELIVER TO", MARGIN, y, bold, 8, muted);
+  drawText(page, "DELIVER TO", MARGIN, y, bold, 8, brand);
   y -= 16;
 
   const shipLines = [
