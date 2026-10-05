@@ -48,3 +48,15 @@ export const PAYMENT_STATUS_VALUES = [
 
 export type OrderStatus = (typeof ORDER_STATUS_VALUES)[number];
 export type OrderPaymentStatus = (typeof PAYMENT_STATUS_VALUES)[number];
+
+/** Percent (of subtotal) or a fixed BDT amount off — tasks/phase-14-advanced/87-coupons.md. */
+export const COUPON_TYPE_VALUES = ["PERCENT", "FIXED"] as const;
+export type CouponType = (typeof COUPON_TYPE_VALUES)[number];
+
+/** tasks/phase-14-advanced/90-analytics.md — lightweight, self-hosted event log. */
+export const ANALYTICS_EVENT_TYPE_VALUES = [
+  "PRODUCT_VIEW",
+  "SEARCH",
+  "ADD_TO_CART",
+] as const;
+export type AnalyticsEventType = (typeof ANALYTICS_EVENT_TYPE_VALUES)[number];

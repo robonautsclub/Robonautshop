@@ -12,6 +12,7 @@ import {
 } from "react";
 
 import { useAuth } from "@/components/auth/auth-provider";
+import { recordAddToCartAction } from "@/lib/analytics/actions";
 import {
   calculateCartItemCount,
   calculateCartSubtotal,
@@ -240,6 +241,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         added = true;
         return next;
       });
+
+      if (added) {
+        void recordAddToCartAction(input.productId).catch(() => {});
+      }
 
       return added;
     },

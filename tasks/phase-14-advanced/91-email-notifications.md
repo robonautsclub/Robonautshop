@@ -1,6 +1,6 @@
 # Task 91 — Email notifications
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

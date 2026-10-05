@@ -31,6 +31,9 @@ export const orders = sqliteTable(
     paymentMethod: text("payment_method").notNull(),
     subtotal: integer("subtotal").notNull(),
     shippingTotal: integer("shipping_total").notNull(),
+    /** Coupon discount in BDT, computed server-side (tasks/phase-14-advanced/87-coupons.md). */
+    discountTotal: integer("discount_total").notNull().default(0),
+    couponCode: text("coupon_code"),
     total: integer("total").notNull(),
     shippingFullName: text("shipping_full_name").notNull(),
     shippingPhone: text("shipping_phone").notNull(),

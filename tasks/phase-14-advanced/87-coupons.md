@@ -1,6 +1,6 @@
 # Task 87 — Coupons
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

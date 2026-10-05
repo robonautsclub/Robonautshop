@@ -1,6 +1,6 @@
 # Task 86 — Wishlist
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

@@ -1,6 +1,6 @@
 # Task 93 — Inventory alerts
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

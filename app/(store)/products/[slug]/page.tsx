@@ -12,6 +12,10 @@ import {
   ProductGrid,
 } from "@/components/product";
 import { ProductPurchasePanel } from "@/components/product/product-purchase-panel";
+import { WishlistButton } from "@/components/product/wishlist-button";
+import { FrequentlyBoughtTogether } from "@/components/recommendations/frequently-bought-together";
+import { ProductReviewsSection } from "@/components/reviews/product-reviews-section";
+import { getServerSession } from "@/lib/auth/session";
 import {
   getProductBySlug,
   getProductCardModels,
@@ -22,6 +26,10 @@ import {
   getDatasheetsForProductSlug,
 } from "@/lib/content";
 import { getRequestDb } from "@/lib/db/request";
+import { recordAnalyticsEvent } from "@/lib/analytics/queries";
+import { getFrequentlyBoughtWith } from "@/lib/recommendations/queries";
+import { getMyReviewForProduct, getReviewsForProduct, getReviewSummaryForProduct } from "@/lib/reviews/queries";
+import { isInWishlist } from "@/lib/wishlist/queries";
 
 type ProductDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -61,6 +69,18 @@ export default async function ProductDetailPage({
   const specificationEntries = Object.entries(product.specifications);
   const datasheets = getDatasheetsForProductSlug(product.slug);
   const codeExamples = getCodeExamplesForProductSlug(product.slug);
+
+  const session = await getServerSession();
+  const [frequentlyBoughtWith, reviews, reviewSummary, myReview, wishlisted] = await Promise.all([
+    getFrequentlyBoughtWith(db, product.id, 4),
+    getReviewsForProduct(db, product.id),
+    getReviewSummaryForProduct(db, product.id),
+    session ? getMyReviewForProduct(db, session.user.id, product.id) : Promise.resolve(null),
+    session ? isInWishlist(db, session.user.id, product.id) : Promise.resolve(false),
+  ]);
+
+  // Fire-and-forget — never block the page render on analytics logging.
+  void recordAnalyticsEvent(db, { type: "PRODUCT_VIEW", productId: product.id });
 
   return (
     <PageContainer as="section" className="py-10">
@@ -126,6 +146,12 @@ export default async function ProductDetailPage({
             product={product}
             variants={product.variants}
             inventory={product.inventory}
+          />
+
+          <WishlistButton
+            productId={product.id}
+            initialWishlisted={wishlisted}
+            isSignedIn={Boolean(session)}
           />
         </div>
       </div>
@@ -194,6 +220,16 @@ export default async function ProductDetailPage({
           )}
         </div>
       </div>
+
+      <FrequentlyBoughtTogether items={frequentlyBoughtWith} />
+
+      <ProductReviewsSection
+        productSlug={product.slug}
+        reviews={reviews}
+        summary={reviewSummary}
+        isSignedIn={Boolean(session)}
+        myReview={myReview}
+      />
     </PageContainer>
   );
 }

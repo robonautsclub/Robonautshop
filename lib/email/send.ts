@@ -142,6 +142,65 @@ export async function sendOrderConfirmationEmail(
   });
 }
 
+/** Abandoned cart reminder (tasks/phase-14-advanced/92-abandoned-carts.md). */
+export async function sendAbandonedCartReminderEmail(args: {
+  to: string;
+  name: string;
+  itemCount: number;
+}): Promise<boolean> {
+  const site = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "";
+  const safeName = escapeHtml(args.name.trim() || "there");
+
+  return sendEmail({
+    to: args.to,
+    subject: "You left something in your cart",
+    html: `
+      <p>Hi ${safeName},</p>
+      <p>You still have ${args.itemCount} item${args.itemCount === 1 ? "" : "s"} waiting in your Robonautshop cart.</p>
+      ${site ? `<p><a href="${escapeHtml(site)}/cart">Finish your order</a></p>` : ""}
+      <p>— Robonautshop</p>
+    `,
+  });
+}
+
+export type LowStockAlertLine = {
+  sku: string;
+  productName: string;
+  availableQuantity: number;
+  lowStockThreshold: number;
+};
+
+/**
+ * Low-stock admin alert (tasks/phase-14-advanced/93-inventory-alerts.md).
+ * No-ops when ADMIN_ALERT_EMAIL isn't set, same as the Resend API key check.
+ */
+export async function sendLowStockAlertEmail(lines: LowStockAlertLine[]): Promise<boolean> {
+  const to = process.env.ADMIN_ALERT_EMAIL?.trim();
+  if (!to || lines.length === 0) {
+    return false;
+  }
+
+  const rowsHtml = lines
+    .map(
+      (line) =>
+        `<tr>
+          <td style="padding:4px 8px 4px 0;">${escapeHtml(line.productName)} (${escapeHtml(line.sku)})</td>
+          <td style="padding:4px 0; text-align:right;">${line.availableQuantity} left (threshold ${line.lowStockThreshold})</td>
+        </tr>`,
+    )
+    .join("");
+
+  return sendEmail({
+    to,
+    subject: `Low stock alert · ${lines.length} item${lines.length === 1 ? "" : "s"}`,
+    html: `
+      <p>The following items are at or below their low-stock threshold after a recent order:</p>
+      <table style="border-collapse:collapse; width:100%; max-width:480px;">${rowsHtml}</table>
+      <p style="margin-top:16px;">— Robonautshop inventory alerts</p>
+    `,
+  });
+}
+
 function escapeHtml(value: string): string {
   return value
     .replaceAll("&", "&amp;")

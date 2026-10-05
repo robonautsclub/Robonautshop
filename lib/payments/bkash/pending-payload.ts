@@ -26,9 +26,20 @@ export type BkashPendingPayload = {
   specialInstructions?: string;
   subtotal: number;
   shippingTotal: number;
+  /** Coupon discount in BDT, if one was applied (tasks/phase-14-advanced/87-coupons.md). */
+  discountTotal?: number;
+  couponId?: string | null;
+  couponCode?: string | null;
   total: number;
 };
 
 export function parseBkashPendingPayload(raw: string): BkashPendingPayload {
-  return JSON.parse(raw) as BkashPendingPayload;
+  const parsed = JSON.parse(raw) as BkashPendingPayload;
+  // Defensive defaults for payloads staged before the coupon fields existed.
+  return {
+    discountTotal: 0,
+    couponId: null,
+    couponCode: null,
+    ...parsed,
+  };
 }

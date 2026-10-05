@@ -1,6 +1,6 @@
 # Task 88 — Recommendations
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

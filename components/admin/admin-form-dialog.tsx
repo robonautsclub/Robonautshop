@@ -16,6 +16,13 @@ type AdminFormDialogProps = {
   submitLabel?: string;
   description?: string;
   className?: string;
+  /**
+   * When provided, replaces the "demo only, not saved" placeholder submit
+   * with a real handler — used by features backed by actual D1 writes
+   * (e.g. coupons, tasks/phase-14-advanced/87-coupons.md). Omit for the
+   * still-demo-only admin shells (categories, products, ...).
+   */
+  onSubmit?: (event: FormEvent<HTMLFormElement>) => void;
 };
 
 export function AdminFormDialog({
@@ -27,10 +34,16 @@ export function AdminFormDialog({
   submitLabel = "Save (demo)",
   description,
   className,
+  onSubmit: onSubmitProp,
 }: AdminFormDialogProps) {
   const [message, setMessage] = useState<string | null>(null);
+  const isDemo = !onSubmitProp;
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
+    if (onSubmitProp) {
+      onSubmitProp(event);
+      return;
+    }
     event.preventDefault();
     setMessage(
       `Demo only — this ${noun} was not saved. Persistence comes in a later phase.`,
@@ -47,11 +60,13 @@ export function AdminFormDialog({
       title={title}
       description={
         description ??
-        "Form shell only. Submitting will not persist to a database."
+        (isDemo
+          ? "Form shell only. Submitting will not persist to a database."
+          : undefined)
       }
       className={className}
     >
-      <AdminFormNote noun={noun} />
+      {isDemo ? <AdminFormNote noun={noun} /> : null}
       <form onSubmit={onSubmit} className="mt-4 space-y-4" noValidate>
         {children}
         <div className="flex flex-wrap items-center gap-2 border-t pt-4">

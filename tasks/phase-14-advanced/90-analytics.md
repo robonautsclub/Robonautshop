@@ -1,6 +1,6 @@
 # Task 90 — Analytics
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

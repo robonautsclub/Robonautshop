@@ -205,15 +205,15 @@ Superseded stubs (do not implement): [77](phase-12-wire-up/77-real-auth.md), [79
 
 ## Phase 14 — Advanced
 
-- [ ] 85 [Reviews](phase-14-advanced/85-reviews.md)
-- [ ] 86 [Wishlist](phase-14-advanced/86-wishlist.md)
-- [ ] 87 [Coupons](phase-14-advanced/87-coupons.md)
-- [ ] 88 [Recommendations](phase-14-advanced/88-recommendations.md)
-- [ ] 89 [Advanced search](phase-14-advanced/89-advanced-search.md)
-- [ ] 90 [Analytics](phase-14-advanced/90-analytics.md)
-- [ ] 91 [Email notifications](phase-14-advanced/91-email-notifications.md)
-- [ ] 92 [Abandoned carts](phase-14-advanced/92-abandoned-carts.md)
-- [ ] 93 [Inventory alerts](phase-14-advanced/93-inventory-alerts.md)
+- [x] 85 [Reviews](phase-14-advanced/85-reviews.md)
+- [x] 86 [Wishlist](phase-14-advanced/86-wishlist.md)
+- [x] 87 [Coupons](phase-14-advanced/87-coupons.md)
+- [x] 88 [Recommendations](phase-14-advanced/88-recommendations.md)
+- [x] 89 [Advanced search](phase-14-advanced/89-advanced-search.md)
+- [x] 90 [Analytics](phase-14-advanced/90-analytics.md)
+- [x] 91 [Email notifications](phase-14-advanced/91-email-notifications.md)
+- [x] 92 [Abandoned carts](phase-14-advanced/92-abandoned-carts.md)
+- [x] 93 [Inventory alerts](phase-14-advanced/93-inventory-alerts.md)
 
 ## Phase 15 — App Router UX & SEO
 

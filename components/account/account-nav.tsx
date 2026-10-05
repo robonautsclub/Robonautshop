@@ -6,6 +6,7 @@ const accountLinks = [
   { href: "/account", label: "Overview", exact: true },
   { href: "/account/addresses", label: "Addresses", exact: false },
   { href: "/account/orders", label: "Orders", exact: false },
+  { href: "/account/wishlist", label: "Wishlist", exact: false },
 ] as const;
 
 type AccountNavProps = {

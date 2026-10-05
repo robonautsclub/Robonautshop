@@ -20,6 +20,7 @@ import {
   PAYMENT_METHODS,
   type PaymentMethodId,
 } from "@/lib/checkout/types";
+import { previewCouponAction } from "@/lib/coupons/actions";
 import { placeOrderAction } from "@/lib/server-cart/actions";
 import { cn } from "@/lib/utils";
 
@@ -56,6 +57,12 @@ export function CheckoutPageContent() {
   const [specialInstructions, setSpecialInstructions] = useState("");
   const [errors, setErrors] = useState<AddressErrors>({});
   const [status, setStatus] = useState<string | null>(null);
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discountAmount: number } | null>(
+    null,
+  );
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [couponChecking, setCouponChecking] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -85,7 +92,31 @@ export function CheckoutPageContent() {
     () => estimateShippingBdt(cityDraft),
     [cityDraft],
   );
-  const total = subtotal + shipping.amount;
+  const discountAmount = appliedCoupon?.discountAmount ?? 0;
+  const total = Math.max(0, subtotal + shipping.amount - discountAmount);
+
+  async function applyCoupon() {
+    setCouponError(null);
+    if (!couponInput.trim()) {
+      return;
+    }
+    setCouponChecking(true);
+    const result = await previewCouponAction(couponInput, subtotal);
+    setCouponChecking(false);
+
+    if (!result.ok) {
+      setCouponError(result.error);
+      setAppliedCoupon(null);
+      return;
+    }
+    setAppliedCoupon({ code: result.code, discountAmount: result.discountAmount });
+  }
+
+  function removeCoupon() {
+    setAppliedCoupon(null);
+    setCouponInput("");
+    setCouponError(null);
+  }
 
   function applySavedAddress(addressId: string) {
     setSelectedAddressId(addressId);
@@ -186,6 +217,7 @@ export function CheckoutPageContent() {
       location: pinnedLocation ?? undefined,
       paymentMethod,
       specialInstructions: specialInstructions.trim() || undefined,
+      couponCode: appliedCoupon?.code,
     });
 
     if (!result.ok) {
@@ -507,6 +539,43 @@ export function CheckoutPageContent() {
               </li>
             ))}
           </ul>
+          <div className="space-y-1.5 border-t pt-3">
+            <label htmlFor="checkout-coupon" className="text-sm font-medium">
+              Coupon code
+            </label>
+            {appliedCoupon ? (
+              <div className="flex items-center justify-between gap-2 rounded-lg border border-foreground/20 bg-muted/30 px-3 py-2 text-sm">
+                <span className="font-medium">{appliedCoupon.code} applied</span>
+                <button
+                  type="button"
+                  onClick={removeCoupon}
+                  className="text-xs text-muted-foreground underline-offset-4 hover:underline"
+                >
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  id="checkout-coupon"
+                  value={couponInput}
+                  onChange={(event) => setCouponInput(event.target.value)}
+                  placeholder="Enter code"
+                  className={fieldClassName(Boolean(couponError))}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => void applyCoupon()}
+                  disabled={couponChecking}
+                >
+                  {couponChecking ? "Checking…" : "Apply"}
+                </Button>
+              </div>
+            )}
+            {couponError ? <p className="text-sm text-destructive">{couponError}</p> : null}
+          </div>
+
           <div className="space-y-2 border-t pt-3 text-sm">
             <div className="flex justify-between gap-3">
               <span className="text-muted-foreground">Subtotal</span>
@@ -518,6 +587,12 @@ export function CheckoutPageContent() {
                 {shipping.amount > 0 ? formatBdt(shipping.amount) : "—"}
               </span>
             </div>
+            {discountAmount > 0 ? (
+              <div className="flex justify-between gap-3 text-emerald-700 dark:text-emerald-400">
+                <span>Discount</span>
+                <span>-{formatBdt(discountAmount)}</span>
+              </div>
+            ) : null}
             <div className="flex justify-between gap-3 text-base font-semibold">
               <span>Total</span>
               <span>{formatBdt(total)}</span>

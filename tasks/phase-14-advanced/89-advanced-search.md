@@ -1,6 +1,6 @@
 # Task 89 — Advanced search
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

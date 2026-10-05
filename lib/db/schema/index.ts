@@ -17,3 +17,8 @@ export * from "@/lib/db/schema/order-items";
 export * from "@/lib/db/schema/bkash-tokens";
 export * from "@/lib/db/schema/bkash-pending-payments";
 export * from "@/lib/db/schema/user-addresses";
+export * from "@/lib/db/schema/product-reviews";
+export * from "@/lib/db/schema/wishlist-items";
+export * from "@/lib/db/schema/coupons";
+export * from "@/lib/db/schema/analytics-events";
+export * from "@/lib/db/schema/cart-reminders";

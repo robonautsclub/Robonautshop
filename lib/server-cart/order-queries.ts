@@ -4,6 +4,9 @@ import { upsertShippingAddressForUser } from "@/lib/account/address-queries";
 import { getProductById } from "@/lib/catalog/queries";
 import { getAvailableQuantity } from "@/lib/catalog/types";
 import { estimateShippingBdt, type PaymentMethodId } from "@/lib/checkout/types";
+import { incrementCouponUsage, validateCoupon } from "@/lib/coupons/queries";
+import { sendLowStockAlertEmail } from "@/lib/email/send";
+import { reserveStockForOrderLines } from "@/lib/inventory/queries";
 import type { Database } from "@/lib/db";
 import { bkashPendingPayments } from "@/lib/db/schema/bkash-pending-payments";
 import { orderItems } from "@/lib/db/schema/order-items";
@@ -33,6 +36,7 @@ export type PlaceOrderInput = {
   location?: { lat: number; lng: number } | null;
   paymentMethod: PaymentMethodId;
   specialInstructions?: string;
+  couponCode?: string;
 };
 
 export type PlaceOrderResult =
@@ -143,6 +147,9 @@ async function insertOrderWithItems(
     lines: ValidatedLine[];
     subtotal: number;
     shippingTotal: number;
+    discountTotal?: number;
+    couponId?: string | null;
+    couponCode?: string | null;
     total: number;
     address: PlaceOrderAddressInput;
     location?: { lat: number; lng: number } | null;
@@ -161,6 +168,8 @@ async function insertOrderWithItems(
     paymentMethod: args.paymentMethod,
     subtotal: args.subtotal,
     shippingTotal: args.shippingTotal,
+    discountTotal: args.discountTotal ?? 0,
+    couponCode: args.couponCode ?? null,
     total: args.total,
     shippingFullName: args.address.fullName,
     shippingPhone: args.address.phone,
@@ -191,6 +200,23 @@ async function insertOrderWithItems(
       createdAt: now,
     })),
   );
+
+  if (args.couponId) {
+    await incrementCouponUsage(db, args.couponId);
+  }
+
+  const lowStockAlerts = await reserveStockForOrderLines(
+    db,
+    args.lines.map((line) => ({
+      productId: line.productId,
+      variantId: line.variantId,
+      quantity: line.quantity,
+      productName: line.productName,
+    })),
+  );
+  if (lowStockAlerts.length > 0) {
+    void sendLowStockAlertEmail(lowStockAlerts);
+  }
 }
 
 async function notifyOrderEmail(
@@ -251,7 +277,23 @@ export async function placeOrderFromServerCart(
   }
 
   const shipping = estimateShippingBdt(input.address.city);
-  const total = validated.subtotal + shipping.amount;
+
+  // Re-validate the coupon here too, authoritatively — the checkout page's
+  // previewCouponAction only shows the customer an estimate.
+  let discountTotal = 0;
+  let couponId: string | null = null;
+  let couponCode: string | null = null;
+  if (input.couponCode?.trim()) {
+    const couponResult = await validateCoupon(db, input.couponCode, validated.subtotal);
+    if (!couponResult.ok) {
+      return couponResult;
+    }
+    discountTotal = couponResult.discountAmount;
+    couponId = couponResult.coupon.id;
+    couponCode = couponResult.coupon.code;
+  }
+
+  const total = Math.max(0, validated.subtotal + shipping.amount - discountTotal);
 
   if (input.paymentMethod === "BKASH") {
     const intendedOrderId = crypto.randomUUID();
@@ -270,6 +312,9 @@ export async function placeOrderFromServerCart(
         specialInstructions: input.specialInstructions,
         subtotal: validated.subtotal,
         shippingTotal: shipping.amount,
+        discountTotal,
+        couponId,
+        couponCode,
         total,
       };
 
@@ -302,6 +347,9 @@ export async function placeOrderFromServerCart(
     lines: validated.lines,
     subtotal: validated.subtotal,
     shippingTotal: shipping.amount,
+    discountTotal,
+    couponId,
+    couponCode,
     total,
     address: input.address,
     location: input.location,
@@ -394,6 +442,9 @@ export async function finalizeBkashPaidOrder(
     lines: payload.lines,
     subtotal: payload.subtotal,
     shippingTotal: payload.shippingTotal,
+    discountTotal: payload.discountTotal,
+    couponId: payload.couponId,
+    couponCode: payload.couponCode,
     total: payload.total,
     address: payload.address,
     location: payload.location,
@@ -465,6 +516,9 @@ export async function finalizeBkashUnpaidOrder(
     lines: payload.lines,
     subtotal: payload.subtotal,
     shippingTotal: payload.shippingTotal,
+    discountTotal: payload.discountTotal,
+    couponId: payload.couponId,
+    couponCode: payload.couponCode,
     total: payload.total,
     address: payload.address,
     location: payload.location,
@@ -580,7 +634,10 @@ export async function repayBkashOrder(
 
   const subtotal = revalidated.reduce((sum, line) => sum + line.lineTotal, 0);
   const shipping = estimateShippingBdt(order.shippingCity);
-  const total = subtotal + shipping.amount;
+  // Reuse the discount already earned on the original order — the coupon
+  // usage count was incremented once, at that order's creation; repaying
+  // doesn't re-validate or re-charge it.
+  const total = Math.max(0, subtotal + shipping.amount - order.discountTotal);
   const now = new Date().toISOString();
 
   try {

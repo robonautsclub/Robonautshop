@@ -62,24 +62,51 @@ export type ProductWithRelations = Product & {
   inventory: InventorySummary[];
 };
 
-function matchesQuery(product: Product, query: string): boolean {
-  const normalized = query.trim().toLowerCase();
-  if (!normalized) {
-    return true;
+/**
+ * Advanced (but still simple — AGENTS.md "Search": "Start simple") search
+ * scoring, tasks/phase-14-advanced/89-advanced-search.md. Splits the query
+ * into terms and requires every term to match somewhere (AND, not just one
+ * substring over the whole phrase), then weights where each term matched so
+ * a name/SKU hit outranks a description hit. Returns 0 for "no match".
+ */
+function scoreQueryMatch(product: Product, query: string): number {
+  const terms = query
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (terms.length === 0) {
+    return 1;
   }
 
-  const haystack = [
-    product.name,
-    product.slug,
-    product.sku,
-    product.shortDescription,
-    product.description,
-    product.brand ?? "",
-  ]
-    .join(" ")
-    .toLowerCase();
+  const name = product.name.toLowerCase();
+  const sku = product.sku.toLowerCase();
+  const slug = product.slug.toLowerCase();
+  const shortDescription = product.shortDescription.toLowerCase();
+  const description = product.description.toLowerCase();
+  const brand = (product.brand ?? "").toLowerCase();
 
-  return haystack.includes(normalized);
+  let score = 0;
+
+  for (const term of terms) {
+    if (name === term) {
+      score += 10;
+    } else if (name.includes(term)) {
+      score += 6;
+    } else if (sku.includes(term) || slug.includes(term)) {
+      score += 5;
+    } else if (brand.includes(term)) {
+      score += 3;
+    } else if (shortDescription.includes(term)) {
+      score += 2;
+    } else if (description.includes(term)) {
+      score += 1;
+    } else {
+      return 0; // every term must match somewhere (AND)
+    }
+  }
+
+  return score;
 }
 
 function sortProducts(rows: Product[], sort: ProductSort = "newest"): Product[] {
@@ -169,8 +196,13 @@ export async function getProducts(
     .from(products)
     .where(and(...conditions));
 
+  let relevanceScores: Map<string, number> | null = null;
   if (options.query) {
-    results = results.filter((product) => matchesQuery(product, options.query!));
+    const scored = results
+      .map((product) => ({ product, score: scoreQueryMatch(product, options.query!) }))
+      .filter((row) => row.score > 0);
+    relevanceScores = new Map(scored.map((row) => [row.product.id, row.score]));
+    results = scored.map((row) => row.product);
   }
 
   if (options.inStock === true) {
@@ -186,6 +218,14 @@ export async function getProducts(
       );
     }
     results = results.filter((product) => (availableByProduct.get(product.id) ?? 0) > 0);
+  }
+
+  // A search ranks by relevance instead of recency, unless the caller picked
+  // a specific sort (price/name) — "newest" is also the unset default, so a
+  // search with no sort chosen lands here too.
+  if (relevanceScores && (!options.sort || options.sort === "newest")) {
+    const scores = relevanceScores;
+    return [...results].sort((a, b) => (scores.get(b.id) ?? 0) - (scores.get(a.id) ?? 0));
   }
 
   return sortProducts(results, options.sort);

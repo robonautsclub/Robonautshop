@@ -1,6 +1,6 @@
 # Task 92 — Abandoned carts
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

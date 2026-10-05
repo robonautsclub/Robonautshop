@@ -13,6 +13,7 @@ import {
 } from "@/components/product/product-toolbar";
 import { getCategories, getProductCardModels, getProducts } from "@/lib/catalog";
 import { getRequestDb } from "@/lib/db/request";
+import { recordAnalyticsEvent } from "@/lib/analytics/queries";
 
 export const metadata: Metadata = {
   title: "Products",
@@ -43,6 +44,10 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     sort,
   });
   const cards = await getProductCardModels(db, products);
+
+  if (q) {
+    void recordAnalyticsEvent(db, { type: "SEARCH", query: q });
+  }
 
   const hasFilters = Boolean(q || category || inStock || sort !== "newest");
 

@@ -1,6 +1,6 @@
 # Task 85 — Reviews
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 
