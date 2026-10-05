@@ -4,7 +4,7 @@
 
 ## Goal
 
-Create the Robonautshop Next.js application in the current empty folder.
+Create the Robonautsshop Next.js application in the current empty folder.
 
 ## In scope
 

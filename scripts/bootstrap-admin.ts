@@ -16,7 +16,7 @@
  *      (this hashes the password correctly, for real, in production).
  *   2. Promote that account with a plain SQL update — no password handling
  *      needed, so this is the fully reliable path:
- *        wrangler d1 execute robonautshop-db --remote \
+ *        wrangler d1 execute robonautsshop-db --remote \
  *          --command="UPDATE users SET role='ADMIN' WHERE email='you@example.com';"
  *
  * Usage (local):

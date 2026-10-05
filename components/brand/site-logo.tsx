@@ -25,7 +25,7 @@ export function SiteLogo({
   href = "/",
   size = "md",
   showWordmark = true,
-  wordmark = "Robonautshop",
+  wordmark = "Robonautsshop",
   className,
   imageClassName,
   wordmarkClassName,

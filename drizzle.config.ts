@@ -10,8 +10,8 @@ import { defineConfig } from "drizzle-kit";
  * Applying migrations (local or remote) is done with Wrangler, not
  * drizzle-kit, so D1's own migration tracking (`d1_migrations` table) stays
  * authoritative:
- *   wrangler d1 migrations apply robonautshop-db --local
- *   wrangler d1 migrations apply robonautshop-db --remote
+ *   wrangler d1 migrations apply robonautsshop-db --local
+ *   wrangler d1 migrations apply robonautsshop-db --remote
  */
 export default defineConfig({
   dialect: "sqlite",

@@ -4,11 +4,11 @@
 
 ## Goal
 
-Set the Robonautshop document shell and a store layout that can hold the navbar and footer.
+Set the Robonautsshop document shell and a store layout that can hold the navbar and footer.
 
 ## In scope
 
-- `app/layout.tsx`: html, body, font, and global metadata for Robonautshop
+- `app/layout.tsx`: html, body, font, and global metadata for Robonautsshop
 - Move the home page into `app/(store)/page.tsx` if it currently lives at `app/page.tsx`
 - `app/(store)/layout.tsx` with a `main` region. Leave clear slots for navbar and footer; do not build them yet if they do not exist
 - Metadata title and description suitable for a robotics parts store in Bangladesh
@@ -29,5 +29,5 @@ Set the Robonautshop document shell and a store layout that can hold the navbar 
 ## Done when
 
 - The store route group exists
-- The document title is Robonautshop
+- The document title is Robonautsshop
 - Lint and typecheck pass

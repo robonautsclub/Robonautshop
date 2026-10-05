@@ -4,7 +4,7 @@
 
 ## Goal
 
-Add `app/global-error.tsx` to handle failures at the root layout level. Because it replaces the root layout when active, it must render its own `<html>` and `<body>` and still feel like Robonautshop.
+Add `app/global-error.tsx` to handle failures at the root layout level. Because it replaces the root layout when active, it must render its own `<html>` and `<body>` and still feel like Robonautsshop.
 
 ## In scope
 

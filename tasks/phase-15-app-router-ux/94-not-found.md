@@ -4,7 +4,7 @@
 
 ## Goal
 
-Add a branded root `app/not-found.tsx` so unknown routes and `notFound()` calls (product/kit/project/category slugs) show Robonautshop UI instead of the Next.js default 404.
+Add a branded root `app/not-found.tsx` so unknown routes and `notFound()` calls (product/kit/project/category slugs) show Robonautsshop UI instead of the Next.js default 404.
 
 Extract a small reusable status-page pattern (inspired by `CatalogEmptyState`) so later error / forbidden / unauthorized pages do not duplicate layout markup.
 

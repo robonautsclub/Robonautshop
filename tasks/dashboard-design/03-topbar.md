@@ -33,6 +33,6 @@ to store”, and optional utility actions (UI only) using Lucide icons.
 
 ## Done when
 
-- Top bar feels like a professional commerce admin header, still Robonautshop
+- Top bar feels like a professional commerce admin header, still Robonautsshop
 - Lint and typecheck pass
 - The report lists completed work, files changed, and the next suggested task

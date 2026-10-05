@@ -38,7 +38,7 @@ export function isSesConfigured(): boolean {
   );
 }
 
-/** Verified SES sender — uses `SES_FROM_EMAIL` with a Robonautshop display name. */
+/** Verified SES sender — uses `SES_FROM_EMAIL` with a Robonautsshop display name. */
 export function getSesFromAddress(): string {
   const from = process.env.SES_FROM_EMAIL?.trim();
   if (!from) {
@@ -47,7 +47,7 @@ export function getSesFromAddress(): string {
   if (from.includes("<")) {
     return from;
   }
-  return `Robonautshop <${from}>`;
+  return `Robonautsshop <${from}>`;
 }
 
 /**

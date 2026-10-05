@@ -238,11 +238,14 @@ async function notifyOrderEmail(
     to: user.email,
     customerName: user.name,
     orderId: order.id,
+    createdAt: order.createdAt,
     paymentMethod: order.paymentMethod,
     paymentStatus: order.paymentStatus,
     orderStatus: order.status,
     subtotal: order.subtotal,
     shippingTotal: order.shippingTotal,
+    discountTotal: order.discountTotal,
+    couponCode: order.couponCode,
     total: order.total,
     shippingFullName: order.shippingFullName,
     shippingPhone: order.shippingPhone,
@@ -252,7 +255,9 @@ async function notifyOrderEmail(
     shippingPostalCode: order.shippingPostalCode,
     lines: items.map((item) => ({
       productName: item.productName,
+      sku: item.sku,
       quantity: item.quantity,
+      unitPrice: item.unitPrice,
       lineTotal: item.lineTotal,
     })),
   });
@@ -744,6 +749,49 @@ export async function listOrdersForCustomer(
     order,
     items: itemsByOrder.get(order.id) ?? [],
   }));
+}
+
+/**
+ * Admin lookup — not scoped to a customer userId.
+ * Used for on-demand invoice generation and real-order detail fallback.
+ */
+export async function getOrderForAdmin(
+  db: Database,
+  orderId: string,
+): Promise<{
+  order: OrderRecord;
+  items: OrderItemRecord[];
+  customer: { name: string; email: string };
+} | null> {
+  const orderRows = await db
+    .select()
+    .from(orders)
+    .where(eq(orders.id, orderId))
+    .limit(1);
+  const order = orderRows[0];
+  if (!order) {
+    return null;
+  }
+
+  const [items, userRows] = await Promise.all([
+    db.select().from(orderItems).where(eq(orderItems.orderId, orderId)),
+    db
+      .select({ email: users.email, name: users.name })
+      .from(users)
+      .where(eq(users.id, order.userId))
+      .limit(1),
+  ]);
+
+  const user = userRows[0];
+  if (!user?.email) {
+    return null;
+  }
+
+  return {
+    order,
+    items,
+    customer: { name: user.name, email: user.email },
+  };
 }
 
 /** Look up a completed or unpaid order by bKash paymentID. */

@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Robonautshop",
-    template: "%s · Robonautshop",
+    default: "Robonautsshop",
+    template: "%s · Robonautsshop",
   },
   description:
     "Robotics parts, kits, and project guides for builders in Bangladesh.",

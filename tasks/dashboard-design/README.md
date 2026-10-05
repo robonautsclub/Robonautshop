@@ -20,7 +20,7 @@ Redesign `/admin` into a professional e-commerce admin dashboard.
 
 Current admin uses `max-w-7xl` and smaller padding, so it feels narrower than the
 storefront. Align layout width with the public site, then upgrade to a denser
-professional ops dashboard (commerce-console density, still Robonautshop-branded).
+professional ops dashboard (commerce-console density, still Robonautsshop-branded).
 
 ## Design intent
 

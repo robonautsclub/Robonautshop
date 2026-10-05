@@ -17,7 +17,7 @@ export default function DocsIndexPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-semibold tracking-tight">Help & docs</h1>
         <p className="mt-2 text-muted-foreground">
-          Shipping, payments, returns, and lab safety for Robonautshop shoppers.
+          Shipping, payments, returns, and lab safety for Robonautsshop shoppers.
         </p>
       </div>
 

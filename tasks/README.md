@@ -1,10 +1,10 @@
-# Robonautshop — Task Prompts
+# Robonautsshop — Task Prompts
 
 Small, independent prompts for building the robotics parts store. Give an agent **one file at a time**. Do not start the next task until the current one is done and you ask for it.
 
 Checked items are implemented. Unchecked items are not.
 
-**Store name:** Robonautshop
+**Store name:** Robonautsshop
 
 ## Current strategy
 

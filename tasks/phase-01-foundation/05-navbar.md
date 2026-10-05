@@ -10,7 +10,7 @@ Add a responsive store navbar.
 
 - `components/layout/navbar.tsx`
 - Mount it in `app/(store)/layout.tsx`
-- Brand text: Robonautshop, linking to `/`
+- Brand text: Robonautsshop, linking to `/`
 - Links: Products `/products`, Categories `/categories`, Kits `/kits`, Projects `/projects`
 - Cart `/cart` and Account `/account` as icon links using Lucide
 - Desktop links, and a hamburger plus shadcn Sheet on small screens

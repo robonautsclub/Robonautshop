@@ -3,14 +3,25 @@
  * Not a real orders system — clearly fixture data only.
  */
 
+/** Matches D1 order statuses so real-order detail fallback can render without remapping. */
 export type AdminOrderStatus =
   | "PENDING"
+  | "PAYMENT_PENDING"
+  | "PAID"
   | "PROCESSING"
+  | "PACKED"
   | "SHIPPED"
   | "DELIVERED"
-  | "CANCELLED";
+  | "CANCELLED"
+  | "REFUNDED";
 
-export type AdminPaymentStatus = "PENDING" | "PAID" | "FAILED" | "REFUNDED";
+export type AdminPaymentStatus =
+  | "PENDING"
+  | "AUTHORIZED"
+  | "PAID"
+  | "FAILED"
+  | "REFUNDED"
+  | "CANCELLED";
 
 export type AdminOrderLine = {
   name: string;

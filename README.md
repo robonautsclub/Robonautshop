@@ -1,4 +1,4 @@
-# Robonautshop
+# Robonautsshop
 
 Robotics parts, kits, and project guides for builders in Bangladesh. Catalog, cart, auth, checkout, and orders are wired to a real Cloudflare D1 database. **bKash Checkout (URL)** is integrated for online payment; Nagad and other providers are not yet. The admin dashboard is still UI shells over real catalog data (see "Admin" below).
 
@@ -72,7 +72,7 @@ pnpm db:seed:remote      # same, against the deployed D1 — development data on
 
 ### Object storage (R2)
 
-The `PRODUCT_IMAGES` R2 bucket (`robonautshop-product-images`) is bound for future product images. No upload code exists yet — product image metadata/upload flow is a later task (see AGENTS.md "Product images").
+The `PRODUCT_IMAGES` R2 bucket (`robonautsshop-product-images`) is bound for future product images. No upload code exists yet — product image metadata/upload flow is a later task (see AGENTS.md "Product images").
 
 ### API
 

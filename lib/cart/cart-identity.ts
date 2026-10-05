@@ -16,7 +16,7 @@
 
 export type CartIdentity = { kind: "guest" } | { kind: "user"; userId: string };
 
-export const GUEST_CART_STORAGE_KEY = "robonautshop.cart.guest.v1";
+export const GUEST_CART_STORAGE_KEY = "robonautsshop.cart.guest.v1";
 
 export function resolveCartIdentity(
   user: { id: string; role: "CUSTOMER" | "ADMIN" } | null,

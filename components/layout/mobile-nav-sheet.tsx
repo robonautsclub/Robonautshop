@@ -70,7 +70,7 @@ export function MobileNavSheet({ pathname }: MobileNavSheetProps) {
       </SheetTrigger>
       <SheetContent side="left" className="w-72">
         <SheetHeader>
-          <SheetTitle className="sr-only">Robonautshop</SheetTitle>
+          <SheetTitle className="sr-only">Robonautsshop</SheetTitle>
           <SiteLogo href="/" size="sm" />
         </SheetHeader>
         <nav className="flex flex-col gap-1 px-4">

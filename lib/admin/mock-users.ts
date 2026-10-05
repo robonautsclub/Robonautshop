@@ -48,7 +48,7 @@ export const mockAdminUsers: AdminUser[] = [
   {
     id: "USR-1",
     name: "Fuad Super",
-    email: "super@robonautshop.local",
+    email: "super@robonautsshop.local",
     role: "SUPER_ADMIN",
     status: "ACTIVE",
     createdAt: "2026-01-01T00:00:00.000Z",
@@ -56,7 +56,7 @@ export const mockAdminUsers: AdminUser[] = [
   {
     id: "USR-2",
     name: "Nadia Admin",
-    email: "admin@robonautshop.local",
+    email: "admin@robonautsshop.local",
     role: "ADMIN",
     status: "ACTIVE",
     createdAt: "2026-01-15T00:00:00.000Z",
@@ -64,7 +64,7 @@ export const mockAdminUsers: AdminUser[] = [
   {
     id: "USR-3",
     name: "Karim Manager",
-    email: "manager@robonautshop.local",
+    email: "manager@robonautsshop.local",
     role: "STORE_MANAGER",
     status: "ACTIVE",
     createdAt: "2026-02-01T00:00:00.000Z",

@@ -20,7 +20,7 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "robonautshop-db",
+      "database_name": "robonautsshop-db",
       "database_id": "39a41e21-37a1-4f29-bd64-76d490f6692a",
       "migrations_dir": "migrations"
     }

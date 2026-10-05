@@ -1,5 +1,5 @@
 {
-  "name": "robonautshop",
+  "name": "robonautsshop",
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@10.11.1",
@@ -14,11 +14,11 @@
     "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "db:generate": "drizzle-kit generate",
-    "db:migrate:local": "wrangler d1 migrations apply robonautshop-db --local",
-    "db:migrate:remote": "wrangler d1 migrations apply robonautshop-db --remote",
+    "db:migrate:local": "wrangler d1 migrations apply robonautsshop-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply robonautsshop-db --remote",
     "db:seed:generate": "tsx scripts/generate-seed-sql.ts",
-    "db:seed:local": "pnpm db:seed:generate && wrangler d1 execute robonautshop-db --local --file=.seed/seed.sql",
-    "db:seed:remote": "pnpm db:seed:generate && wrangler d1 execute robonautshop-db --remote --file=.seed/seed.sql",
+    "db:seed:local": "pnpm db:seed:generate && wrangler d1 execute robonautsshop-db --local --file=.seed/seed.sql",
+    "db:seed:remote": "pnpm db:seed:generate && wrangler d1 execute robonautsshop-db --remote --file=.seed/seed.sql",
     "admin:bootstrap": "node --env-file=.env --import tsx scripts/bootstrap-admin.ts"
   },
   "dependencies": {
@@ -36,6 +36,7 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^1.47.0",
     "next": "16.3.8",
+    "pdf-lib": "^1.17.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-leaflet": "^5.0.0",

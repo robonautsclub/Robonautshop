@@ -19,30 +19,63 @@ import { cn } from "@/lib/utils";
 
 function orderTone(status: AdminOrderStatus) {
   if (status === "DELIVERED") return "success" as const;
-  if (status === "CANCELLED") return "danger" as const;
-  if (status === "PENDING") return "warning" as const;
+  if (status === "CANCELLED" || status === "REFUNDED") return "danger" as const;
+  if (
+    status === "PENDING" ||
+    status === "PAYMENT_PENDING" ||
+    status === "PAID" ||
+    status === "PROCESSING" ||
+    status === "PACKED"
+  ) {
+    return "warning" as const;
+  }
   return "neutral" as const;
 }
 
 function paymentTone(status: AdminPaymentStatus) {
   if (status === "PAID") return "success" as const;
-  if (status === "FAILED" || status === "REFUNDED") return "danger" as const;
+  if (status === "FAILED" || status === "REFUNDED" || status === "CANCELLED") {
+    return "danger" as const;
+  }
   return "warning" as const;
 }
 
-export function AdminOrderDetailShell({ order }: { order: AdminOrder }) {
+export function AdminOrderDetailShell({
+  order,
+  invoiceAvailable = false,
+}: {
+  order: AdminOrder;
+  /** True when this detail is a real D1 order (invoice PDF can be generated). */
+  invoiceAvailable?: boolean;
+}) {
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title={order.id}
-        description="Demo order detail shell. Status changes are not available yet."
+        description={
+          invoiceAvailable
+            ? "Real order detail. Invoice is generated on demand (not stored)."
+            : "Demo order detail shell. Status changes are not available yet."
+        }
         actions={
-          <Link
-            href="/admin/orders"
-            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
-          >
-            Back to orders
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            {invoiceAvailable ? (
+              <a
+                href={`/admin/orders/${order.id}/invoice`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(buttonVariants({ size: "sm" }))}
+              >
+                Invoice
+              </a>
+            ) : null}
+            <Link
+              href="/admin/orders"
+              className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+            >
+              Back to orders
+            </Link>
+          </div>
         }
       />
 

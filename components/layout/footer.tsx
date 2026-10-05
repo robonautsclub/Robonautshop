@@ -104,10 +104,10 @@ export function Footer() {
                   aria-hidden
                 />
                 <a
-                  href="mailto:hello@robonautshop.com"
+                  href="mailto:hello@robonautsshop.com"
                   className="transition-colors hover:text-foreground"
                 >
-                  hello@robonautshop.com
+                  hello@robonautsshop.com
                 </a>
               </li>
             </ul>
@@ -173,7 +173,7 @@ export function Footer() {
         </div>
 
         <div className="flex flex-col gap-1.5 border-t pt-4 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© {year} Robonautshop</p>
+          <p>© {year} Robonautsshop</p>
           <p className="sm:text-right">
             Developed by{" "}
             <a

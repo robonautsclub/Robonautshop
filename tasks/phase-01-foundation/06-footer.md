@@ -10,7 +10,7 @@ Add a simple footer that matches the navbar.
 
 - `components/layout/footer.tsx`
 - Mount it in `app/(store)/layout.tsx`
-- Brand: Robonautshop
+- Brand: Robonautsshop
 - Same nav links as the navbar
 - One short line that the store serves robotics builders in Bangladesh and can expand later
 - Copyright year from the current date

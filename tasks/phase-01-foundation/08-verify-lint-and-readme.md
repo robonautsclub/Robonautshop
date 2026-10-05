@@ -8,7 +8,7 @@ Confirm the foundation and document how to run it.
 
 ## In scope
 
-- `README.md` with what Robonautshop is, how to install, how to run the dev server, and that the catalog is not built yet
+- `README.md` with what Robonautsshop is, how to install, how to run the dev server, and that the catalog is not built yet
 - `pnpm lint`
 - `pnpm typecheck`
 - Fix any errors from the Phase 1 files only
