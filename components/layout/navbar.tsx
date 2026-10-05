@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShoppingCart, UserRound } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 
 import { useAuth } from "@/components/auth/auth-provider";
 import { SiteLogo } from "@/components/brand/site-logo";
 import { useCart } from "@/components/cart/cart-provider";
+import { AccountAvatar } from "@/components/layout/account-avatar";
 import { MobileNavSheet } from "@/components/layout/mobile-nav-sheet";
 import { NavbarSearch } from "@/components/layout/navbar-search";
 import { storeNavLinks } from "@/components/layout/nav-links";
@@ -90,7 +91,7 @@ export function Navbar() {
                 isActive(pathname, "/account") && "bg-muted",
               )}
             >
-              <UserRound />
+              <AccountAvatar />
             </Link>
           ) : null}
         </div>

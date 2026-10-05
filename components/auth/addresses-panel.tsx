@@ -1,12 +1,13 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useMemo, useState } from "react";
 
 import { fieldClassName } from "@/components/auth/auth-form-shell";
 import { Button } from "@/components/ui/button";
 import {
   createMyAddressAction,
   deleteMyAddressAction,
+  updateMyAddressAction,
 } from "@/lib/account/address-actions";
 import type { UserAddressRecord } from "@/lib/account/address-queries";
 import { addressSchema, type AddressInput } from "@/lib/auth/schemas";
@@ -17,25 +18,77 @@ type AddressesPanelProps = {
   initialAddresses: UserAddressRecord[];
 };
 
+type FormValues = {
+  fullName: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  postalCode: string;
+};
+
+function emptyForm(): FormValues {
+  return {
+    fullName: "",
+    phone: "",
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    postalCode: "",
+  };
+}
+
+function formFromAddress(address: UserAddressRecord): FormValues {
+  return {
+    fullName: address.fullName,
+    phone: address.phone,
+    addressLine1: address.addressLine1,
+    addressLine2: address.addressLine2 ?? "",
+    city: address.city,
+    postalCode: address.postalCode ?? "",
+  };
+}
+
 export function AddressesPanel({ initialAddresses }: AddressesPanelProps) {
   const [addresses, setAddresses] = useState<UserAddressRecord[]>(initialAddresses);
+  const latestAddress = addresses[0] ?? null;
+  const [editingId, setEditingId] = useState<string | null>(latestAddress?.id ?? null);
+  const [values, setValues] = useState<FormValues>(() =>
+    latestAddress ? formFromAddress(latestAddress) : emptyForm(),
+  );
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+
+  const isEditing = Boolean(editingId);
+
+  const heading = useMemo(
+    () => (isEditing ? "Edit address" : "Add address"),
+    [isEditing],
+  );
+
+  function setField<K extends keyof FormValues>(key: K, value: FormValues[K]) {
+    setValues((current) => ({ ...current, [key]: value }));
+  }
+
+  function applyAddressList(next: UserAddressRecord[]) {
+    setAddresses(next);
+    const latest = next[0] ?? null;
+    setEditingId(latest?.id ?? null);
+    setValues(latest ? formFromAddress(latest) : emptyForm());
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus(null);
 
-    const form = event.currentTarget;
-    const formData = new FormData(form);
     const parsed = addressSchema.safeParse({
-      fullName: formData.get("fullName"),
-      phone: formData.get("phone"),
-      addressLine1: formData.get("addressLine1"),
-      addressLine2: formData.get("addressLine2") || undefined,
-      city: formData.get("city"),
-      postalCode: formData.get("postalCode") || "",
+      fullName: values.fullName,
+      phone: values.phone,
+      addressLine1: values.addressLine1,
+      addressLine2: values.addressLine2 || undefined,
+      city: values.city,
+      postalCode: values.postalCode || "",
     });
 
     if (!parsed.success) {
@@ -59,7 +112,12 @@ export function AddressesPanel({ initialAddresses }: AddressesPanelProps) {
 
     setErrors({});
     setPending(true);
-    const result = await createMyAddressAction(parsed.data);
+    const wasEditing = Boolean(editingId);
+
+    const result = editingId
+      ? await updateMyAddressAction(editingId, parsed.data)
+      : await createMyAddressAction(parsed.data);
+
     setPending(false);
 
     if (!result.ok) {
@@ -70,14 +128,15 @@ export function AddressesPanel({ initialAddresses }: AddressesPanelProps) {
       return;
     }
 
-    setAddresses((current) => {
-      const withoutDefault = result.address.isDefault
-        ? current.map((row) => ({ ...row, isDefault: false }))
-        : current;
-      return [result.address, ...withoutDefault];
-    });
-    setStatus("Address saved.");
-    form.reset();
+    const without = addresses.filter((row) => row.id !== result.address.id);
+    const withoutDefault = result.address.isDefault
+      ? without.map((row) => ({ ...row, isDefault: false }))
+      : without;
+    const next = [result.address, ...withoutDefault];
+    setAddresses(next);
+    setEditingId(result.address.id);
+    setValues(formFromAddress(result.address));
+    setStatus(wasEditing ? "Address updated." : "Address saved.");
   }
 
   async function removeAddress(id: string) {
@@ -91,26 +150,47 @@ export function AddressesPanel({ initialAddresses }: AddressesPanelProps) {
       return;
     }
 
-    setAddresses((current) => {
-      const next = current.filter((address) => address.id !== id);
-      if (next.length > 0 && !next.some((row) => row.isDefault)) {
-        return next.map((row, index) =>
-          index === 0 ? { ...row, isDefault: true } : row,
-        );
-      }
-      return next;
-    });
+    let next = addresses.filter((address) => address.id !== id);
+    if (next.length > 0 && !next.some((row) => row.isDefault)) {
+      next = next.map((row, index) =>
+        index === 0 ? { ...row, isDefault: true } : row,
+      );
+    }
+    applyAddressList(next);
     setStatus("Address removed.");
+  }
+
+  function startNewAddress() {
+    setEditingId(null);
+    setValues(emptyForm());
+    setErrors({});
+    setStatus(null);
+  }
+
+  function loadAddressIntoForm(address: UserAddressRecord) {
+    setEditingId(address.id);
+    setValues(formFromAddress(address));
+    setErrors({});
+    setStatus(null);
   }
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <form className="space-y-4 rounded-xl border p-5" onSubmit={onSubmit} noValidate>
-        <div>
-          <h2 className="text-lg font-semibold tracking-tight">Add address</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Bangladesh-friendly fields. Saved to your account in the database.
-          </p>
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <h2 className="text-lg font-semibold tracking-tight">{heading}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {isEditing
+                ? "Your latest saved address is loaded. Edit any field and save."
+                : "Bangladesh-friendly fields. Saved to your account in the database."}
+            </p>
+          </div>
+          {isEditing ? (
+            <Button type="button" variant="outline" size="sm" onClick={startNewAddress}>
+              Add new
+            </Button>
+          ) : null}
         </div>
 
         <div className="space-y-1.5">
@@ -120,6 +200,8 @@ export function AddressesPanel({ initialAddresses }: AddressesPanelProps) {
           <input
             id="address-name"
             name="fullName"
+            value={values.fullName}
+            onChange={(event) => setField("fullName", event.target.value)}
             className={fieldClassName(Boolean(errors.fullName))}
           />
           {errors.fullName ? (
@@ -136,6 +218,8 @@ export function AddressesPanel({ initialAddresses }: AddressesPanelProps) {
             name="phone"
             inputMode="numeric"
             placeholder="01XXXXXXXXX"
+            value={values.phone}
+            onChange={(event) => setField("phone", event.target.value)}
             className={fieldClassName(Boolean(errors.phone))}
           />
           {errors.phone ? (
@@ -150,6 +234,8 @@ export function AddressesPanel({ initialAddresses }: AddressesPanelProps) {
           <input
             id="address-line1"
             name="addressLine1"
+            value={values.addressLine1}
+            onChange={(event) => setField("addressLine1", event.target.value)}
             className={fieldClassName(Boolean(errors.addressLine1))}
           />
           {errors.addressLine1 ? (
@@ -164,6 +250,8 @@ export function AddressesPanel({ initialAddresses }: AddressesPanelProps) {
           <input
             id="address-line2"
             name="addressLine2"
+            value={values.addressLine2}
+            onChange={(event) => setField("addressLine2", event.target.value)}
             className={fieldClassName(Boolean(errors.addressLine2))}
           />
           {errors.addressLine2 ? (
@@ -180,6 +268,8 @@ export function AddressesPanel({ initialAddresses }: AddressesPanelProps) {
               id="address-city"
               name="city"
               placeholder="Dhaka"
+              value={values.city}
+              onChange={(event) => setField("city", event.target.value)}
               className={fieldClassName(Boolean(errors.city))}
             />
             {errors.city ? (
@@ -195,6 +285,8 @@ export function AddressesPanel({ initialAddresses }: AddressesPanelProps) {
               name="postalCode"
               inputMode="numeric"
               placeholder="1205"
+              value={values.postalCode}
+              onChange={(event) => setField("postalCode", event.target.value)}
               className={fieldClassName(Boolean(errors.postalCode))}
             />
             {errors.postalCode ? (
@@ -204,7 +296,7 @@ export function AddressesPanel({ initialAddresses }: AddressesPanelProps) {
         </div>
 
         <Button type="submit" disabled={pending}>
-          {pending ? "Saving…" : "Save address"}
+          {pending ? "Saving…" : isEditing ? "Save changes" : "Save address"}
         </Button>
         {errors.form ? (
           <p className="text-sm text-destructive" role="alert">
@@ -245,16 +337,26 @@ export function AddressesPanel({ initialAddresses }: AddressesPanelProps) {
                   {address.city}
                   {address.postalCode ? ` · ${address.postalCode}` : ""}
                 </p>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="mt-3"
-                  disabled={pending}
-                  onClick={() => removeAddress(address.id)}
-                >
-                  Remove
-                </Button>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={pending}
+                    onClick={() => loadAddressIntoForm(address)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    disabled={pending}
+                    onClick={() => removeAddress(address.id)}
+                  >
+                    Remove
+                  </Button>
+                </div>
               </li>
             ))}
           </ul>

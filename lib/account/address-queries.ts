@@ -58,6 +58,44 @@ export async function createAddressForUser(
   return rows[0]!;
 }
 
+export async function updateAddressForUser(
+  db: Database,
+  userId: string,
+  addressId: string,
+  input: AddressInput,
+): Promise<UserAddressRecord | null> {
+  const rows = await db
+    .select()
+    .from(userAddresses)
+    .where(and(eq(userAddresses.id, addressId), eq(userAddresses.userId, userId)))
+    .limit(1);
+  const existing = rows[0];
+  if (!existing) {
+    return null;
+  }
+
+  const now = new Date().toISOString();
+  await db
+    .update(userAddresses)
+    .set({
+      fullName: input.fullName,
+      phone: input.phone,
+      addressLine1: input.addressLine1,
+      addressLine2: input.addressLine2?.trim() || null,
+      city: input.city,
+      postalCode: input.postalCode?.trim() || null,
+      updatedAt: now,
+    })
+    .where(and(eq(userAddresses.id, addressId), eq(userAddresses.userId, userId)));
+
+  const updated = await db
+    .select()
+    .from(userAddresses)
+    .where(eq(userAddresses.id, addressId))
+    .limit(1);
+  return updated[0] ?? null;
+}
+
 export async function deleteAddressForUser(
   db: Database,
   userId: string,
