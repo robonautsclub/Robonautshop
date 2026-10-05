@@ -20,19 +20,30 @@ export function OrderConfirmationContent({
     PAYMENT_METHODS.find((method) => method.id === order.paymentMethod)?.label ??
     order.paymentMethod;
 
+  const headline =
+    order.paymentStatus === "PAID"
+      ? "Thanks — payment received"
+      : order.paymentStatus === "FAILED" || order.paymentStatus === "CANCELLED"
+        ? "Order saved — payment not completed"
+        : "Thanks — your order is confirmed";
+
+  const subcopy =
+    order.paymentStatus === "PAID"
+      ? "Your bKash payment was confirmed. We’ll update the status here as the order is processed."
+      : order.paymentMethod === "BKASH" && order.paymentStatus === "PENDING"
+        ? "Waiting for bKash payment. If you closed the bKash window, return to checkout and try again."
+        : order.paymentStatus === "FAILED" || order.paymentStatus === "CANCELLED"
+          ? "No charge was completed. You can place a new order from checkout when you’re ready."
+          : "We’ll update the status here as it’s processed. Cash on Delivery and other unpaid methods stay pending until collected.";
+
   return (
     <PageContainer as="section" className="py-10">
       <div className="mb-8 max-w-2xl">
         <p className="text-sm font-medium text-muted-foreground">
           Order {order.id}
         </p>
-        <h1 className="mt-1 text-3xl font-semibold tracking-tight">
-          Thanks — your order is confirmed
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          We’ll update the status here as it’s processed. No payment has been
-          charged yet.
-        </p>
+        <h1 className="mt-1 text-3xl font-semibold tracking-tight">{headline}</h1>
+        <p className="mt-2 text-muted-foreground">{subcopy}</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">

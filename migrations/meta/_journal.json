@@ -22,6 +22,20 @@
       "when": 1791144877635,
       "tag": "0002_orders-and-carts",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1791172345423,
+      "tag": "0003_condemned_songbird",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1791172901307,
+      "tag": "0004_flat_slipstream",
+      "breakpoints": true
     }
   ]
 }

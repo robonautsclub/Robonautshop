@@ -140,18 +140,6 @@ Professional e-commerce admin layout. Same width as the public store (`PageConta
 
 See also [dashboard-design/README.md](dashboard-design/README.md).
 
-## Phase 15 — App Router UX & SEO
-
-Next.js special files for loading, errors, auth status pages, and sitemap. UI shells only until Phase 12 wires real auth.
-
-- [x] 94 [Custom not-found page](phase-15-app-router-ux/94-not-found.md)
-- [x] 95 [Segment error pages](phase-15-app-router-ux/95-error.md)
-- [x] 96 [Root global-error page](phase-15-app-router-ux/96-global-error.md)
-- [x] 97 [Route loading UI](phase-15-app-router-ux/97-loading.md)
-- [x] 98 [Forbidden (403) page](phase-15-app-router-ux/98-forbidden.md)
-- [x] 99 [Unauthorized (401) page](phase-15-app-router-ux/99-unauthorized.md)
-- [x] 100 [Sitemap and robots](phase-15-app-router-ux/100-sitemap.md)
-
 ---
 
 # Deferred — backend and beyond
@@ -226,3 +214,19 @@ Superseded stubs (do not implement): [77](phase-12-wire-up/77-real-auth.md), [79
 - [ ] 91 [Email notifications](phase-14-advanced/91-email-notifications.md)
 - [ ] 92 [Abandoned carts](phase-14-advanced/92-abandoned-carts.md)
 - [ ] 93 [Inventory alerts](phase-14-advanced/93-inventory-alerts.md)
+
+## Phase 15 — App Router UX & SEO
+
+Next.js special files for loading, errors, auth status pages, and sitemap. UI shells only until Phase 12 wires real auth.
+
+- [x] 94 [Custom not-found page](phase-15-app-router-ux/94-not-found.md)
+- [x] 95 [Segment error pages](phase-15-app-router-ux/95-error.md)
+- [x] 96 [Root global-error page](phase-15-app-router-ux/96-global-error.md)
+- [x] 97 [Route loading UI](phase-15-app-router-ux/97-loading.md)
+- [x] 98 [Forbidden (403) page](phase-15-app-router-ux/98-forbidden.md)
+- [x] 99 [Unauthorized (401) page](phase-15-app-router-ux/99-unauthorized.md)
+- [x] 100 [Sitemap and robots](phase-15-app-router-ux/100-sitemap.md)
+
+## Phase 16 — Payments
+
+- [x] 101 [bKash Checkout URL](phase-16-payments/101-bkash-checkout-url.md)

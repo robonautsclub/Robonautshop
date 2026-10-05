@@ -41,6 +41,10 @@ export const orders = sqliteTable(
     shippingLat: real("shipping_lat"),
     shippingLng: real("shipping_lng"),
     specialInstructions: text("special_instructions"),
+    /** bKash Checkout (URL) paymentID from Create Payment (task 101). */
+    bkashPaymentId: text("bkash_payment_id"),
+    /** bKash trxID from Execute Payment when paid (task 101). */
+    bkashTransactionId: text("bkash_transaction_id"),
     createdAt: text("created_at")
       .notNull()
       .default(sql`(current_timestamp)`),
@@ -51,5 +55,6 @@ export const orders = sqliteTable(
   (table) => [
     index("orders_user_id_idx").on(table.userId),
     index("orders_status_idx").on(table.status),
+    index("orders_bkash_payment_id_idx").on(table.bkashPaymentId),
   ],
 );

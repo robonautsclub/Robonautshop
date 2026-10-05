@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { type FormEvent, useMemo, useState } from "react";
 
 import { fieldClassName } from "@/components/auth/auth-form-shell";
@@ -36,6 +36,8 @@ type AddressErrors = Partial<
 
 export function CheckoutPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const paymentErrorFromUrl = searchParams.get("paymentError");
   const { hydrated, resolvedLines, subtotal, clearCart } = useCart();
   const [addressLine1, setAddressLine1] = useState("");
   const [addressLine2, setAddressLine2] = useState("");
@@ -139,6 +141,14 @@ export function CheckoutPageContent() {
       return;
     }
 
+    // bKash: keep the cart until payment succeeds and the order is created
+    // in the callback. COD/Nagad: order already exists — clear local cart.
+    if (result.redirectUrl) {
+      setStatus("Redirecting to bKash…");
+      window.location.assign(result.redirectUrl);
+      return;
+    }
+
     clearCart();
     setStatus("Order placed. Redirecting…");
     router.push(`/checkout/confirmation?orderId=${result.orderId}`);
@@ -149,9 +159,14 @@ export function CheckoutPageContent() {
       <div className="mb-8">
         <h1 className="text-3xl font-semibold tracking-tight">Checkout</h1>
         <p className="mt-2 text-muted-foreground">
-          Your order is saved for real. No payment is charged yet — payment
-          provider integration is a later phase.
+          Choose Cash on Delivery or pay online with bKash Checkout. Prices and
+          stock are confirmed on the server when you place the order.
         </p>
+        {(errors.form || paymentErrorFromUrl) && (
+          <p className="mt-3 text-sm text-destructive" role="alert">
+            {errors.form ?? paymentErrorFromUrl}
+          </p>
+        )}
       </div>
 
       <form

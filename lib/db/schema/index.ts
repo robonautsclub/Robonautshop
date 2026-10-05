@@ -14,3 +14,5 @@ export * from "@/lib/db/schema/kit-components";
 export * from "@/lib/db/schema/cart-items";
 export * from "@/lib/db/schema/orders";
 export * from "@/lib/db/schema/order-items";
+export * from "@/lib/db/schema/bkash-tokens";
+export * from "@/lib/db/schema/bkash-pending-payments";

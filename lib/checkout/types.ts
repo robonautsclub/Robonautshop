@@ -13,7 +13,7 @@ export const PAYMENT_METHODS: Array<{
   {
     id: "BKASH",
     label: "bKash",
-    description: "Placeholder only — no bKash payment is processed.",
+    description: "Pay with bKash Checkout. You will be redirected to bKash to complete payment.",
   },
   {
     id: "NAGAD",
