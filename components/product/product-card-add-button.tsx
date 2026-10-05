@@ -83,7 +83,7 @@ export function ProductCardAddButton({
     <div ref={rootRef} className={cn("relative", className)}>
       <Button
         type="button"
-        size="xs"
+        size="sm"
         className="shrink-0"
         disabled={!canAdd}
         aria-label={canAdd ? `Add ${productName} to cart` : `${productName} out of stock`}
