@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { AdminDeleteTrigger } from "@/components/admin/admin-confirm-delete-dialog";
+import { AdminOrdersFilters } from "@/components/admin/admin-orders-filters";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import {
   AdminPagination,
@@ -13,7 +14,6 @@ import {
   AdminStatusBadge,
   AdminTable,
   AdminTableHead,
-  AdminTableToolbarSearch,
   AdminTd,
   AdminTh,
 } from "@/components/admin/admin-table";
@@ -30,6 +30,7 @@ import {
 } from "@/lib/admin";
 import { formatAdminDateTime } from "@/lib/admin/format-date";
 import { formatBdt, type Product } from "@/lib/catalog";
+import type { AdminOrderFilters } from "@/lib/orders/admin-filters";
 import { cn } from "@/lib/utils";
 
 function orderTone(status: AdminOrderStatus) {
@@ -48,11 +49,19 @@ function paymentTone(status: AdminPaymentStatus) {
 export function AdminOrdersShell({
   orders,
   products,
+  filters,
 }: {
   orders: AdminOrder[];
   products: Product[];
+  filters: AdminOrderFilters;
 }) {
   const [localOrders, setLocalOrders] = useState(orders);
+  const [previousOrders, setPreviousOrders] = useState(orders);
+  if (previousOrders !== orders) {
+    // New filter results from the server replace the local list.
+    setPreviousOrders(orders);
+    setLocalOrders(orders);
+  }
   const [, setTick] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
   const pagination = useAdminPagination(localOrders, 20);
@@ -119,14 +128,7 @@ export function AdminOrdersShell({
       <AdminPageHeader
         title="Orders"
         description={`${localOrders.length} orders · download receipt · cancel releases booked stock.`}
-        toolbar={
-          <>
-            <AdminTableToolbarSearch placeholder="Search orders" />
-            <p className="text-xs text-muted-foreground">
-              Order status and payment status stay separate
-            </p>
-          </>
-        }
+        toolbar={<AdminOrdersFilters filters={filters} />}
       />
 
       <AdminTable>
@@ -230,6 +232,12 @@ export function AdminOrdersShell({
           })}
         </tbody>
       </AdminTable>
+
+      {localOrders.length === 0 ? (
+        <p className="rounded-lg border border-dashed px-3 py-6 text-center text-sm text-muted-foreground">
+          No orders match these filters.
+        </p>
+      ) : null}
 
       <AdminPagination
         page={pagination.page}

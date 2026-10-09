@@ -12,8 +12,10 @@ export {
   listAdminInventory,
   listAdminKits,
   listAdminProductOptions,
+  listAdminProductImages,
   listAdminProducts,
   listAdminProjects,
+  listAdminVariants,
   type AdminInventoryRow,
   type AdminProductOption,
 } from "@/lib/admin/catalog";
@@ -37,6 +39,7 @@ export {
 export {
   getAdminFinanceSummary,
   type AdminFinanceSummary,
+  type AdminMonthlyFinance,
 } from "@/lib/admin/finances";
 export {
   bookOrderLines,

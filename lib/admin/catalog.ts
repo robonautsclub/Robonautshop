@@ -6,12 +6,21 @@
 
 import { inArray } from "drizzle-orm";
 
-import { getAvailableQuantity, type Category, type Kit, type Product, type RobotProject } from "@/lib/catalog/types";
+import {
+  getAvailableQuantity,
+  type Category,
+  type Kit,
+  type Product,
+  type ProductImage,
+  type ProductVariant,
+  type RobotProject,
+} from "@/lib/catalog/types";
 import type { Database } from "@/lib/db";
 import { categories } from "@/lib/db/schema/categories";
 import { inventory } from "@/lib/db/schema/inventory";
 import { kits } from "@/lib/db/schema/kits";
 import { productImages } from "@/lib/db/schema/product-images";
+import { productVariants } from "@/lib/db/schema/product-variants";
 import { products } from "@/lib/db/schema/products";
 import { robotProjects } from "@/lib/db/schema/robot-projects";
 
@@ -33,6 +42,7 @@ export async function getAdminCategoryName(
 }
 
 export type AdminInventoryRow = {
+  id: string;
   productId: string;
   variantId: string | null;
   sku: string;
@@ -56,6 +66,7 @@ export async function listAdminInventory(
 
   return inventoryRows
     .map((row) => ({
+      id: row.id,
       productId: row.productId,
       variantId: row.variantId,
       sku: row.sku,
@@ -152,4 +163,21 @@ export async function getAdminDashboardStats(db: Database) {
     inventorySkuCount: inventoryRows.length,
     lowStockCount: lowStock,
   };
+}
+
+export async function listAdminVariants(db: Database): Promise<ProductVariant[]> {
+  return db.select().from(productVariants).orderBy(productVariants.sortOrder);
+}
+
+export async function listAdminProductImages(db: Database): Promise<ProductImage[]> {
+  return db
+    .select({
+      id: productImages.id,
+      productId: productImages.productId,
+      url: productImages.url,
+      alt: productImages.alt,
+      sortOrder: productImages.sortOrder,
+    })
+    .from(productImages)
+    .orderBy(productImages.sortOrder);
 }

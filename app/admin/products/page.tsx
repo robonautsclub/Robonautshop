@@ -1,12 +1,21 @@
 import { AdminProductsShell } from "@/components/admin/admin-products-shell";
-import { listAdminCategories, listAdminProducts } from "@/lib/admin";
+import {
+  listAdminCategories,
+  listAdminProductImages,
+  listAdminProducts,
+  listAdminVariants,
+} from "@/lib/admin";
 import { getRequestDb } from "@/lib/db/request";
+
+export const dynamic = "force-dynamic";
 
 export default async function AdminProductsPage() {
   const db = await getRequestDb();
-  const [productRows, categoryRows] = await Promise.all([
+  const [productRows, categoryRows, variants, images] = await Promise.all([
     listAdminProducts(db),
     listAdminCategories(db),
+    listAdminVariants(db),
+    listAdminProductImages(db),
   ]);
   const categoryNameById = new Map(
     categoryRows.map((category) => [category.id, category.name]),
@@ -20,5 +29,12 @@ export default async function AdminProductsPage() {
     name: category.name,
   }));
 
-  return <AdminProductsShell products={products} categories={categories} />;
+  return (
+    <AdminProductsShell
+      products={products}
+      categories={categories}
+      variants={variants}
+      images={images}
+    />
+  );
 }

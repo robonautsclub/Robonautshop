@@ -46,6 +46,17 @@ export const PAYMENT_STATUS_VALUES = [
   "CANCELLED",
 ] as const;
 
+/**
+ * What an order currently holds against inventory (tasks/phase-18-hardening
+ * 104/105/109). Tracked on the order so reserve, release, and deduct each
+ * happen at most once per order:
+ * - NONE: nothing held (e.g. a failed/cancelled bKash attempt)
+ * - RESERVED: `reservedQuantity` was incremented for its lines
+ * - DEDUCTED: shipped — `stockQuantity` was reduced and the reservation consumed
+ */
+export const ORDER_STOCK_STATE_VALUES = ["NONE", "RESERVED", "DEDUCTED"] as const;
+export type OrderStockState = (typeof ORDER_STOCK_STATE_VALUES)[number];
+
 export type OrderStatus = (typeof ORDER_STATUS_VALUES)[number];
 export type OrderPaymentStatus = (typeof PAYMENT_STATUS_VALUES)[number];
 
@@ -60,3 +71,25 @@ export const ANALYTICS_EVENT_TYPE_VALUES = [
   "ADD_TO_CART",
 ] as const;
 export type AnalyticsEventType = (typeof ANALYTICS_EVENT_TYPE_VALUES)[number];
+
+/**
+ * Why a stock quantity changed (tasks/phase-19-admin-catalog/122). Admin
+ * adjustments pick one of the first five; ORDER_SHIPPED is written by the
+ * ship step (task 109) so every stock change has a history row.
+ */
+export const STOCK_MOVEMENT_REASON_VALUES = [
+  "RECEIVED",
+  "DAMAGED",
+  "RECOUNT",
+  "RETURNED",
+  "CORRECTION",
+  "ORDER_SHIPPED",
+] as const;
+export type StockMovementReason = (typeof STOCK_MOVEMENT_REASON_VALUES)[number];
+export const ADMIN_STOCK_REASONS = [
+  "RECEIVED",
+  "DAMAGED",
+  "RECOUNT",
+  "RETURNED",
+  "CORRECTION",
+] as const satisfies readonly StockMovementReason[];

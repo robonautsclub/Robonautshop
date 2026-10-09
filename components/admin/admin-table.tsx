@@ -130,3 +130,10 @@ export function AdminStatusBadge({
     </span>
   );
 }
+
+/** Badge tone for DRAFT / PUBLISHED / ARCHIVED — shared by products, kits and projects. */
+export function catalogStatusTone(status: "DRAFT" | "PUBLISHED" | "ARCHIVED") {
+  if (status === "PUBLISHED") return "success" as const;
+  if (status === "DRAFT") return "warning" as const;
+  return "neutral" as const;
+}

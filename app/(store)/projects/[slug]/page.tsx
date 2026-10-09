@@ -7,6 +7,7 @@ import { ComponentRequirementsList } from "@/components/catalog/component-requir
 import { SkillLevelBadge } from "@/components/catalog/skill-level-badge";
 import { CodeExampleBlocks } from "@/components/content/code-example-blocks";
 import { PageContainer } from "@/components/layout/page-container";
+import { JsonLd } from "@/components/shared/json-ld";
 import { buttonVariants } from "@/components/ui/button";
 import {
   formatBdt,
@@ -20,6 +21,8 @@ import {
   getRobotGuideByProjectSlug,
 } from "@/lib/content";
 import { getRequestDb } from "@/lib/db/request";
+import { breadcrumbJsonLd } from "@/lib/seo/structured-data";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 import { cn } from "@/lib/utils";
 
 type ProjectDetailPageProps = {
@@ -37,10 +40,14 @@ export async function generateMetadata({
     return { title: "Project not found" };
   }
 
-  return {
+  return buildPageMetadata({
     title: project.name,
     description: project.shortDescription,
-  };
+    path: `/projects/${project.slug}`,
+    image: project.imageUrl
+      ? { url: project.imageUrl, alt: project.imageAlt || project.name }
+      : null,
+  });
 }
 
 export default async function ProjectDetailPage({
@@ -64,6 +71,12 @@ export default async function ProjectDetailPage({
 
   return (
     <PageContainer as="section" className="py-10">
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Projects", path: "/projects" },
+          { name: project.name, path: `/projects/${project.slug}` },
+        ])}
+      />
       <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
         <ol className="flex flex-wrap items-center gap-1">
           <li>

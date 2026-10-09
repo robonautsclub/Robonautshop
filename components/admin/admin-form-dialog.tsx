@@ -6,6 +6,13 @@ import { AdminDialog } from "@/components/admin/admin-dialog";
 import { fieldClassName } from "@/components/auth/auth-form-shell";
 import { Button } from "@/components/ui/button";
 
+/**
+ * Shown when an admin form has no real save handler yet (mock-backed
+ * sections). Never claim "saved" for data that was not persisted
+ * (tasks/phase-18-hardening/118, AGENTS.md §49).
+ */
+export const PREVIEW_ONLY_MESSAGE = "Preview only — changes are not saved yet.";
+
 type AdminFormDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -41,8 +48,10 @@ export function AdminFormDialog({
       return;
     }
     event.preventDefault();
-    setMessage(`“${noun}” saved.`);
+    setMessage(`${PREVIEW_ONLY_MESSAGE} “${noun}” was not stored.`);
   }
+
+  const previewOnly = !onSubmitProp;
 
   return (
     <AdminDialog
@@ -52,7 +61,13 @@ export function AdminFormDialog({
         onOpenChange(next);
       }}
       title={title}
-      description={description}
+      description={
+        previewOnly
+          ? [description, "Preview — this section isn't connected to the database yet."]
+              .filter(Boolean)
+              .join(" ")
+          : description
+      }
       className={className}
     >
       <form onSubmit={onSubmit} className="mt-4 space-y-4" noValidate>
@@ -68,7 +83,10 @@ export function AdminFormDialog({
           </Button>
         </div>
         {message ? (
-          <p className="text-sm text-muted-foreground" role="status">
+          <p
+            className="rounded-md border border-dashed bg-muted/40 px-3 py-2 text-sm text-muted-foreground"
+            role="status"
+          >
             {message}
           </p>
         ) : null}

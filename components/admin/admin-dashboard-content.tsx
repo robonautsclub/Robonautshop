@@ -85,11 +85,11 @@ export async function AdminDashboardContent() {
       href: "/admin/finances",
     },
     {
-      label: "COD to receive",
-      value: formatBdt(finance.codReceivableBdt),
-      hint: `${finance.codReceivableOrderCount} pending COD`,
+      label: "Unpaid bKash",
+      value: formatBdt(finance.unpaidBkashBdt),
+      hint: `${finance.unpaidBkashOrderCount} attempts awaiting payment`,
       href: "/admin/finances",
-      warn: finance.codReceivableBdt > 0,
+      warn: finance.unpaidBkashOrderCount > 0,
     },
   ];
 
