@@ -255,3 +255,63 @@ Payments: bKash only. No courier integrations for now. Admin and content mock da
 - [x] 116 [Finances calculated from the mock orders](phase-18-hardening/116-realistic-mock-finances.md)
 - [x] 117 [Realistic mock tutorials, guides, docs and code examples](phase-18-hardening/117-realistic-mock-content.md)
 - [x] 118 [Honest message for mock-backed admin saves](phase-18-hardening/118-honest-admin-save-message.md)
+
+## Phase 19 — Admin catalog (real D1 writes)
+
+Replace preview-only admin dialogs with real, ADMIN-guarded saves.
+
+- [ ] 119 [Admin product create and edit (real D1 writes)](phase-19-admin-catalog/119-admin-product-crud.md)
+- [ ] 120 [Product status: draft, published, archived](phase-19-admin-catalog/120-product-status-archive.md)
+- [ ] 121 [Admin category create, edit and delete](phase-19-admin-catalog/121-admin-category-crud.md)
+- [ ] 122 [Stock adjustments with reasons and movement history](phase-19-admin-catalog/122-stock-adjustments-history.md)
+- [ ] 123 [Admin product image upload to R2](phase-19-admin-catalog/123-admin-image-upload-r2.md)
+- [ ] 124 [Admin kits create and edit](phase-19-admin-catalog/124-admin-kit-crud.md)
+- [ ] 125 [Admin robot projects create and edit](phase-19-admin-catalog/125-admin-project-crud.md)
+- [ ] 126 [Admin orders search and filter](phase-19-admin-catalog/126-admin-orders-search-filter.md)
+
+## Phase 20 — Accounts & auth
+
+Account recovery and self-service. bKash stays the only payment method.
+
+- [ ] 127 [Forgot and reset password](phase-20-accounts/127-forgot-reset-password.md)
+- [ ] 128 [Email verification](phase-20-accounts/128-email-verification.md)
+- [ ] 129 [Customer profile edit](phase-20-accounts/129-profile-edit.md)
+- [ ] 130 [Customer cancels an order before it ships](phase-20-accounts/130-customer-cancel-order.md)
+- [ ] 131 [Customer invoice download](phase-20-accounts/131-customer-invoice-download.md)
+- [ ] 132 [Active sessions list and revoke](phase-20-accounts/132-active-sessions.md)
+- [ ] 133 [Account deletion request](phase-20-accounts/133-account-deletion.md)
+
+## Phase 21 — Storefront gaps
+
+Browse, discovery and trust pages.
+
+- [ ] 134 [Product listing pagination](phase-21-storefront/134-product-pagination.md)
+- [ ] 135 [Brand filter](phase-21-storefront/135-brand-filter.md)
+- [ ] 136 [Search autocomplete](phase-21-storefront/136-search-autocomplete.md)
+- [ ] 137 [Recently viewed products](phase-21-storefront/137-recently-viewed.md)
+- [ ] 138 [Subcategories](phase-21-storefront/138-subcategories.md)
+- [ ] 139 [Product compare](phase-21-storefront/139-product-compare.md)
+- [ ] 140 [Product questions and answers](phase-21-storefront/140-product-qa.md)
+- [ ] 141 [Back-in-stock notifications](phase-21-storefront/141-back-in-stock.md)
+- [ ] 142 [Policy, About and FAQ pages](phase-21-storefront/142-policy-pages.md)
+- [ ] 143 [Homepage: new arrivals and bestsellers](phase-21-storefront/143-homepage-new-bestsellers.md)
+
+## Phase 22 — Trust, staff & ops
+
+Moderation, returns, staff permissions, audit and exports.
+
+- [ ] 144 [Review moderation and verified purchase](phase-22-ops/144-review-moderation.md)
+- [ ] 145 [Return and warranty requests](phase-22-ops/145-return-warranty-requests.md)
+- [ ] 146 [Staff roles and permissions](phase-22-ops/146-staff-roles.md)
+- [ ] 147 [Admin audit log](phase-22-ops/147-admin-audit-log.md)
+- [ ] 148 [Admin two-factor authentication](phase-22-ops/148-admin-2fa.md)
+- [ ] 149 [CSV export for orders, products and inventory](phase-22-ops/149-csv-export.md)
+- [ ] 150 [Server error logging](phase-22-ops/150-error-logging.md)
+
+## Out of scope for now
+
+Not turned into tasks. Ask before planning these.
+
+- **Payments:** Nagad, Rocket, cards, Cash on Delivery, bank transfer, gateway refunds, payment reconciliation, failed-payment retry
+- **Delivery:** courier integrations (Pathao, Steadfast, RedX), zone/weight rates, tracking numbers, shipping labels, store pickup, split shipments
+- **Later platform features:** AI assistants, multi-vendor marketplace, POS, multi-warehouse, loyalty/referrals, gift cards, subscriptions, page builder, SMS/WhatsApp marketing
