@@ -2,6 +2,7 @@
 
 import { type FormEvent, useState } from "react";
 
+import { PREVIEW_ONLY_MESSAGE } from "@/components/admin/admin-form-dialog";
 import { fieldClassName } from "@/components/auth/auth-form-shell";
 import { Button } from "@/components/ui/button";
 
@@ -22,7 +23,7 @@ export function AdminShellForm({
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setMessage(`“${noun}” saved.`);
+    setMessage(`${PREVIEW_ONLY_MESSAGE} “${noun}” was not stored.`);
   }
 
   return (

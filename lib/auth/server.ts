@@ -96,6 +96,22 @@ export function buildAuth(db: Database, options: { withNextCookies: boolean }) {
       },
     },
     socialProviders: getSocialProviders(),
+    // Better Auth's built-in limiter covers sign-in/sign-up (tasks/phase-18-
+    // hardening/113) — keyed by Cloudflare's real client IP. In-memory per
+    // Worker isolate, like lib/rate-limit/memory.ts: best-effort only.
+    advanced: {
+      ipAddress: { ipAddressHeaders: ["cf-connecting-ip", "x-forwarded-for"] },
+    },
+    rateLimit: {
+      enabled: process.env.NODE_ENV === "production",
+      window: 60,
+      max: 100,
+      customRules: {
+        "/sign-in/email": { window: 60, max: 5 },
+        "/sign-up/email": { window: 60, max: 3 },
+        "/request-password-reset": { window: 60, max: 3 },
+      },
+    },
     plugins: [dash(), sentinel(), ...(options.withNextCookies ? [nextCookies()] : [])],
   });
 }

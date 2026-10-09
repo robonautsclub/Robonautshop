@@ -2,16 +2,26 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 
 import { upsertShippingAddressForUser } from "@/lib/account/address-queries";
 import { getProductById } from "@/lib/catalog/queries";
-import { getAvailableQuantity } from "@/lib/catalog/types";
 import { estimateShippingBdt, type PaymentMethodId } from "@/lib/checkout/types";
 import { incrementCouponUsage, validateCoupon } from "@/lib/coupons/queries";
 import { sendLowStockAlertEmail } from "@/lib/email/send";
-import { reserveStockForOrderLines } from "@/lib/inventory/queries";
+import {
+  releaseStockForOrderLines,
+  reserveStockForOrderLines,
+  toStockLines,
+  type StockLine,
+} from "@/lib/inventory/queries";
+import { getLineAvailableQuantity } from "@/lib/inventory/rules";
+import { canRepayWithBkash } from "@/lib/orders/repay-rules";
 import type { Database } from "@/lib/db";
 import { bkashPendingPayments } from "@/lib/db/schema/bkash-pending-payments";
 import { orderItems } from "@/lib/db/schema/order-items";
 import { orders } from "@/lib/db/schema/orders";
-import type { OrderPaymentStatus, OrderStatus } from "@/lib/db/schema/shared";
+import type {
+  OrderPaymentStatus,
+  OrderStatus,
+  OrderStockState,
+} from "@/lib/db/schema/shared";
 import { users } from "@/lib/db/schema/users";
 import { sendOrderConfirmationEmail } from "@/lib/email/send";
 import {
@@ -96,16 +106,10 @@ async function validateCartLines(
       continue;
     }
 
-    const inventoryRow = variant
-      ? (product.inventory.find((row) => row.variantId === variant.id) ?? null)
-      : (product.inventory.find((row) => row.variantId === null) ??
-        product.inventory[0] ??
-        null);
-
-    const availableQuantity = inventoryRow
-      ? getAvailableQuantity(inventoryRow)
-      : product.inventory.reduce((sum, row) => sum + getAvailableQuantity(row), 0);
-
+    const availableQuantity = getLineAvailableQuantity(
+      product.inventory,
+      variant?.id ?? null,
+    );
     const quantity = Math.min(line.quantity, availableQuantity);
 
     if (quantity <= 0) {
@@ -156,6 +160,7 @@ async function insertOrderWithItems(
     specialInstructions?: string;
     bkashPaymentId?: string | null;
     bkashTransactionId?: string | null;
+    stockState: OrderStockState;
   },
 ): Promise<void> {
   const now = new Date().toISOString();
@@ -182,6 +187,7 @@ async function insertOrderWithItems(
     specialInstructions: args.specialInstructions?.trim() || null,
     bkashPaymentId: args.bkashPaymentId ?? null,
     bkashTransactionId: args.bkashTransactionId ?? null,
+    stockState: args.stockState,
     createdAt: now,
     updatedAt: now,
   });
@@ -204,19 +210,45 @@ async function insertOrderWithItems(
   if (args.couponId) {
     await incrementCouponUsage(db, args.couponId);
   }
+}
 
-  const lowStockAlerts = await reserveStockForOrderLines(
-    db,
-    args.lines.map((line) => ({
-      productId: line.productId,
-      variantId: line.variantId,
-      quantity: line.quantity,
-      productName: line.productName,
-    })),
-  );
-  if (lowStockAlerts.length > 0) {
-    void sendLowStockAlertEmail(lowStockAlerts);
+/**
+ * Reserve stock for an order's lines (tasks/phase-18-hardening/104) and send
+ * low-stock alerts. Returns the stock state the order should record.
+ */
+async function reserveForOrder(
+  db: Database,
+  lines: StockLine[],
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const result = await reserveStockForOrderLines(db, lines);
+  if (!result.ok) {
+    return result;
   }
+  if (result.alerts.length > 0) {
+    void sendLowStockAlertEmail(result.alerts);
+  }
+  return { ok: true };
+}
+
+/**
+ * A paid order must be recorded even if its stock was claimed meanwhile —
+ * the money is already taken. Reserve when possible; otherwise log it loudly
+ * so an admin can resolve the oversell, and record that nothing is held.
+ */
+async function reserveForPaidOrder(
+  db: Database,
+  orderId: string,
+  lines: StockLine[],
+): Promise<OrderStockState> {
+  const reserved = await reserveForOrder(db, lines);
+  if (reserved.ok) {
+    return "RESERVED";
+  }
+  console.error("Paid order could not reserve stock (oversold)", {
+    orderId,
+    error: reserved.error,
+  });
+  return "NONE";
 }
 
 async function notifyOrderEmail(
@@ -267,7 +299,8 @@ async function notifyOrderEmail(
  * Creates a real order from the signed-in user's server cart — never from
  * line items the client reports directly (AGENTS.md "Pricing").
  *
- * COD / Nagad: insert order immediately (`PENDING`), clear cart, email.
+ * Non-bKash methods (none enabled today — bKash only, see AGENTS.md §17):
+ * reserve stock, insert order (`PENDING`), clear cart, email.
  * BKASH: stage `bkash_pending_payments`, redirect; cart stays until Execute
  * succeeds or fail/cancel persists a repayable unpaid order.
  */
@@ -343,12 +376,18 @@ export async function placeOrderFromServerCart(
 
   const orderId = crypto.randomUUID();
 
+  const reserved = await reserveForOrder(db, toStockLines(validated.lines));
+  if (!reserved.ok) {
+    return reserved;
+  }
+
   await insertOrderWithItems(db, {
     orderId,
     userId,
     paymentMethod: input.paymentMethod,
     status: "PENDING",
     paymentStatus: "PENDING",
+    stockState: "RESERVED",
     lines: validated.lines,
     subtotal: validated.subtotal,
     shippingTotal: shipping.amount,
@@ -388,6 +427,15 @@ export async function finalizeBkashPaidOrder(
       return { orderId: existing.id };
     }
 
+    let stockState = existing.stockState;
+    if (stockState === "NONE") {
+      const existingItems = await db
+        .select()
+        .from(orderItems)
+        .where(eq(orderItems.orderId, existing.id));
+      stockState = await reserveForPaidOrder(db, existing.id, toStockLines(existingItems));
+    }
+
     const now = new Date().toISOString();
     await db
       .update(orders)
@@ -395,6 +443,7 @@ export async function finalizeBkashPaidOrder(
         status: "PAID",
         paymentStatus: "PAID",
         bkashTransactionId: trxID,
+        stockState,
         updatedAt: now,
       })
       .where(eq(orders.id, existing.id));
@@ -438,12 +487,19 @@ export async function finalizeBkashPaidOrder(
     return { error: "Saved checkout details were invalid. Please try again." };
   }
 
+  const stockState = await reserveForPaidOrder(
+    db,
+    pending.id,
+    toStockLines(payload.lines),
+  );
+
   await insertOrderWithItems(db, {
     orderId: pending.id,
     userId: pending.userId,
     paymentMethod: "BKASH",
     status: "PAID",
     paymentStatus: "PAID",
+    stockState,
     lines: payload.lines,
     subtotal: payload.subtotal,
     shippingTotal: payload.shippingTotal,
@@ -485,12 +541,22 @@ export async function finalizeBkashUnpaidOrder(
     if (existing.paymentStatus === "PAID") {
       return { orderId: existing.id };
     }
+    // A failed/cancelled attempt must not keep holding stock
+    // (tasks/phase-18-hardening/105). Repaying reserves it again.
+    if (existing.stockState === "RESERVED") {
+      const existingItems = await db
+        .select()
+        .from(orderItems)
+        .where(eq(orderItems.orderId, existing.id));
+      await releaseStockForOrderLines(db, toStockLines(existingItems));
+    }
     const now = new Date().toISOString();
     await db
       .update(orders)
       .set({
         paymentStatus,
         status: "PAYMENT_PENDING",
+        stockState: existing.stockState === "RESERVED" ? "NONE" : existing.stockState,
         updatedAt: now,
       })
       .where(eq(orders.id, existing.id));
@@ -518,6 +584,8 @@ export async function finalizeBkashUnpaidOrder(
     paymentMethod: "BKASH",
     status: "PAYMENT_PENDING",
     paymentStatus,
+    // Unpaid attempts hold no stock (tasks/phase-18-hardening/105).
+    stockState: "NONE",
     lines: payload.lines,
     subtotal: payload.subtotal,
     shippingTotal: payload.shippingTotal,
@@ -571,11 +639,7 @@ export async function repayBkashOrder(
     return { ok: false, error: "This order is already paid." };
   }
 
-  if (
-    order.paymentStatus !== "FAILED" &&
-    order.paymentStatus !== "CANCELLED" &&
-    order.paymentStatus !== "PENDING"
-  ) {
+  if (!canRepayWithBkash(order)) {
     return { ok: false, error: "This order cannot be repaid right now." };
   }
 
@@ -608,15 +672,10 @@ export async function repayBkashOrder(
       };
     }
 
-    const inventoryRow = variant
-      ? (product.inventory.find((row) => row.variantId === variant.id) ?? null)
-      : (product.inventory.find((row) => row.variantId === null) ??
-        product.inventory[0] ??
-        null);
-
-    const availableQuantity = inventoryRow
-      ? getAvailableQuantity(inventoryRow)
-      : product.inventory.reduce((sum, row) => sum + getAvailableQuantity(row), 0);
+    // An order that still holds its reservation already owns these units.
+    const availableQuantity =
+      getLineAvailableQuantity(product.inventory, variant?.id ?? null) +
+      (order.stockState === "RESERVED" ? item.quantity : 0);
 
     if (availableQuantity < item.quantity) {
       return {
@@ -644,6 +703,16 @@ export async function repayBkashOrder(
   // doesn't re-validate or re-charge it.
   const total = Math.max(0, subtotal + shipping.amount - order.discountTotal);
   const now = new Date().toISOString();
+
+  // Re-claim the stock before sending the customer to bKash
+  // (tasks/phase-18-hardening/105); released again if the attempt fails.
+  const reservedNow = order.stockState === "NONE";
+  if (reservedNow) {
+    const reserved = await reserveForOrder(db, toStockLines(revalidated));
+    if (!reserved.ok) {
+      return reserved;
+    }
+  }
 
   try {
     const payment = await createBkashCheckoutPayment(db, {
@@ -678,6 +747,7 @@ export async function repayBkashOrder(
         status: "PAYMENT_PENDING",
         bkashPaymentId: payment.paymentID,
         bkashTransactionId: null,
+        stockState: order.stockState === "DEDUCTED" ? "DEDUCTED" : "RESERVED",
         updatedAt: now,
       })
       .where(eq(orders.id, order.id));
@@ -689,6 +759,9 @@ export async function repayBkashOrder(
 
     return { ok: true, redirectUrl: payment.bkashURL };
   } catch (error) {
+    if (reservedNow) {
+      await releaseStockForOrderLines(db, toStockLines(revalidated));
+    }
     const message =
       error instanceof BkashApiError
         ? error.message

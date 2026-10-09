@@ -46,6 +46,17 @@ export const PAYMENT_STATUS_VALUES = [
   "CANCELLED",
 ] as const;
 
+/**
+ * What an order currently holds against inventory (tasks/phase-18-hardening
+ * 104/105/109). Tracked on the order so reserve, release, and deduct each
+ * happen at most once per order:
+ * - NONE: nothing held (e.g. a failed/cancelled bKash attempt)
+ * - RESERVED: `reservedQuantity` was incremented for its lines
+ * - DEDUCTED: shipped — `stockQuantity` was reduced and the reservation consumed
+ */
+export const ORDER_STOCK_STATE_VALUES = ["NONE", "RESERVED", "DEDUCTED"] as const;
+export type OrderStockState = (typeof ORDER_STOCK_STATE_VALUES)[number];
+
 export type OrderStatus = (typeof ORDER_STATUS_VALUES)[number];
 export type OrderPaymentStatus = (typeof PAYMENT_STATUS_VALUES)[number];
 

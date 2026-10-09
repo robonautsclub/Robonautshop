@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import {
@@ -41,7 +42,13 @@ function paymentTone(status: AdminPaymentStatus) {
   return "warning" as const;
 }
 
-export function AdminOrderDetailShell({ order }: { order: AdminOrder }) {
+type AdminOrderDetailShellProps = {
+  order: AdminOrder;
+  /** Status update control — only real D1 orders get one (task 108). */
+  statusControl?: ReactNode;
+};
+
+export function AdminOrderDetailShell({ order, statusControl }: AdminOrderDetailShellProps) {
   return (
     <div className="space-y-6">
       <AdminPageHeader
@@ -122,6 +129,7 @@ export function AdminOrderDetailShell({ order }: { order: AdminOrder }) {
           <p className="text-xs text-muted-foreground">
             Order status and payment status are tracked separately.
           </p>
+          {statusControl}
         </section>
       </div>
 
