@@ -1,7 +1,11 @@
 import { sql } from "drizzle-orm";
 import { index, integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-import { ORDER_STATUS_VALUES, PAYMENT_STATUS_VALUES } from "@/lib/db/schema/shared";
+import {
+  ORDER_STATUS_VALUES,
+  ORDER_STOCK_STATE_VALUES,
+  PAYMENT_STATUS_VALUES,
+} from "@/lib/db/schema/shared";
 import { users } from "@/lib/db/schema/users";
 
 /**
@@ -29,6 +33,10 @@ export const orders = sqliteTable(
       .notNull()
       .default("PENDING"),
     paymentMethod: text("payment_method").notNull(),
+    /** Inventory held by this order — see ORDER_STOCK_STATE_VALUES. */
+    stockState: text("stock_state", { enum: ORDER_STOCK_STATE_VALUES })
+      .notNull()
+      .default("NONE"),
     subtotal: integer("subtotal").notNull(),
     shippingTotal: integer("shipping_total").notNull(),
     /** Coupon discount in BDT, computed server-side (tasks/phase-14-advanced/87-coupons.md). */

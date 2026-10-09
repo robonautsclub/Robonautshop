@@ -16,6 +16,7 @@ import {
   AdminTh,
 } from "@/components/admin/admin-table";
 import type { AdminCustomer } from "@/lib/admin";
+import { formatBdt } from "@/lib/catalog";
 
 export function AdminCustomersShell({
   customers: initialCustomers,
@@ -48,6 +49,7 @@ export function AdminCustomersShell({
           <AdminTh>Phone</AdminTh>
           <AdminTh>City</AdminTh>
           <AdminTh>Orders</AdminTh>
+          <AdminTh className="text-right">Spent</AdminTh>
           <AdminTh>Joined</AdminTh>
           <AdminTh className="text-right">Actions</AdminTh>
         </AdminTableHead>
@@ -62,8 +64,14 @@ export function AdminCustomersShell({
               </AdminTd>
               <AdminTd className="break-all">{customer.email}</AdminTd>
               <AdminTd className="font-mono text-xs">{customer.phone}</AdminTd>
-              <AdminTd>{customer.city}</AdminTd>
+              <AdminTd>
+                <p>{customer.city}</p>
+                <p className="text-xs text-muted-foreground">{customer.area}</p>
+              </AdminTd>
               <AdminTd className="font-medium">{customer.orderCount}</AdminTd>
+              <AdminTd className="text-right font-medium">
+                {formatBdt(customer.totalSpentBdt)}
+              </AdminTd>
               <AdminTd>
                 {new Date(customer.createdAt).toLocaleDateString()}
               </AdminTd>
