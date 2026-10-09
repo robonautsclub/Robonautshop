@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, lt, or, sql, type SQL } from "drizzle-orm";
 
 import { upsertShippingAddressForUser } from "@/lib/account/address-queries";
 import { getProductById } from "@/lib/catalog/queries";
@@ -12,6 +12,7 @@ import {
   type StockLine,
 } from "@/lib/inventory/queries";
 import { getLineAvailableQuantity } from "@/lib/inventory/rules";
+import { likeContains, nextDay, type AdminOrderFilters } from "@/lib/orders/admin-filters";
 import { canRepayWithBkash } from "@/lib/orders/repay-rules";
 import type { Database } from "@/lib/db";
 import { bkashPendingPayments } from "@/lib/db/schema/bkash-pending-payments";
@@ -834,12 +835,41 @@ export type AdminOrderDetail = {
  * List all real orders for the admin orders table (newest first).
  * Not scoped to a customer — admin-only callers must gate access.
  */
+/**
+ * Admin order list. Search and filters run in SQL
+ * (tasks/phase-19-admin-catalog/126) — order ID, customer name, phone or
+ * account email, plus order status, payment status and a date range.
+ */
 export async function listOrdersForAdmin(
   db: Database,
+  filters: AdminOrderFilters = {},
 ): Promise<AdminOrderDetail[]> {
+  const conditions: SQL[] = [];
+  if (filters.q) {
+    const pattern = likeContains(filters.q);
+    const contains = (column: SQL | typeof orders.id) =>
+      sql`${column} like ${pattern} escape '\\'`;
+    conditions.push(
+      or(
+        contains(orders.id),
+        contains(sql`${orders.shippingFullName}`),
+        contains(sql`${orders.shippingPhone}`),
+        inArray(
+          orders.userId,
+          db.select({ id: users.id }).from(users).where(contains(sql`${users.email}`)),
+        ),
+      )!,
+    );
+  }
+  if (filters.status) conditions.push(eq(orders.status, filters.status));
+  if (filters.payment) conditions.push(eq(orders.paymentStatus, filters.payment));
+  if (filters.from) conditions.push(gte(orders.createdAt, filters.from));
+  if (filters.to) conditions.push(lt(orders.createdAt, nextDay(filters.to)));
+
   const orderRows = await db
     .select()
     .from(orders)
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
     .orderBy(desc(orders.createdAt));
 
   if (orderRows.length === 0) {

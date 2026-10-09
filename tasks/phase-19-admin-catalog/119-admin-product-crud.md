@@ -1,6 +1,6 @@
 # Task 119 — Admin product create and edit (real D1 writes)
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

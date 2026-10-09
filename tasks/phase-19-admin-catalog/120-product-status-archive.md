@@ -1,6 +1,6 @@
 # Task 120 — Product status: draft, published, archived
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

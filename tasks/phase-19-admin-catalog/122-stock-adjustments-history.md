@@ -1,6 +1,6 @@
 # Task 122 — Stock adjustments with reasons and movement history
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 
@@ -22,7 +22,7 @@ Admins need to correct stock (received, damaged, recount) with a recorded reason
 - `stock_movements` table + migration
 - Adjust stock dialog in admin inventory (reason select + note)
 - Movement history list per SKU
-- Record existing automatic changes (ship deduction, cancel release) as movements too
+- Record the automatic ship deduction as a movement too (reservations and their release never change stock quantity, so they are not stock movements)
 
 ## Out of scope
 

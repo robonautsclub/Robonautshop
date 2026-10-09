@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { type FormEvent, useState } from "react";
 
 import { AdminDeleteTrigger } from "@/components/admin/admin-confirm-delete-dialog";
 import {
@@ -16,37 +16,67 @@ import {
 import {
   AdminTable,
   AdminTableHead,
-  AdminTableToolbarSearch,
   AdminTd,
   AdminTh,
 } from "@/components/admin/admin-table";
+import { useAdminSave } from "@/components/admin/use-admin-save";
 import { Button } from "@/components/ui/button";
+import { deleteCategoryAction, saveCategoryAction } from "@/lib/admin/catalog-actions";
+import { categoryInputSchema } from "@/lib/admin/catalog-schemas";
 import type { Category } from "@/lib/catalog";
 
 type AdminCategoriesShellProps = {
   categories: Category[];
 };
 
+/** Categories backed by real D1 writes (tasks/phase-19-admin-catalog/121). */
 export function AdminCategoriesShell({
-  categories: initialCategories,
+  categories: rows,
 }: AdminCategoriesShellProps) {
-  const [rows, setRows] = useState(initialCategories);
   const [editing, setEditing] = useState<Category | null>(null);
   const [showCreate, setShowCreate] = useState(false);
-  const [status, setStatus] = useState<string | null>(null);
+  const save = useAdminSave();
   const dialogOpen = showCreate || editing !== null;
   const pagination = useAdminPagination(rows, 20);
+
+  function closeDialog() {
+    setShowCreate(false);
+    setEditing(null);
+  }
+
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const input = {
+      name: form.get("name"),
+      slug: form.get("slug"),
+      description: form.get("description"),
+      sortOrder: form.get("sortOrder"),
+    };
+    const parsed = categoryInputSchema.safeParse(input);
+    if (!parsed.success) {
+      save.setError(parsed.error.issues[0]?.message ?? "Please check the form.");
+      return;
+    }
+    const categoryId = editing?.id ?? null;
+    const result = await save.run(
+      () => saveCategoryAction(categoryId, input),
+      categoryId ? `Saved “${parsed.data.name}”.` : `Created “${parsed.data.name}”.`,
+    );
+    if (result?.ok) closeDialog();
+  }
 
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Categories"
-        description={`${rows.length} categories · Add/Edit opens in a popup. Delete always asks for confirmation.`}
+        description={`${rows.length} categories · Saved to the database. A category can only be deleted once no product uses it.`}
         actions={
           <Button
             type="button"
             size="sm"
             onClick={() => {
+              save.setError(null);
               setEditing(null);
               setShowCreate(true);
             }}
@@ -56,7 +86,6 @@ export function AdminCategoriesShell({
         }
         toolbar={
           <>
-            <AdminTableToolbarSearch placeholder="Search categories" />
             <p className="text-xs text-muted-foreground">
               Sorted by catalog sort order
             </p>
@@ -93,6 +122,7 @@ export function AdminCategoriesShell({
                     variant="outline"
                     size="sm"
                     onClick={() => {
+                      save.setError(null);
                       setShowCreate(false);
                       setEditing(category);
                     }}
@@ -102,17 +132,15 @@ export function AdminCategoriesShell({
                   <AdminDeleteTrigger
                     itemLabel={`the category “${category.name}”`}
                     title="Delete category?"
-                    description={`Are you sure you want to delete “${category.name}”? This removes it from the list.`}
+                    description={`Are you sure you want to delete “${category.name}”? This can't be undone.`}
                     buttonLabel="Delete"
                     buttonVariant="destructive"
-                    onConfirm={() => {
-                      setRows((current) =>
-                        current.filter((row) => row.id !== category.id),
-                      );
-                      setStatus(
-                        `“${category.name}” was removed.`,
-                      );
-                    }}
+                    onConfirm={() =>
+                      void save.run(
+                        () => deleteCategoryAction(category.id),
+                        `“${category.name}” was deleted.`,
+                      )
+                    }
                   />
                 </div>
               </AdminTd>
@@ -130,24 +158,29 @@ export function AdminCategoriesShell({
         onPageSizeChange={pagination.setPageSize}
       />
 
-      {status ? (
+      {save.status ? (
         <p className="text-sm text-muted-foreground" role="status">
-          {status}
+          {save.status}
+        </p>
+      ) : null}
+      {save.error && !dialogOpen ? (
+        <p className="text-sm text-destructive" role="alert">
+          {save.error}
         </p>
       ) : null}
 
       <AdminFormDialog
+        key={editing?.id ?? "new"}
         open={dialogOpen}
         onOpenChange={(open) => {
-          if (!open) {
-            setShowCreate(false);
-            setEditing(null);
-          }
+          if (!open) closeDialog();
         }}
         title={
           editing ? `Edit category · ${editing.name}` : "Create category"
         }
         noun="category"
+        submitLabel={save.pending ? "Saving…" : "Save category"}
+        onSubmit={onSubmit}
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <AdminField id="admin-category-name" label="Name">
@@ -158,7 +191,7 @@ export function AdminCategoriesShell({
               className={fieldClassName()}
             />
           </AdminField>
-          <AdminField id="admin-category-slug" label="Slug">
+          <AdminField id="admin-category-slug" label="Slug (blank = from name)">
             <input
               id="admin-category-slug"
               name="slug"
@@ -187,6 +220,11 @@ export function AdminCategoriesShell({
             </AdminField>
           </div>
         </div>
+        {save.error ? (
+          <p className="text-sm text-destructive" role="alert">
+            {save.error}
+          </p>
+        ) : null}
       </AdminFormDialog>
     </div>
   );

@@ -260,14 +260,14 @@ Payments: bKash only. No courier integrations for now. Admin and content mock da
 
 Replace preview-only admin dialogs with real, ADMIN-guarded saves.
 
-- [ ] 119 [Admin product create and edit (real D1 writes)](phase-19-admin-catalog/119-admin-product-crud.md)
-- [ ] 120 [Product status: draft, published, archived](phase-19-admin-catalog/120-product-status-archive.md)
-- [ ] 121 [Admin category create, edit and delete](phase-19-admin-catalog/121-admin-category-crud.md)
-- [ ] 122 [Stock adjustments with reasons and movement history](phase-19-admin-catalog/122-stock-adjustments-history.md)
-- [ ] 123 [Admin product image upload to R2](phase-19-admin-catalog/123-admin-image-upload-r2.md)
-- [ ] 124 [Admin kits create and edit](phase-19-admin-catalog/124-admin-kit-crud.md)
-- [ ] 125 [Admin robot projects create and edit](phase-19-admin-catalog/125-admin-project-crud.md)
-- [ ] 126 [Admin orders search and filter](phase-19-admin-catalog/126-admin-orders-search-filter.md)
+- [x] 119 [Admin product create and edit (real D1 writes)](phase-19-admin-catalog/119-admin-product-crud.md)
+- [x] 120 [Product status: draft, published, archived](phase-19-admin-catalog/120-product-status-archive.md)
+- [x] 121 [Admin category create, edit and delete](phase-19-admin-catalog/121-admin-category-crud.md)
+- [x] 122 [Stock adjustments with reasons and movement history](phase-19-admin-catalog/122-stock-adjustments-history.md)
+- [x] 123 [Admin product image upload to R2](phase-19-admin-catalog/123-admin-image-upload-r2.md)
+- [x] 124 [Admin kits create and edit](phase-19-admin-catalog/124-admin-kit-crud.md)
+- [x] 125 [Admin robot projects create and edit](phase-19-admin-catalog/125-admin-project-crud.md)
+- [x] 126 [Admin orders search and filter](phase-19-admin-catalog/126-admin-orders-search-filter.md)
 
 ## Phase 20 — Accounts & auth
 

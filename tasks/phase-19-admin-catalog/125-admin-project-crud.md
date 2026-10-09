@@ -1,6 +1,6 @@
 # Task 125 — Admin robot projects create and edit
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

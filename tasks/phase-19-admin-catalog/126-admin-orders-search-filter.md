@@ -1,6 +1,6 @@
 # Task 126 — Admin orders search and filter
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

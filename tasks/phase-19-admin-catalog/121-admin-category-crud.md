@@ -1,6 +1,6 @@
 # Task 121 — Admin category create, edit and delete
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

@@ -1,6 +1,6 @@
 # Task 123 — Admin product image upload to R2
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
 
+import { slugify } from "@/lib/catalog/slug";
 import type {
   Category,
   InventorySummary,
@@ -372,13 +373,6 @@ const PRODUCT_SEEDS: ProductSeed[] = [
     },
   },
 ];
-
-function slugify(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
 
 function isoDaysAgo(days: number): string {
   return faker.date.recent({ days }).toISOString();

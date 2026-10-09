@@ -1,6 +1,6 @@
 # Task 124 — Admin kits create and edit
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

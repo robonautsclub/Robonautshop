@@ -12,8 +12,10 @@ export {
   listAdminInventory,
   listAdminKits,
   listAdminProductOptions,
+  listAdminProductImages,
   listAdminProducts,
   listAdminProjects,
+  listAdminVariants,
   type AdminInventoryRow,
   type AdminProductOption,
 } from "@/lib/admin/catalog";
