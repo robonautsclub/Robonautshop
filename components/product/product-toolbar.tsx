@@ -11,18 +11,22 @@ const SORT_OPTIONS: Array<{ value: ProductSort; label: string }> = [
 export type ProductToolbarValues = {
   q: string;
   category: string;
+  brands: string[];
   inStock: boolean;
   sort: ProductSort;
 };
 
 type ProductToolbarProps = {
   categories: Category[];
+  /** All brands available to filter by (from the database). */
+  brands?: string[];
   values: ProductToolbarValues;
   action?: string;
 };
 
 export function ProductToolbar({
   categories,
+  brands = [],
   values,
   action = "/products",
 }: ProductToolbarProps) {
@@ -82,6 +86,26 @@ export function ProductToolbar({
           ))}
         </select>
       </div>
+
+      {brands.length > 0 ? (
+        <fieldset className="flex min-w-[10rem] flex-col gap-1.5">
+          <legend className="text-xs font-medium">Brand</legend>
+          <div className="flex max-h-24 flex-wrap gap-x-4 gap-y-1 overflow-y-auto">
+            {brands.map((brand) => (
+              <label key={brand} className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  name="brand"
+                  value={brand}
+                  defaultChecked={values.brands.includes(brand)}
+                  className="size-4 rounded border"
+                />
+                {brand}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      ) : null}
 
       <label className="flex h-9 items-center gap-2 text-sm">
         <input

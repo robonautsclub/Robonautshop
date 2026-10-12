@@ -52,6 +52,8 @@ export type GetProductsOptions = {
   query?: string;
   featured?: boolean;
   inStock?: boolean;
+  /** Match any of these brand names exactly. */
+  brands?: string[];
   sort?: ProductSort;
 };
 
@@ -167,6 +169,9 @@ async function buildProductConditions(
   if (options.featured === true) {
     conditions.push(eq(products.featured, true));
   }
+  if (options.brands && options.brands.length > 0) {
+    conditions.push(inArray(products.brand, options.brands));
+  }
   if (options.inStock === true) {
     conditions.push(
       exists(
@@ -233,6 +238,16 @@ async function attachProductRelations(
 
 export async function getCategories(db: Database): Promise<Category[]> {
   return db.select().from(categories).orderBy(categories.sortOrder);
+}
+
+/** Distinct brands of published products, for the brand filter (task 135). */
+export async function getProductBrands(db: Database): Promise<string[]> {
+  const rows = await db
+    .selectDistinct({ brand: products.brand })
+    .from(products)
+    .where(and(eq(products.status, "PUBLISHED"), sql`${products.brand} IS NOT NULL AND ${products.brand} <> ''`))
+    .orderBy(asc(sql`lower(${products.brand})`));
+  return rows.flatMap((row) => (row.brand ? [row.brand] : []));
 }
 
 export async function getCategoryBySlug(

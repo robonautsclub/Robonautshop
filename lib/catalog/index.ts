@@ -45,6 +45,7 @@ export {
   getKitRequirementLines,
   getKits,
   getProductById,
+  getProductBrands,
   getProductBySlug,
   getProductCardModels,
   getProducts,

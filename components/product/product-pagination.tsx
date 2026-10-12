@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 type ProductPaginationProps = {
   basePath: string;
   /** Active filters to keep in every page link. */
-  params: Record<string, string | undefined>;
+  params: Record<string, string | string[] | undefined>;
   page: number;
   totalPages: number;
 };

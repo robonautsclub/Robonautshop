@@ -12,8 +12,8 @@ import {
   parseProductSort,
   ProductToolbar,
 } from "@/components/product/product-toolbar";
-import { getCategories, getProductCardModels, getProductsPage } from "@/lib/catalog";
-import { buildListHref, parsePageParam } from "@/lib/catalog/list-url";
+import { getCategories, getProductBrands, getProductCardModels, getProductsPage } from "@/lib/catalog";
+import { buildListHref, parseMultiParam, parsePageParam } from "@/lib/catalog/list-url";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { getRequestDb } from "@/lib/db/request";
 import { recordAnalyticsEvent } from "@/lib/analytics/queries";
@@ -21,6 +21,7 @@ import { recordAnalyticsEvent } from "@/lib/analytics/queries";
 type ProductsSearchParams = {
   q?: string;
   category?: string;
+  brand?: string | string[];
   inStock?: string;
   sort?: string;
   page?: string;
@@ -43,14 +44,16 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const params = await searchParams;
   const q = params.q?.trim() ?? "";
   const category = params.category?.trim() ?? "";
+  const brands = parseMultiParam(params.brand);
   const inStock = params.inStock === "1" || params.inStock === "true";
   const sort = parseProductSort(params.sort);
 
   const db = await getRequestDb();
-  const categories = await getCategories(db);
+  const [categories, allBrands] = await Promise.all([getCategories(db), getProductBrands(db)]);
   const result = await getProductsPage(db, {
     query: q || undefined,
     categorySlug: category || undefined,
+    brands,
     inStock: inStock || undefined,
     sort,
     page: parsePageParam(params.page),
@@ -59,6 +62,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const filterParams = {
     q: q || undefined,
     category: category || undefined,
+    brand: brands,
     inStock: inStock ? "1" : undefined,
     sort: sort !== "newest" ? sort : undefined,
   };
@@ -69,7 +73,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     void recordAnalyticsEvent(db, { type: "SEARCH", query: q });
   }
 
-  const hasFilters = Boolean(q || category || inStock || sort !== "newest");
+  const hasFilters = Boolean(q || category || brands.length > 0 || inStock || sort !== "newest");
 
   return (
     <PageContainer as="section" className="py-10">
@@ -82,7 +86,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
       <ProductToolbar
         categories={categories}
-        values={{ q, category, inStock, sort }}
+        brands={allBrands}
+        values={{ q, category, brands, inStock, sort }}
       />
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">

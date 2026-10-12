@@ -1,6 +1,6 @@
 # Task 135 — Brand filter
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

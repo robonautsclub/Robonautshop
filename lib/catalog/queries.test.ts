@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { getProducts, getProductsPage } from "@/lib/catalog/queries";
+import { getProductBrands, getProducts, getProductsPage } from "@/lib/catalog/queries";
 import type { Database } from "@/lib/db";
 import { categories } from "@/lib/db/schema/categories";
 import { inventory } from "@/lib/db/schema/inventory";
@@ -91,6 +91,20 @@ describe("getProductsPage", () => {
   it("returns nothing for an unknown category", async () => {
     const result = await getProductsPage(db, { categorySlug: "nope" });
     expect(result).toMatchObject({ total: 0, products: [] });
+  });
+});
+
+describe("brand filter", () => {
+  it("lists distinct published brands from the database", async () => {
+    expect(await getProductBrands(db)).toEqual(["Acme", "Other"]);
+  });
+
+  it("shows only the selected brands' products and paginates them", async () => {
+    const acme = await getProductsPage(db, { brands: ["Acme"] });
+    expect(acme.products.map((p) => p.id).sort()).toEqual(["p01", "p02"]);
+
+    const both = await getProductsPage(db, { brands: ["Acme", "Other"], pageSize: 4 });
+    expect(both.total).toBe(6);
   });
 });
 

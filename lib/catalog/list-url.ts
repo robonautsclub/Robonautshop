@@ -12,13 +12,15 @@ export function parsePageParam(value: string | undefined): number {
  */
 export function buildListHref(
   basePath: string,
-  params: Record<string, string | undefined>,
+  params: Record<string, string | string[] | undefined>,
   page: number,
 ): string {
   const search = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
-    if (value) {
-      search.set(key, value);
+    for (const entry of Array.isArray(value) ? value : [value]) {
+      if (entry) {
+        search.append(key, entry);
+      }
     }
   }
   if (page > 1) {
@@ -26,4 +28,10 @@ export function buildListHref(
   }
   const query = search.toString();
   return query ? `${basePath}?${query}` : basePath;
+}
+
+/** Normalizes a repeated query param (`?brand=a&brand=b`) to a clean string list. */
+export function parseMultiParam(value: string | string[] | undefined): string[] {
+  const list = Array.isArray(value) ? value : value ? [value] : [];
+  return [...new Set(list.map((entry) => entry.trim()).filter(Boolean))];
 }

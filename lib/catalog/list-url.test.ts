@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildListHref, parsePageParam } from "@/lib/catalog/list-url";
+import { buildListHref, parseMultiParam, parsePageParam } from "@/lib/catalog/list-url";
 
 describe("parsePageParam", () => {
   it("defaults to page 1 for missing or invalid values", () => {
@@ -19,5 +19,16 @@ describe("buildListHref", () => {
     );
     expect(buildListHref("/products", { q: "nano" }, 2)).toBe("/products?q=nano&page=2");
     expect(buildListHref("/products", {}, 1)).toBe("/products");
+  });
+});
+
+describe("multi-value params", () => {
+  it("round-trips repeated params", () => {
+    expect(buildListHref("/products", { brand: ["Acme", "Other"] }, 2)).toBe(
+      "/products?brand=Acme&brand=Other&page=2",
+    );
+    expect(parseMultiParam(["Acme", " ", "Acme"])).toEqual(["Acme"]);
+    expect(parseMultiParam("Acme")).toEqual(["Acme"]);
+    expect(parseMultiParam(undefined)).toEqual([]);
   });
 });
