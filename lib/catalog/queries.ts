@@ -334,6 +334,22 @@ export async function getProductsPage(
   return { products: rows, total, page, pageSize, totalPages };
 }
 
+/** Published products for the given slugs, in the order requested (missing ones are skipped). */
+export async function getProductsBySlugs(db: Database, slugs: string[]): Promise<Product[]> {
+  if (slugs.length === 0) {
+    return [];
+  }
+  const rows = await db
+    .select()
+    .from(products)
+    .where(and(eq(products.status, "PUBLISHED"), inArray(products.slug, slugs)));
+  const bySlug = new Map(rows.map((product) => [product.slug, product]));
+  return slugs.flatMap((slug) => {
+    const product = bySlug.get(slug);
+    return product ? [product] : [];
+  });
+}
+
 export async function getProductBySlug(
   db: Database,
   slug: string,

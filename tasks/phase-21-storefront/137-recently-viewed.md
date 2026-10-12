@@ -1,6 +1,6 @@
 # Task 137 — Recently viewed products
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

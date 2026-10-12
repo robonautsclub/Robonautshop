@@ -15,6 +15,7 @@ import {
   getProducts,
   getProjects,
 } from "@/lib/catalog";
+import { RecentlyViewed } from "@/components/product/recently-viewed";
 import { getRequestDb } from "@/lib/db/request";
 
 export default async function HomePage() {
@@ -75,6 +76,10 @@ export default async function HomePage() {
             ))}
           </ProductGrid>
         )}
+      </PageContainer>
+
+      <PageContainer>
+        <RecentlyViewed />
       </PageContainer>
 
       <section className="border-y bg-muted/30">

@@ -49,6 +49,7 @@ export {
   getProductBySlug,
   getProductCardModels,
   getProducts,
+  getProductsBySlugs,
   getProductsPage,
   PRODUCTS_PAGE_SIZE,
   getProjectBySlug,

@@ -12,6 +12,7 @@ import {
   ProductCard,
   ProductGrid,
 } from "@/components/product";
+import { RecentlyViewed } from "@/components/product/recently-viewed";
 import { ProductPurchasePanel } from "@/components/product/product-purchase-panel";
 import { WishlistButton } from "@/components/product/wishlist-button";
 import { FrequentlyBoughtTogether } from "@/components/recommendations/frequently-bought-together";
@@ -248,6 +249,7 @@ export default async function ProductDetailPage({
         isSignedIn={Boolean(session)}
         myReview={myReview}
       />
+      <RecentlyViewed currentSlug={product.slug} />
     </PageContainer>
   );
 }
