@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getRequestDb } from "@/lib/db/request";
+import { loggerForRequest, type Logger } from "@/lib/logger";
 import {
   BkashApiError,
   executeBkashPayment,
@@ -50,6 +51,17 @@ function redirectToAccountOrders(orderId?: string, error?: string): NextResponse
  * /account/orders — do not silently discard the attempt (task 102).
  */
 export async function GET(request: Request) {
+  const log = loggerForRequest(request);
+  try {
+    return await handleCallback(request, log);
+  } catch (error) {
+    // Anything unexpected: log it with the request id, show the shopper a safe message.
+    log.error("bkash.callback_failed", error);
+    return redirectToCheckout("Something went wrong with your payment. Please check your orders or try again.");
+  }
+}
+
+async function handleCallback(request: Request, log: Logger) {
   const { searchParams } = new URL(request.url);
   const paymentID = searchParams.get("paymentID") ?? searchParams.get("paymentId");
   const status = (searchParams.get("status") ?? "").toLowerCase();
@@ -59,6 +71,7 @@ export async function GET(request: Request) {
   }
 
   const db = await getRequestDb();
+  log.info("bkash.callback", { paymentID, status: status || "success" });
 
   const existingOrder = await getOrderByBkashPaymentId(db, paymentID);
   if (existingOrder?.paymentStatus === "PAID") {
@@ -101,6 +114,7 @@ export async function GET(request: Request) {
     }
     return redirectToConfirmation(finalized.orderId);
   } catch (executeError) {
+    log.error("bkash.execute_failed", executeError, { paymentID });
     try {
       const queried = await queryBkashPayment(db, paymentID);
       if (queried.transactionStatus === "Completed" && queried.trxID) {
@@ -110,8 +124,9 @@ export async function GET(request: Request) {
         }
         return redirectToConfirmation(finalized.orderId);
       }
-    } catch {
-      // fall through
+    } catch (queryError) {
+      // Fall through to marking the order unpaid, but keep the reason.
+      log.error("bkash.query_failed", queryError, { paymentID });
     }
 
     const unpaid = await finalizeBkashUnpaidOrder(db, paymentID, "FAILED");

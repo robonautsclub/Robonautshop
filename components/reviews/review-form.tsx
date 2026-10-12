@@ -57,7 +57,7 @@ export function ReviewForm({ productSlug, initial, onSubmitted }: ReviewFormProp
       return;
     }
 
-    setStatus(initial ? "Review updated." : "Thanks for your review!");
+    setStatus(initial ? "Review updated." : "Thanks! Your review will appear once it has been approved.");
     onSubmitted?.();
   }
 

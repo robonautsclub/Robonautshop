@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useMemo, type ReactNode } from "react";
 
 import { authClient } from "@/lib/auth/client";
+import type { UserRole } from "@/lib/db/schema/shared";
 
 export type SessionUser = {
   id: string;
@@ -12,10 +13,11 @@ export type SessionUser = {
   emailVerified: boolean;
   phone: string | null;
   /** CUSTOMER | ADMIN — see lib/db/schema/users.ts. Authorization must still be checked server-side. */
-  role: "CUSTOMER" | "ADMIN";
+  role: UserRole;
 };
 
-export type SignInResult = { ok: true } | { ok: false; error: string };
+/** `twoFactorRequired` means the password was right and a TOTP / backup code is still needed. */
+export type SignInResult = { ok: true; twoFactorRequired?: boolean } | { ok: false; error: string };
 
 type AuthContextValue = {
   /** False until the first session check (local or server) has resolved. */
@@ -33,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(
     async (input: { email: string; password: string }): Promise<SignInResult> => {
-      const { error } = await authClient.signIn.email({
+      const { data, error } = await authClient.signIn.email({
         email: input.email,
         password: input.password,
       });
@@ -43,6 +45,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           ok: false,
           error: error.message ?? "Could not sign in with that email and password.",
         };
+      }
+
+      if ((data as { twoFactorRedirect?: boolean } | null)?.twoFactorRedirect) {
+        return { ok: true, twoFactorRequired: true };
       }
 
       return { ok: true };
@@ -58,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const user = data?.user ?? null;
     // The generic authClient isn't typed against our server's additional
     // `role` field (see lib/auth/server.ts), but the API always returns it.
-    const extra = user as { role?: "CUSTOMER" | "ADMIN"; phone?: string | null } | null;
+    const extra = user as { role?: UserRole; phone?: string | null } | null;
     const role = extra?.role ?? "CUSTOMER";
 
     return {

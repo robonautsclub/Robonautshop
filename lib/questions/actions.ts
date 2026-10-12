@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { getProductBySlug } from "@/lib/catalog/queries";
-import { getServerSession, requireAdminSession } from "@/lib/auth/session";
+import { getServerSession, requirePermission } from "@/lib/auth/session";
 import { getRequestDb } from "@/lib/db/request";
 import { limitAction } from "@/lib/rate-limit/action";
 import { answerQuestionSchema, askQuestionSchema } from "@/lib/questions/schemas";
@@ -61,7 +61,7 @@ export async function answerQuestionAction(
   questionId: string,
   answer: string,
 ): Promise<QuestionWriteResult> {
-  await requireAdminSession();
+  await requirePermission("questions.answer");
   const parsed = answerQuestionSchema.safeParse({ answer });
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid answer." };
@@ -76,7 +76,7 @@ export async function setQuestionHiddenAction(
   questionId: string,
   hidden: boolean,
 ): Promise<QuestionWriteResult> {
-  await requireAdminSession();
+  await requirePermission("questions.answer");
   const db = await getRequestDb();
   const result = await setQuestionHidden(db, questionId, hidden);
   revalidateAfterWrite(result);

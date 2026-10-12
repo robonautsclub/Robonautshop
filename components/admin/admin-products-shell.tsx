@@ -9,6 +9,7 @@ import {
   AdminFormDialog,
   fieldClassName,
 } from "@/components/admin/admin-form-dialog";
+import { AdminExportLink } from "@/components/admin/admin-export-link";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import {
   AdminPagination,
@@ -155,9 +156,15 @@ export function AdminProductsShell({
         title="Products"
         description={`${products.length} products · Saved to the database. Archive hides a product from the store without breaking past orders.`}
         actions={
-          <Button type="button" size="sm" onClick={openCreate}>
-            New product
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <AdminExportLink
+              href="/admin/products/export"
+              params={{ q: query.trim(), status: statusFilter === "ALL" ? undefined : statusFilter }}
+            />
+            <Button type="button" size="sm" onClick={openCreate}>
+              New product
+            </Button>
+          </div>
         }
         toolbar={
           <>

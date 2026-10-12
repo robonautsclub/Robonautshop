@@ -28,7 +28,9 @@ import {
   moveProductImage,
   updateProductImageAlt,
 } from "@/lib/admin/product-images";
-import { requireAdminSession } from "@/lib/auth/session";
+import { recordAudit } from "@/lib/audit/log";
+import { catalogStatusSnapshot, productSnapshot } from "@/lib/audit/snapshots";
+import { requirePermission } from "@/lib/auth/session";
 import type { ProductStatus } from "@/lib/catalog/types";
 import { getRequestDb } from "@/lib/db/request";
 import {
@@ -43,7 +45,7 @@ import { getProductImagesBucket } from "@/lib/media/r2";
 
 /**
  * Admin catalog server actions (tasks/phase-19-admin-catalog/119–125).
- * Every action calls requireAdminSession() first — it redirects signed-out
+ * Every action calls requirePermission("catalog.manage") first — it redirects signed-out
  * users and 403s non-admins — and re-validates input with Zod; nothing
  * from the browser is trusted, so inputs are typed `unknown` on purpose.
  */
@@ -64,16 +66,27 @@ export async function saveProductAction(
   productId: string | null,
   input: unknown,
 ): Promise<CatalogWriteResult> {
-  await requireAdminSession();
+  const session = await requirePermission("catalog.manage");
   const parsed = productInputSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
   }
   const db = await getRequestDb();
+  const before = productId ? await productSnapshot(db, productId) : null;
   const result = productId
     ? await updateProduct(db, productId, parsed.data)
     : await createProduct(db, parsed.data);
-  if (result.ok) revalidateCatalog("/admin/products");
+  if (result.ok) {
+    revalidateCatalog("/admin/products");
+    await recordAudit(db, {
+      actor: session.user,
+      action: productId ? "product.update" : "product.create",
+      entityType: "product",
+      entityId: result.id,
+      before,
+      after: await productSnapshot(db, result.id),
+    });
+  }
   return result;
 }
 
@@ -83,14 +96,25 @@ async function setStatus(
   id: string,
   status: ProductStatus,
 ): Promise<CatalogWriteResult> {
-  await requireAdminSession();
+  const session = await requirePermission("catalog.manage");
   const parsed = productStatusInputSchema.safeParse({ productId: id, status });
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
   }
   const db = await getRequestDb();
+  const before = await catalogStatusSnapshot(db, table, parsed.data.productId);
   const result = await setCatalogStatus(db, table, parsed.data.productId, parsed.data.status);
-  if (result.ok) revalidateCatalog(adminPath);
+  if (result.ok) {
+    revalidateCatalog(adminPath);
+    await recordAudit(db, {
+      actor: session.user,
+      action: `${table === "robot_projects" ? "project" : table.slice(0, -1)}.status`,
+      entityType: table === "robot_projects" ? "project" : table.slice(0, -1),
+      entityId: parsed.data.productId,
+      before,
+      after: { status: parsed.data.status },
+    });
+  }
   return result;
 }
 
@@ -110,7 +134,7 @@ export async function saveCategoryAction(
   categoryId: string | null,
   input: unknown,
 ): Promise<CatalogWriteResult> {
-  await requireAdminSession();
+  const session = await requirePermission("catalog.manage");
   const parsed = categoryInputSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
@@ -119,15 +143,27 @@ export async function saveCategoryAction(
   const result = categoryId
     ? await updateCategory(db, categoryId, parsed.data)
     : await createCategory(db, parsed.data);
-  if (result.ok) revalidateCatalog("/admin/categories");
+  if (result.ok) {
+    revalidateCatalog("/admin/categories");
+    await recordAudit(db, {
+      actor: session.user,
+      action: categoryId ? "category.update" : "category.create",
+      entityType: "category",
+      entityId: result.id,
+      after: { name: parsed.data.name, parentId: parsed.data.parentId },
+    });
+  }
   return result;
 }
 
 export async function deleteCategoryAction(categoryId: string): Promise<CatalogWriteResult> {
-  await requireAdminSession();
+  const session = await requirePermission("catalog.manage");
   const db = await getRequestDb();
   const result = await deleteCategory(db, categoryId);
-  if (result.ok) revalidateCatalog("/admin/categories");
+  if (result.ok) {
+    revalidateCatalog("/admin/categories");
+    await recordAudit(db, { actor: session.user, action: "category.delete", entityType: "category", entityId: categoryId });
+  }
   return result;
 }
 
@@ -135,14 +171,23 @@ export async function saveKitAction(
   kitId: string | null,
   input: unknown,
 ): Promise<CatalogWriteResult> {
-  await requireAdminSession();
+  const session = await requirePermission("catalog.manage");
   const parsed = kitInputSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
   }
   const db = await getRequestDb();
   const result = await saveKit(db, kitId, parsed.data);
-  if (result.ok) revalidateCatalog("/admin/kits");
+  if (result.ok) {
+    revalidateCatalog("/admin/kits");
+    await recordAudit(db, {
+      actor: session.user,
+      action: kitId ? "kit.update" : "kit.create",
+      entityType: "kit",
+      entityId: result.id,
+      after: { name: parsed.data.name },
+    });
+  }
   return result;
 }
 
@@ -150,28 +195,47 @@ export async function saveProjectAction(
   projectId: string | null,
   input: unknown,
 ): Promise<CatalogWriteResult> {
-  await requireAdminSession();
+  const session = await requirePermission("catalog.manage");
   const parsed = projectInputSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
   }
   const db = await getRequestDb();
   const result = await saveProject(db, projectId, parsed.data);
-  if (result.ok) revalidateCatalog("/admin/projects");
+  if (result.ok) {
+    revalidateCatalog("/admin/projects");
+    await recordAudit(db, {
+      actor: session.user,
+      action: projectId ? "project.update" : "project.create",
+      entityType: "project",
+      entityId: result.id,
+      after: { name: parsed.data.name },
+    });
+  }
   return result;
 }
 
 export async function adjustStockAction(
   input: unknown,
 ): Promise<StockAdjustmentResult> {
-  const session = await requireAdminSession();
+  const session = await requirePermission("inventory.manage");
   const parsed = stockAdjustmentInputSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
   }
   const db = await getRequestDb();
   const result = await adjustStock(db, { ...parsed.data, actorUserId: session.user.id });
-  if (result.ok) revalidateCatalog("/admin/inventory");
+  if (result.ok) {
+    revalidateCatalog("/admin/inventory");
+    await recordAudit(db, {
+      actor: session.user,
+      action: "stock.adjust",
+      entityType: "inventory",
+      entityId: parsed.data.inventoryId,
+      before: { stock: result.stockAfter - parsed.data.delta },
+      after: { stock: result.stockAfter, reason: parsed.data.reason },
+    });
+  }
   return result;
 }
 
@@ -179,7 +243,7 @@ export async function setLowStockThresholdAction(
   inventoryId: string,
   lowStockThreshold: number,
 ): Promise<SimpleResult> {
-  await requireAdminSession();
+  await requirePermission("inventory.manage");
   const parsed = lowStockThresholdInputSchema.safeParse({ inventoryId, lowStockThreshold });
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
@@ -191,7 +255,7 @@ export async function setLowStockThresholdAction(
 }
 
 export async function listStockMovementsAction(inventoryId: string): Promise<StockMovementRow[]> {
-  await requireAdminSession();
+  await requirePermission("inventory.manage");
   const db = await getRequestDb();
   return listStockMovements(db, inventoryId);
 }
@@ -204,7 +268,7 @@ const imageAltSchema = z.object({
 });
 
 export async function updateProductImageAltAction(imageId: string, alt: string): Promise<SimpleResult> {
-  await requireAdminSession();
+  await requirePermission("catalog.manage");
   const parsed = imageAltSchema.safeParse({ imageId, alt });
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
@@ -220,7 +284,7 @@ export async function moveProductImageAction(
   imageId: string,
   direction: "up" | "down",
 ): Promise<SimpleResult> {
-  await requireAdminSession();
+  await requirePermission("catalog.manage");
   if (direction !== "up" && direction !== "down") {
     return { ok: false, error: "Invalid direction." };
   }
@@ -233,7 +297,7 @@ export async function moveProductImageAction(
 
 /** Removes the row, then the R2 object when the image was uploaded here (seed URLs live elsewhere). */
 export async function deleteProductImageAction(imageId: string): Promise<SimpleResult> {
-  await requireAdminSession();
+  await requirePermission("catalog.manage");
   const db = await getRequestDb();
   const url = await deleteProductImage(db, imageId);
   if (url === null) return { ok: false, error: "Image not found." };

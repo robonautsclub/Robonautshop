@@ -10,6 +10,7 @@ import { getServerSession } from "@/lib/auth/session";
 import { getRequestDb } from "@/lib/db/request";
 import { accounts } from "@/lib/db/schema/users";
 import { limitAction } from "@/lib/rate-limit/action";
+import { loggerForAction } from "@/lib/logger-next";
 
 const deleteAccountSchema = z.object({
   /** Password for email/password accounts; the account email for social-only accounts. */
@@ -56,7 +57,7 @@ export async function deleteMyAccountAction(confirmation: string): Promise<Delet
         headers: await headers(),
       });
     } catch (error) {
-      console.error("[account] delete confirmation failed:", error);
+      (await loggerForAction()).warn("account.delete_confirmation_rejected", { userId: session.user.id, reason: error instanceof Error ? error.message : "unknown" });
       return { ok: false, error: "That password is incorrect." };
     }
   } else if (parsed.data.confirmation.trim().toLowerCase() !== session.user.email.toLowerCase()) {
@@ -66,7 +67,7 @@ export async function deleteMyAccountAction(confirmation: string): Promise<Delet
   try {
     return await deleteCustomerAccount(db, session.user.id);
   } catch (error) {
-    console.error("[account] account deletion failed:", error);
+    (await loggerForAction()).error("account.deletion_failed", error, { userId: session.user.id });
     return { ok: false, error: "Something went wrong. Please try again." };
   }
 }

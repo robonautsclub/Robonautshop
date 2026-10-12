@@ -32,6 +32,7 @@ import {
 import type { BkashPendingPayload } from "@/lib/payments/bkash/pending-payload";
 import { parseBkashPendingPayload } from "@/lib/payments/bkash/pending-payload";
 import { clearServerCart, getServerCartLines } from "@/lib/server-cart/queries";
+import { logger } from "@/lib/logger";
 
 export type PlaceOrderAddressInput = {
   fullName: string;
@@ -245,10 +246,7 @@ async function reserveForPaidOrder(
   if (reserved.ok) {
     return "RESERVED";
   }
-  console.error("Paid order could not reserve stock (oversold)", {
-    orderId,
-    error: reserved.error,
-  });
+  logger.error("order.oversold_paid", undefined, { orderId, reason: reserved.error });
   return "NONE";
 }
 

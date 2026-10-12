@@ -1,3 +1,4 @@
+import { requirePermission } from "@/lib/auth/session";
 import { AdminOrdersShell } from "@/components/admin/admin-orders-shell";
 import { listAdminOrders, listAdminProducts } from "@/lib/admin";
 import { mapRealOrderToAdminOrder } from "@/lib/admin/map-real-order";
@@ -15,6 +16,7 @@ export default async function AdminOrdersPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  await requirePermission("orders.manage");
   const filters = parseAdminOrderFilters(await searchParams);
   const db = await getRequestDb();
   const [products, realOrders] = await Promise.all([

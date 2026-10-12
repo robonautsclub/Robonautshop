@@ -1,7 +1,9 @@
 import { forbidden, redirect } from "next/navigation";
 import { headers } from "next/headers";
 
+import { hasPermission, isBackOfficeRole, type Permission } from "@/lib/auth/permissions";
 import { getAuth } from "@/lib/auth/server";
+import { TWO_FACTOR_SETUP_PATH, twoFactorRequired } from "@/lib/auth/two-factor";
 
 /**
  * The one authoritative way to read the current request's session
@@ -44,6 +46,45 @@ export async function requireAdminSession() {
   }
 
   if (session.user.role !== "ADMIN") {
+    forbidden();
+  }
+
+  return session;
+}
+
+/**
+ * Any back-office account (ADMIN or a staff role) — the gate for the /admin
+ * layout (task 146). It only proves "may enter the admin area"; every page
+ * and action still needs requirePermission() for what it does.
+ */
+export async function requireStaffSession() {
+  const session = await getServerSession();
+
+  if (!session) {
+    redirect("/login?callbackUrl=/admin");
+  }
+
+  if (!isBackOfficeRole(session.user.role)) {
+    forbidden();
+  }
+
+  // Back-office accounts must finish two-factor enrollment before any admin access.
+  if (twoFactorRequired(session.user)) {
+    redirect(TWO_FACTOR_SETUP_PATH);
+  }
+
+  return session;
+}
+
+/**
+ * The one server-side authorization check for admin pages and actions:
+ * signed in, back-office role, and the role holds `permission` (see
+ * lib/auth/permissions.ts). ADMIN always passes.
+ */
+export async function requirePermission(permission: Permission) {
+  const session = await requireStaffSession();
+
+  if (!hasPermission(session.user.role, permission)) {
     forbidden();
   }
 

@@ -1,6 +1,6 @@
 # Task 147 — Admin audit log
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

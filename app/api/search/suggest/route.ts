@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getProductSuggestions } from "@/lib/catalog/suggestions";
 import { getRequestDb } from "@/lib/db/request";
 import { checkRateLimit } from "@/lib/rate-limit/memory";
+import { loggerForRequest } from "@/lib/logger";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -27,7 +28,7 @@ export async function GET(request: Request) {
     const suggestions = await getProductSuggestions(db, query.slice(0, MAX_QUERY_LENGTH));
     return NextResponse.json({ suggestions });
   } catch (error) {
-    console.error("[search] suggestion query failed:", error);
+    loggerForRequest(request).error("search.suggest_failed", error);
     return NextResponse.json({ error: "Something went wrong." }, { status: 500 });
   }
 }

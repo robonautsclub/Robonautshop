@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { AccountOrderItems } from "@/components/account/account-order-items";
 import { CancelOrderButton } from "@/components/account/cancel-order-button";
+import { ReturnRequestSection } from "@/components/account/return-request-section";
 import { RepayBkashButton } from "@/components/account/repay-bkash-button";
 import { PageContainer } from "@/components/layout/page-container";
 import { buttonVariants } from "@/components/ui/button";
@@ -13,6 +14,8 @@ import { getPaymentMethodLabel } from "@/lib/checkout/types";
 import { getRequestDb } from "@/lib/db/request";
 import { canRepayWithBkash } from "@/lib/orders/repay-rules";
 import { canCustomerCancelOrder } from "@/lib/orders/status-rules";
+import { listReturnRequestsForOrder } from "@/lib/returns/queries";
+import { getReturnWindowDays, isWithinReturnWindow, remainingRequestableQuantity } from "@/lib/returns/rules";
 import { getOrderForCustomer } from "@/lib/server-cart/order-queries";
 import { cn } from "@/lib/utils";
 
@@ -49,6 +52,20 @@ export default async function AccountOrderDetailPage({
   }
 
   const { order, items } = record;
+  const returnRequests = await listReturnRequestsForOrder(db, session.user.id, order.id);
+  const windowDays = getReturnWindowDays();
+  const canRequestReturn =
+    order.status === "DELIVERED" && isWithinReturnWindow(order.updatedAt, new Date(), windowDays);
+  const requestableItems = items.map((item) => ({
+    id: item.id,
+    productName: item.productName,
+    remaining: remainingRequestableQuantity(
+      item.quantity,
+      returnRequests
+        .filter((request) => request.orderItemId === item.id && request.status !== "REJECTED")
+        .map((request) => request.quantity),
+    ),
+  }));
 
   return (
     <PageContainer as="section" className="space-y-6 py-10">
@@ -167,6 +184,13 @@ export default async function AccountOrderDetailPage({
           </div>
         </dl>
       </section>
+
+      <ReturnRequestSection
+        items={requestableItems}
+        requests={returnRequests}
+        windowDays={windowDays}
+        canRequest={canRequestReturn}
+      />
     </PageContainer>
   );
 }

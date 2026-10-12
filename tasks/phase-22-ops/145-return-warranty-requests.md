@@ -1,6 +1,6 @@
 # Task 145 — Return and warranty requests
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

@@ -2,6 +2,7 @@ import { Hono } from "hono";
 
 import { createDb } from "@/lib/db";
 import { healthChecks } from "@/lib/db/schema";
+import { createLogger, requestIdFromHeaders } from "@/lib/logger";
 
 /**
  * Cloudflare bindings this API layer actually uses (see wrangler.jsonc).
@@ -12,6 +13,10 @@ import { healthChecks } from "@/lib/db/schema";
  */
 type Bindings = {
   DB: D1Database;
+};
+
+type Variables = {
+  requestId: string;
 };
 
 /**
@@ -26,7 +31,24 @@ type Bindings = {
  * and tasks/phase-11-database. Each route should stay thin and delegate to a
  * service/repository module rather than querying the database directly.
  */
-export const app = new Hono<{ Bindings: Bindings }>().basePath("/api");
+export const app = new Hono<{ Bindings: Bindings; Variables: Variables }>().basePath("/api");
+
+// Every API response carries the request ID that appears in its log lines.
+app.use("*", async (c, next) => {
+  const requestId = requestIdFromHeaders(c.req.raw.headers);
+  c.set("requestId", requestId);
+  c.header("x-request-id", requestId);
+  await next();
+});
+
+// Uncaught errors: structured log line with the request ID, safe message to the caller.
+app.onError((error, c) => {
+  createLogger({ requestId: c.get("requestId") }).error("api.unhandled_error", error, {
+    method: c.req.method,
+    path: new URL(c.req.url).pathname,
+  });
+  return c.json({ status: "error", message: "Something went wrong. Please try again." }, 500);
+});
 
 app.get("/health", (c) =>
   c.json({
@@ -51,7 +73,7 @@ app.get("/health/db", async (c) => {
       latestCheck: rows.at(-1) ?? null,
     });
   } catch (error) {
-    console.error("D1 health check failed", error);
+    createLogger({ requestId: c.get("requestId") }).error("api.health_db_failed", error);
     return c.json({ status: "error", message: "Database check failed." }, 500);
   }
 });

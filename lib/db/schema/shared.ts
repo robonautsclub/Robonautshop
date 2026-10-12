@@ -93,3 +93,18 @@ export const ADMIN_STOCK_REASONS = [
   "RETURNED",
   "CORRECTION",
 ] as const satisfies readonly StockMovementReason[];
+
+/**
+ * Account roles (task 146). CUSTOMER is a shopper; every other role is
+ * back-office. What each role may do lives in lib/auth/permissions.ts. The
+ * column is plain text in SQLite, so adding a role needs no SQL migration.
+ */
+export const USER_ROLE_VALUES = [
+  "CUSTOMER",
+  "ADMIN",
+  "STAFF",
+  "ORDER_MANAGER",
+  "INVENTORY_MANAGER",
+  "CONTENT_MANAGER",
+] as const;
+export type UserRole = (typeof USER_ROLE_VALUES)[number];

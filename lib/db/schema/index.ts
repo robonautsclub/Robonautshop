@@ -25,3 +25,5 @@ export * from "@/lib/db/schema/cart-reminders";
 export * from "@/lib/db/schema/stock-movements";
 export * from "@/lib/db/schema/product-questions";
 export * from "@/lib/db/schema/back-in-stock";
+export * from "@/lib/db/schema/return-requests";
+export * from "@/lib/db/schema/audit-logs";

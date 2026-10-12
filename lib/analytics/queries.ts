@@ -4,6 +4,7 @@ import type { Database } from "@/lib/db";
 import { analyticsEvents } from "@/lib/db/schema/analytics-events";
 import type { AnalyticsEventType } from "@/lib/db/schema/shared";
 import { products } from "@/lib/db/schema/products";
+import { logger } from "@/lib/logger";
 
 /**
  * Basic storefront analytics hooks (tasks/phase-14-advanced/90-analytics.md).
@@ -24,7 +25,7 @@ export async function recordAnalyticsEvent(
       createdAt: new Date().toISOString(),
     });
   } catch (error) {
-    console.error("[analytics] failed to record event", error);
+    logger.error("analytics.record_failed", error);
   }
 }
 

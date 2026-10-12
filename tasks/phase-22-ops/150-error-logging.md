@@ -1,6 +1,6 @@
 # Task 150 — Server error logging
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

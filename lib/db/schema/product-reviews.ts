@@ -4,6 +4,9 @@ import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqli
 import { products } from "@/lib/db/schema/products";
 import { users } from "@/lib/db/schema/users";
 
+export const REVIEW_STATUS_VALUES = ["PENDING", "APPROVED", "HIDDEN"] as const;
+export type ReviewStatus = (typeof REVIEW_STATUS_VALUES)[number];
+
 /**
  * Product reviews (tasks/phase-14-advanced/85-reviews.md). `rating` is
  * validated server-side to be an integer 1-5 (lib/reviews/actions.ts) —
@@ -26,6 +29,8 @@ export const productReviews = sqliteTable(
     rating: integer("rating").notNull(),
     title: text("title"),
     body: text("body").notNull(),
+    /** Only APPROVED reviews are public and count toward ratings (task 144). */
+    status: text("status", { enum: REVIEW_STATUS_VALUES }).notNull().default("PENDING"),
     createdAt: text("created_at")
       .notNull()
       .default(sql`(current_timestamp)`),

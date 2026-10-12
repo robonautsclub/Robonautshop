@@ -3,7 +3,7 @@
  *
  * These take already-validated data (lib/admin/catalog-schemas.ts) and never
  * check the role themselves — the server actions in
- * lib/admin/catalog-actions.ts call requireAdminSession() first. Kept apart
+ * lib/admin/catalog-actions.ts call requirePermission() first. Kept apart
  * from the actions so the rules can be tested against a real local D1.
  *
  * D1 has no interactive transactions; multi-row saves go through

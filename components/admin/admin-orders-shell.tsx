@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { AdminDeleteTrigger } from "@/components/admin/admin-confirm-delete-dialog";
 import { AdminOrdersFilters } from "@/components/admin/admin-orders-filters";
+import { AdminExportLink } from "@/components/admin/admin-export-link";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import {
   AdminPagination,
@@ -128,6 +129,7 @@ export function AdminOrdersShell({
       <AdminPageHeader
         title="Orders"
         description={`${localOrders.length} orders · download receipt · cancel releases booked stock.`}
+        actions={<AdminExportLink href="/admin/orders/export" params={filters} />}
         toolbar={<AdminOrdersFilters filters={filters} />}
       />
 

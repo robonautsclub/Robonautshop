@@ -10,6 +10,7 @@ import {
 import { invoicePdfFilename, shortOrderId } from "@/lib/invoice/from-order";
 import { INVOICE_LOGO_PNG_BASE64 } from "@/lib/invoice/logo-base64";
 import type { OrderInvoice } from "@/lib/invoice/types";
+import { logger } from "@/lib/logger";
 
 const PAGE_WIDTH = 595.28;
 const PAGE_HEIGHT = 841.89;
@@ -107,7 +108,7 @@ export async function renderOrderInvoicePdf(invoice: OrderInvoice): Promise<Uint
   try {
     logo = await doc.embedPng(base64ToBytes(INVOICE_LOGO_PNG_BASE64));
   } catch (error) {
-    console.error("[invoice] Failed to embed logo PNG:", error);
+    logger.error("invoice.logo_embed_failed", error);
   }
 
   let page = doc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);

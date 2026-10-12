@@ -1,5 +1,7 @@
 import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
+import { USER_ROLE_VALUES } from "@/lib/db/schema/shared";
+
 /**
  * Users and auth tables, shaped to match what Better Auth needs
  * (https://better-auth.com/docs/concepts/database): a `user`, `session`,
@@ -35,9 +37,11 @@ export const users = sqliteTable("users", {
     .notNull()
     .default(false),
   image: text("image"),
+  /** Set by Better Auth's two-factor plugin once TOTP enrollment is verified (task 148). */
+  twoFactorEnabled: integer("two_factor_enabled", { mode: "boolean" }).notNull().default(false),
   /** Optional Bangladesh mobile number, edited on /account (task 129). */
   phone: text("phone"),
-  role: text("role", { enum: ["CUSTOMER", "ADMIN"] })
+  role: text("role", { enum: USER_ROLE_VALUES })
     .notNull()
     .default("CUSTOMER"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
@@ -108,4 +112,24 @@ export const verifications = sqliteTable(
     updatedAt: integer("updated_at", { mode: "timestamp" }),
   },
   (table) => [index("verifications_identifier_idx").on(table.identifier)],
+);
+
+/**
+ * TOTP secrets and backup codes (Better Auth two-factor plugin, task 148).
+ * Both are stored encrypted by the plugin and never returned to clients.
+ */
+export const twoFactors = sqliteTable(
+  "two_factors",
+  {
+    id: text("id").primaryKey(),
+    secret: text("secret").notNull(),
+    backupCodes: text("backup_codes").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    verified: integer("verified", { mode: "boolean" }).notNull().default(true),
+    failedVerificationCount: integer("failed_verification_count").notNull().default(0),
+    lockedUntil: integer("locked_until", { mode: "timestamp" }),
+  },
+  (table) => [index("two_factors_user_id_idx").on(table.userId), index("two_factors_secret_idx").on(table.secret)],
 );

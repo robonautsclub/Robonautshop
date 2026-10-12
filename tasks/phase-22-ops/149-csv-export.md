@@ -1,6 +1,6 @@
 # Task 149 — CSV export for orders, products and inventory
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

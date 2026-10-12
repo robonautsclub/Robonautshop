@@ -3,7 +3,9 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { addProductImage, productExists } from "@/lib/admin/product-images";
+import { hasPermission } from "@/lib/auth/permissions";
 import { getServerSession } from "@/lib/auth/session";
+import { twoFactorRequired } from "@/lib/auth/two-factor";
 import { getRequestDb } from "@/lib/db/request";
 import {
   buildProductImageKey,
@@ -12,6 +14,7 @@ import {
   validateImageUpload,
 } from "@/lib/media/images";
 import { getProductImagesBucket } from "@/lib/media/r2";
+import { loggerForRequest } from "@/lib/logger";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,9 +34,12 @@ function jsonError(message: string, status: number) {
  * bytes, and the object key is random — the uploaded filename is never used.
  */
 export async function POST(request: Request) {
+  const log = loggerForRequest(request);
   const session = await getServerSession();
   if (!session) return jsonError("Please sign in.", 401);
-  if (session.user.role !== "ADMIN") return jsonError("Not allowed.", 403);
+  if (!hasPermission(session.user.role, "catalog.manage") || twoFactorRequired(session.user)) {
+    return jsonError("Not allowed.", 403);
+  }
 
   const declaredLength = Number(request.headers.get("content-length") ?? 0);
   if (declaredLength > MAX_IMAGE_BYTES + 64 * 1024) {
@@ -80,9 +86,9 @@ export async function POST(request: Request) {
     revalidatePath("/", "layout");
     return NextResponse.json({ ok: true, image });
   } catch (error) {
-    console.error("Product image upload failed", error);
+    log.error("product_image.upload_failed", error);
     await bucket.delete(key).catch((cleanupError: unknown) => {
-      console.error("Could not remove orphaned R2 object", key, cleanupError);
+      log.error("product_image.orphan_cleanup_failed", cleanupError, { key });
     });
     return jsonError("Upload failed. Please try again.", 500);
   }

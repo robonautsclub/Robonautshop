@@ -6,6 +6,7 @@ import { profileSchema, type ProfileInput } from "@/lib/auth/schemas";
 import { getServerSession } from "@/lib/auth/session";
 import { getRequestDb } from "@/lib/db/request";
 import { users } from "@/lib/db/schema";
+import { loggerForAction } from "@/lib/logger-next";
 
 export type UpdateProfileResult =
   | { ok: true }
@@ -41,7 +42,7 @@ export async function updateMyProfileAction(input: ProfileInput): Promise<Update
       })
       .where(eq(users.id, session.user.id));
   } catch (error) {
-    console.error("[account] profile update failed:", error);
+    (await loggerForAction()).error("account.profile_update_failed", error, { userId: session.user.id });
     return { ok: false, error: "Something went wrong. Please try again." };
   }
 
