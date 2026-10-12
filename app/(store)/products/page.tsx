@@ -6,27 +6,38 @@ import {
   CatalogEmptyState,
   ProductCard,
   ProductGrid,
+  ProductPagination,
 } from "@/components/product";
 import {
   parseProductSort,
   ProductToolbar,
 } from "@/components/product/product-toolbar";
-import { getCategories, getProductCardModels, getProducts } from "@/lib/catalog";
+import { getCategories, getProductCardModels, getProductsPage } from "@/lib/catalog";
+import { buildListHref, parsePageParam } from "@/lib/catalog/list-url";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 import { getRequestDb } from "@/lib/db/request";
 import { recordAnalyticsEvent } from "@/lib/analytics/queries";
 
-export const metadata: Metadata = {
-  title: "Products",
+type ProductsSearchParams = {
+  q?: string;
+  category?: string;
+  inStock?: string;
+  sort?: string;
+  page?: string;
 };
 
 type ProductsPageProps = {
-  searchParams: Promise<{
-    q?: string;
-    category?: string;
-    inStock?: string;
-    sort?: string;
-  }>;
+  searchParams: Promise<ProductsSearchParams>;
 };
+
+/** Canonical URL keeps only the page number, so filtered views don't compete with /products. */
+export async function generateMetadata({ searchParams }: ProductsPageProps): Promise<Metadata> {
+  const page = parsePageParam((await searchParams).page);
+  return buildPageMetadata({
+    title: page > 1 ? `Products · Page ${page}` : "Products",
+    path: buildListHref("/products", {}, page),
+  });
+}
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const params = await searchParams;
@@ -37,13 +48,22 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
   const db = await getRequestDb();
   const categories = await getCategories(db);
-  const products = await getProducts(db, {
+  const result = await getProductsPage(db, {
     query: q || undefined,
     categorySlug: category || undefined,
     inStock: inStock || undefined,
     sort,
+    page: parsePageParam(params.page),
   });
-  const cards = await getProductCardModels(db, products);
+  const cards = await getProductCardModels(db, result.products);
+  const filterParams = {
+    q: q || undefined,
+    category: category || undefined,
+    inStock: inStock ? "1" : undefined,
+    sort: sort !== "newest" ? sort : undefined,
+  };
+  const firstShown = (result.page - 1) * result.pageSize + 1;
+  const lastShown = firstShown + cards.length - 1;
 
   if (q) {
     void recordAnalyticsEvent(db, { type: "SEARCH", query: q });
@@ -67,7 +87,9 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
         <p>
-          {products.length} product{products.length === 1 ? "" : "s"}
+          {result.total === 0
+            ? "0 products"
+            : `Showing ${firstShown}–${lastShown} of ${result.total} product${result.total === 1 ? "" : "s"}`}
           {q ? ` for “${q}”` : ""}
         </p>
         {hasFilters ? (
@@ -99,6 +121,13 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           </ProductGrid>
         )}
       </div>
+
+      <ProductPagination
+        basePath="/products"
+        params={filterParams}
+        page={result.page}
+        totalPages={result.totalPages}
+      />
     </PageContainer>
   );
 }

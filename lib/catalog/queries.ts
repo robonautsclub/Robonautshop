@@ -15,7 +15,7 @@
  * tasks/phase-12-wire-up/78-real-cart-orders.md.
  */
 
-import { and, eq, inArray, ne } from "drizzle-orm";
+import { and, asc, count, desc, eq, exists, inArray, ne, or, sql, type AnyColumn, type SQL } from "drizzle-orm";
 
 import type { Database } from "@/lib/db";
 import { categories } from "@/lib/db/schema/categories";
@@ -53,6 +53,16 @@ export type GetProductsOptions = {
   featured?: boolean;
   inStock?: boolean;
   sort?: ProductSort;
+};
+
+export const PRODUCTS_PAGE_SIZE = 12;
+
+export type ProductsPage = {
+  products: Product[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
 };
 
 export type ProductWithRelations = Product & {
@@ -109,25 +119,90 @@ function scoreQueryMatch(product: Product, query: string): number {
   return score;
 }
 
-function sortProducts(rows: Product[], sort: ProductSort = "newest"): Product[] {
-  const copy = [...rows];
-
+/** SQL ordering for a sort option; `id` breaks ties so pages never overlap. */
+function productOrderBy(sort: ProductSort = "newest"): SQL[] {
   switch (sort) {
     case "name-asc":
-      return copy.sort((a, b) => a.name.localeCompare(b.name));
+      return [asc(sql`lower(${products.name})`), asc(products.id)];
     case "name-desc":
-      return copy.sort((a, b) => b.name.localeCompare(a.name));
+      return [desc(sql`lower(${products.name})`), asc(products.id)];
     case "price-asc":
-      return copy.sort((a, b) => a.price - b.price);
+      return [asc(products.price), asc(products.id)];
     case "price-desc":
-      return copy.sort((a, b) => b.price - a.price);
+      return [desc(products.price), asc(products.id)];
     case "newest":
     default:
-      return copy.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
+      return [desc(products.createdAt), asc(products.id)];
   }
+}
+
+/** Escapes LIKE wildcards so user text is matched literally. */
+function likeContains(column: AnyColumn, term: string): SQL {
+  const escaped = term.replace(/[\\%_]/g, (char) => `\\${char}`);
+  return sql`${column} LIKE ${`%${escaped}%`} ESCAPE '\\'`;
+}
+
+/**
+ * The one place product list filters become SQL (used by getProducts and
+ * getProductsPage). Returns null when the filters can match nothing (e.g.
+ * an unknown category slug). Search requires every term to appear in some
+ * searchable column — the same AND rule scoreQueryMatch ranks by.
+ */
+async function buildProductConditions(
+  db: Database,
+  options: GetProductsOptions,
+): Promise<SQL | null> {
+  const category = options.categorySlug
+    ? await getCategoryBySlug(db, options.categorySlug)
+    : null;
+
+  if (options.categorySlug && !category) {
+    return null;
+  }
+
+  const conditions: SQL[] = [eq(products.status, "PUBLISHED")];
+  if (category) {
+    conditions.push(eq(products.categoryId, category.id));
+  }
+  if (options.featured === true) {
+    conditions.push(eq(products.featured, true));
+  }
+  if (options.inStock === true) {
+    conditions.push(
+      exists(
+        db
+          .select({ one: sql`1` })
+          .from(inventory)
+          .where(
+            and(
+              eq(inventory.productId, products.id),
+              sql`${inventory.stockQuantity} - ${inventory.reservedQuantity} > 0`,
+            ),
+          ),
+      ),
+    );
+  }
+
+  const terms = (options.query ?? "").trim().toLowerCase().split(/\s+/).filter(Boolean);
+  for (const term of terms) {
+    const termMatch = or(
+      likeContains(products.name, term),
+      likeContains(products.sku, term),
+      likeContains(products.slug, term),
+      likeContains(products.brand, term),
+      likeContains(products.shortDescription, term),
+      likeContains(products.description, term),
+    );
+    if (termMatch) {
+      conditions.push(termMatch);
+    }
+  }
+
+  return and(...conditions) ?? null;
+}
+
+function usesRelevanceOrder(options: GetProductsOptions): boolean {
+  return Boolean(options.query?.trim()) && (!options.sort || options.sort === "newest");
 }
 
 async function attachProductRelations(
@@ -175,60 +250,73 @@ export async function getProducts(
   db: Database,
   options: GetProductsOptions = {},
 ): Promise<Product[]> {
-  const category = options.categorySlug
-    ? await getCategoryBySlug(db, options.categorySlug)
-    : null;
-
-  if (options.categorySlug && !category) {
+  const where = await buildProductConditions(db, options);
+  if (!where) {
     return [];
   }
 
-  const conditions = [eq(products.status, "PUBLISHED")];
-  if (category) {
-    conditions.push(eq(products.categoryId, category.id));
-  }
-  if (options.featured === true) {
-    conditions.push(eq(products.featured, true));
-  }
-
-  let results = await db
+  const rows = await db
     .select()
     .from(products)
-    .where(and(...conditions));
-
-  let relevanceScores: Map<string, number> | null = null;
-  if (options.query) {
-    const scored = results
-      .map((product) => ({ product, score: scoreQueryMatch(product, options.query!) }))
-      .filter((row) => row.score > 0);
-    relevanceScores = new Map(scored.map((row) => [row.product.id, row.score]));
-    results = scored.map((row) => row.product);
-  }
-
-  if (options.inStock === true) {
-    const ids = results.map((product) => product.id);
-    const inventoryRows = ids.length
-      ? await db.select().from(inventory).where(inArray(inventory.productId, ids))
-      : [];
-    const availableByProduct = new Map<string, number>();
-    for (const row of inventoryRows) {
-      availableByProduct.set(
-        row.productId,
-        (availableByProduct.get(row.productId) ?? 0) + getAvailableQuantity(row),
-      );
-    }
-    results = results.filter((product) => (availableByProduct.get(product.id) ?? 0) > 0);
-  }
+    .where(where)
+    .orderBy(...productOrderBy(options.sort));
 
   // A search ranks by relevance instead of recency, unless the caller picked
-  // a specific sort (price/name) — "newest" is also the unset default, so a
-  // search with no sort chosen lands here too.
-  if (relevanceScores && (!options.sort || options.sort === "newest")) {
-    const scores = relevanceScores;
-    return [...results].sort((a, b) => (scores.get(b.id) ?? 0) - (scores.get(a.id) ?? 0));
+  // a specific sort (price/name) — "newest" is also the unset default.
+  if (usesRelevanceOrder(options)) {
+    const query = options.query!;
+    return rows
+      .map((product) => ({ product, score: scoreQueryMatch(product, query) }))
+      .filter((row) => row.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map((row) => row.product);
   }
 
-  return sortProducts(results, options.sort);
+  return rows;
+}
+
+/**
+ * One page of products with the total count (task 134). LIMIT/OFFSET runs in
+ * D1 except for relevance-ranked searches, whose ordering is computed in JS
+ * over the (already SQL-filtered) matches before slicing.
+ */
+export async function getProductsPage(
+  db: Database,
+  options: GetProductsOptions & { page?: number; pageSize?: number } = {},
+): Promise<ProductsPage> {
+  const pageSize = options.pageSize ?? PRODUCTS_PAGE_SIZE;
+  const requestedPage = Math.max(1, Math.floor(options.page ?? 1));
+
+  const where = await buildProductConditions(db, options);
+  if (!where) {
+    return { products: [], total: 0, page: 1, pageSize, totalPages: 1 };
+  }
+
+  if (usesRelevanceOrder(options)) {
+    const all = await getProducts(db, options);
+    const totalPages = Math.max(1, Math.ceil(all.length / pageSize));
+    const page = Math.min(requestedPage, totalPages);
+    return {
+      products: all.slice((page - 1) * pageSize, page * pageSize),
+      total: all.length,
+      page,
+      pageSize,
+      totalPages,
+    };
+  }
+
+  const [{ total }] = await db.select({ total: count() }).from(products).where(where);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const page = Math.min(requestedPage, totalPages);
+  const rows = await db
+    .select()
+    .from(products)
+    .where(where)
+    .orderBy(...productOrderBy(options.sort))
+    .limit(pageSize)
+    .offset((page - 1) * pageSize);
+
+  return { products: rows, total, page, pageSize, totalPages };
 }
 
 export async function getProductBySlug(

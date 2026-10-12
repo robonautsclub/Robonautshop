@@ -285,7 +285,7 @@ Account recovery and self-service. bKash stays the only payment method.
 
 Browse, discovery and trust pages.
 
-- [ ] 134 [Product listing pagination](phase-21-storefront/134-product-pagination.md)
+- [x] 134 [Product listing pagination](phase-21-storefront/134-product-pagination.md)
 - [ ] 135 [Brand filter](phase-21-storefront/135-brand-filter.md)
 - [ ] 136 [Search autocomplete](phase-21-storefront/136-search-autocomplete.md)
 - [ ] 137 [Recently viewed products](phase-21-storefront/137-recently-viewed.md)

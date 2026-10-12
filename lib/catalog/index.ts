@@ -27,6 +27,7 @@ export type {
   GetProductsOptions,
   ProductCardModel,
   ProductSort,
+  ProductsPage,
   ProductWithRelations,
   RequirementLine,
 } from "@/lib/catalog/queries";
@@ -47,6 +48,8 @@ export {
   getProductBySlug,
   getProductCardModels,
   getProducts,
+  getProductsPage,
+  PRODUCTS_PAGE_SIZE,
   getProjectBySlug,
   getProjectComponents,
   getProjectComponentsForProjects,

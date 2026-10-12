@@ -7,23 +7,28 @@ import {
   CatalogEmptyState,
   ProductCard,
   ProductGrid,
+  ProductPagination,
 } from "@/components/product";
 import {
   getCategoryBySlug,
   getProductCardModels,
-  getProducts,
+  getProductsPage,
 } from "@/lib/catalog";
+import { buildListHref, parsePageParam } from "@/lib/catalog/list-url";
 import { getRequestDb } from "@/lib/db/request";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 type CategoryPageProps = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string }>;
 };
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const page = parsePageParam((await searchParams).page);
   const db = await getRequestDb();
   const category = await getCategoryBySlug(db, slug);
 
@@ -32,14 +37,15 @@ export async function generateMetadata({
   }
 
   return buildPageMetadata({
-    title: category.name,
+    title: page > 1 ? `${category.name} · Page ${page}` : category.name,
     description: category.description ?? undefined,
-    path: `/categories/${category.slug}`,
+    path: buildListHref(`/categories/${category.slug}`, {}, page),
   });
 }
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
+export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
   const { slug } = await params;
+  const pageNumber = parsePageParam((await searchParams).page);
   const db = await getRequestDb();
   const category = await getCategoryBySlug(db, slug);
 
@@ -47,11 +53,12 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     notFound();
   }
 
-  const products = await getProducts(db, {
+  const result = await getProductsPage(db, {
     categorySlug: category.slug,
     sort: "name-asc",
+    page: pageNumber,
   });
-  const cards = await getProductCardModels(db, products);
+  const cards = await getProductCardModels(db, result.products);
 
   return (
     <PageContainer as="section" className="py-10">
@@ -98,6 +105,13 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           ))}
         </ProductGrid>
       )}
+
+      <ProductPagination
+        basePath={`/categories/${category.slug}`}
+        params={{}}
+        page={result.page}
+        totalPages={result.totalPages}
+      />
     </PageContainer>
   );
 }
