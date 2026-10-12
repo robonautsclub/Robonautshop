@@ -35,6 +35,8 @@ export const users = sqliteTable("users", {
     .notNull()
     .default(false),
   image: text("image"),
+  /** Optional Bangladesh mobile number, edited on /account (task 129). */
+  phone: text("phone"),
   role: text("role", { enum: ["CUSTOMER", "ADMIN"] })
     .notNull()
     .default("CUSTOMER"),

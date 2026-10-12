@@ -92,6 +92,8 @@ export function buildAuth(db: Database, options: { withNextCookies: boolean }) {
     },
     user: {
       additionalFields: {
+        // Read-only to clients (input: false); edited via lib/account/profile-actions.ts.
+        phone: { type: "string", required: false, input: false },
         role: {
           type: "string",
           required: false,

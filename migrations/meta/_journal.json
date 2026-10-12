@@ -64,6 +64,13 @@
       "when": 1791575597167,
       "tag": "0008_phase-19-stock-movements",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1791600000000,
+      "tag": "0009_phase-20-user-phone",
+      "breakpoints": true
     }
   ]
 }

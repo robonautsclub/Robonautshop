@@ -1,6 +1,6 @@
 # Task 129 — Customer profile edit
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 
