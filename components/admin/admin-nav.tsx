@@ -7,6 +7,7 @@ import {
   Boxes,
   FolderTree,
   LayoutDashboard,
+  MessageCircleQuestion,
   Package,
   ShoppingBag,
   Users,
@@ -30,6 +31,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   "/admin/users": UserCog,
   "/admin/kits": Boxes,
   "/admin/projects": Bot,
+  "/admin/questions": MessageCircleQuestion,
 };
 
 function isNavActive(pathname: string, href: string) {

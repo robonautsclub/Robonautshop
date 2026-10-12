@@ -17,6 +17,7 @@ import { CompareToggle } from "@/components/compare/compare-toggle";
 import { ProductPurchasePanel } from "@/components/product/product-purchase-panel";
 import { WishlistButton } from "@/components/product/wishlist-button";
 import { FrequentlyBoughtTogether } from "@/components/recommendations/frequently-bought-together";
+import { ProductQuestionsSection } from "@/components/questions/product-questions-section";
 import { ProductReviewsSection } from "@/components/reviews/product-reviews-section";
 import { getServerSession } from "@/lib/auth/session";
 import {
@@ -34,6 +35,7 @@ import { buildPageMetadata } from "@/lib/seo/metadata";
 import { recordAnalyticsEvent } from "@/lib/analytics/queries";
 import { getFrequentlyBoughtWith } from "@/lib/recommendations/queries";
 import { getMyReviewForProduct, getReviewsForProduct, getReviewSummaryForProduct } from "@/lib/reviews/queries";
+import { getPublicQuestionsForProduct } from "@/lib/questions/queries";
 import { isInWishlist } from "@/lib/wishlist/queries";
 
 type ProductDetailPageProps = {
@@ -79,12 +81,13 @@ export default async function ProductDetailPage({
   const codeExamples = getCodeExamplesForProductSlug(product.slug);
 
   const session = await getServerSession();
-  const [frequentlyBoughtWith, reviews, reviewSummary, myReview, wishlisted] = await Promise.all([
+  const [frequentlyBoughtWith, reviews, reviewSummary, myReview, wishlisted, questions] = await Promise.all([
     getFrequentlyBoughtWith(db, product.id, 4),
     getReviewsForProduct(db, product.id),
     getReviewSummaryForProduct(db, product.id),
     session ? getMyReviewForProduct(db, session.user.id, product.id) : Promise.resolve(null),
     session ? isInWishlist(db, session.user.id, product.id) : Promise.resolve(false),
+    getPublicQuestionsForProduct(db, product.id),
   ]);
 
   // Fire-and-forget — never block the page render on analytics logging.
@@ -253,6 +256,12 @@ export default async function ProductDetailPage({
         isSignedIn={Boolean(session)}
         myReview={myReview}
       />
+      <ProductQuestionsSection
+        productSlug={product.slug}
+        questions={questions}
+        isSignedIn={Boolean(session)}
+      />
+
       <RecentlyViewed currentSlug={product.slug} />
     </PageContainer>
   );

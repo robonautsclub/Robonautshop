@@ -1,6 +1,6 @@
 # Task 140 — Product questions and answers
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 
