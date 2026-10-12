@@ -18,6 +18,7 @@ import {
   isWithinReturnWindow,
   remainingRequestableQuantity,
 } from "@/lib/returns/rules";
+import { logger } from "@/lib/logger";
 
 export type ReturnRequestRecord = typeof returnRequests.$inferSelect;
 
@@ -215,7 +216,7 @@ export async function decideReturnRequest(
     orderId: request.orderId,
   });
   if (!result.ok) {
-    console.error("[returns] restock failed after approval:", result.error);
+    logger.error("returns.restock_failed", undefined, { returnRequestId: requestId, reason: result.error });
   }
   return { ok: true, restocked: result.ok };
 }

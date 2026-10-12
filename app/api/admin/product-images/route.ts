@@ -14,6 +14,7 @@ import {
   validateImageUpload,
 } from "@/lib/media/images";
 import { getProductImagesBucket } from "@/lib/media/r2";
+import { loggerForRequest } from "@/lib/logger";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -33,6 +34,7 @@ function jsonError(message: string, status: number) {
  * bytes, and the object key is random — the uploaded filename is never used.
  */
 export async function POST(request: Request) {
+  const log = loggerForRequest(request);
   const session = await getServerSession();
   if (!session) return jsonError("Please sign in.", 401);
   if (!hasPermission(session.user.role, "catalog.manage") || twoFactorRequired(session.user)) {
@@ -84,9 +86,9 @@ export async function POST(request: Request) {
     revalidatePath("/", "layout");
     return NextResponse.json({ ok: true, image });
   } catch (error) {
-    console.error("Product image upload failed", error);
+    log.error("product_image.upload_failed", error);
     await bucket.delete(key).catch((cleanupError: unknown) => {
-      console.error("Could not remove orphaned R2 object", key, cleanupError);
+      log.error("product_image.orphan_cleanup_failed", cleanupError, { key });
     });
     return jsonError("Upload failed. Please try again.", 500);
   }

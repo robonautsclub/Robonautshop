@@ -7,6 +7,7 @@ import {
 import { renderOrderInvoiceHtml } from "@/lib/invoice/html";
 import { renderOrderInvoicePdf } from "@/lib/invoice/pdf";
 import type { OrderInvoice } from "@/lib/invoice/types";
+import { logger } from "@/lib/logger";
 
 export type OrderEmailLine = {
   productName: string;
@@ -97,12 +98,12 @@ async function sendEmail(args: {
     });
 
     if (error) {
-      console.error("[email] Resend rejected send:", error);
+      logger.error("email.rejected", undefined, { subject: args.subject, reason: error.message });
       return false;
     }
     return true;
   } catch (error) {
-    console.error("[email] Resend send failed:", error);
+    logger.error("email.send_failed", error, { subject: args.subject });
     return false;
   }
 }
@@ -227,7 +228,7 @@ export async function sendOrderConfirmationEmail(
       },
     ];
   } catch (error) {
-    console.error("[email] Invoice PDF generation failed — sending HTML only:", error);
+    logger.error("email.invoice_pdf_failed", error);
   }
 
   return sendEmail({

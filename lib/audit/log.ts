@@ -1,10 +1,10 @@
 import { and, desc, eq, like } from "drizzle-orm";
 
 import type { Database } from "@/lib/db";
+import { isSecretKey, logger } from "@/lib/logger";
 import { auditLogs } from "@/lib/db/schema/audit-logs";
 import { users } from "@/lib/db/schema/users";
 
-const SENSITIVE_KEY = /pass(word)?|secret|token|api[-_]?key|authorization|cookie|otp|pin/i;
 const MAX_VALUE_LENGTH = 300;
 
 /** Copies a snapshot with secret-looking keys redacted and long text trimmed. */
@@ -12,7 +12,7 @@ export function sanitizeAuditData(data: Record<string, unknown> | null | undefin
   if (!data) return null;
   const clean: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(data)) {
-    if (SENSITIVE_KEY.test(key)) {
+    if (isSecretKey(key)) {
       clean[key] = "[redacted]";
     } else if (typeof value === "string" && value.length > MAX_VALUE_LENGTH) {
       clean[key] = `${value.slice(0, MAX_VALUE_LENGTH)}…`;
@@ -49,7 +49,7 @@ export async function recordAudit(db: Database, entry: AuditEntry): Promise<void
       after: sanitizeAuditData(entry.after),
     });
   } catch (error) {
-    console.error("[audit] could not write audit log entry:", entry.action, error);
+    logger.error("audit.write_failed", error, { action: entry.action });
   }
 }
 

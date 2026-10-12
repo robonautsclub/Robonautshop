@@ -4,6 +4,7 @@ import { contactFormSchema } from "@/lib/contact/schema";
 import { escapeHtml } from "@/lib/email/html";
 import { sendSesEmail } from "@/lib/email/ses";
 import { checkRateLimit } from "@/lib/rate-limit/memory";
+import { loggerForRequest } from "@/lib/logger";
 
 // OpenNext/Cloudflare only supports the Node.js runtime (there is no Edge
 // runtime here) — declared explicitly since the AWS SDK needs Node APIs
@@ -18,6 +19,7 @@ function safeJsonError(message: string, status: number) {
 }
 
 export async function POST(request: Request) {
+  const log = loggerForRequest(request);
   const ip = request.headers.get("cf-connecting-ip") ?? "unknown";
   const rateLimit = checkRateLimit(`contact:${ip}`, RATE_LIMIT);
   if (!rateLimit.allowed) {
@@ -52,7 +54,7 @@ export async function POST(request: Request) {
 
   const toEmail = process.env.CONTACT_FORM_TO_EMAIL?.trim();
   if (!toEmail) {
-    console.error("[contact] CONTACT_FORM_TO_EMAIL is not configured — message dropped.");
+    log.error("contact.not_configured", undefined, { reason: "CONTACT_FORM_TO_EMAIL is not set; message dropped" });
     return safeJsonError("Something went wrong. Please try again.", 500);
   }
 
@@ -67,7 +69,7 @@ export async function POST(request: Request) {
       `,
     });
   } catch (error) {
-    console.error("[contact] SES send failed:", error);
+    log.error("contact.send_failed", error);
     return safeJsonError("Something went wrong. Please try again.", 500);
   }
 
