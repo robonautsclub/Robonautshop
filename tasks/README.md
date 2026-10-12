@@ -289,7 +289,7 @@ Browse, discovery and trust pages.
 - [x] 135 [Brand filter](phase-21-storefront/135-brand-filter.md)
 - [x] 136 [Search autocomplete](phase-21-storefront/136-search-autocomplete.md)
 - [x] 137 [Recently viewed products](phase-21-storefront/137-recently-viewed.md)
-- [ ] 138 [Subcategories](phase-21-storefront/138-subcategories.md)
+- [x] 138 [Subcategories](phase-21-storefront/138-subcategories.md)
 - [ ] 139 [Product compare](phase-21-storefront/139-product-compare.md)
 - [ ] 140 [Product questions and answers](phase-21-storefront/140-product-qa.md)
 - [ ] 141 [Back-in-stock notifications](phase-21-storefront/141-back-in-stock.md)

@@ -164,7 +164,11 @@ async function buildProductConditions(
 
   const conditions: SQL[] = [eq(products.status, "PUBLISHED")];
   if (category) {
-    conditions.push(eq(products.categoryId, category.id));
+    // A parent category also lists its subcategories' products (task 138).
+    const children = await getSubcategories(db, category.id);
+    conditions.push(
+      inArray(products.categoryId, [category.id, ...children.map((child) => child.id)]),
+    );
   }
   if (options.featured === true) {
     conditions.push(eq(products.featured, true));
@@ -248,6 +252,20 @@ export async function getProductBrands(db: Database): Promise<string[]> {
     .where(and(eq(products.status, "PUBLISHED"), sql`${products.brand} IS NOT NULL AND ${products.brand} <> ''`))
     .orderBy(asc(sql`lower(${products.brand})`));
   return rows.flatMap((row) => (row.brand ? [row.brand] : []));
+}
+
+/** Direct children of a category (one level only). */
+export async function getSubcategories(db: Database, parentId: string): Promise<Category[]> {
+  return db
+    .select()
+    .from(categories)
+    .where(eq(categories.parentId, parentId))
+    .orderBy(categories.sortOrder, categories.name);
+}
+
+export async function getCategoryById(db: Database, id: string): Promise<Category | null> {
+  const rows = await db.select().from(categories).where(eq(categories.id, id)).limit(1);
+  return rows[0] ?? null;
 }
 
 export async function getCategoryBySlug(

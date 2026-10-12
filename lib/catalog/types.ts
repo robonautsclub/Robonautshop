@@ -21,6 +21,8 @@ export interface Category {
   name: string;
   slug: string;
   description: string | null;
+  /** Parent category id; null for a top-level category. One level only. */
+  parentId: string | null;
   sortOrder: number;
   createdAt: string;
   updatedAt: string;

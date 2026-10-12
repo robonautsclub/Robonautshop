@@ -63,7 +63,7 @@ export function ProductToolbar({
           <option value="">All categories</option>
           {categories.map((category) => (
             <option key={category.id} value={category.slug}>
-              {category.name}
+              {category.parentId ? `— ${category.name}` : category.name}
             </option>
           ))}
         </select>

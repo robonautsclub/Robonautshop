@@ -1,6 +1,6 @@
 # Task 138 — Subcategories
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

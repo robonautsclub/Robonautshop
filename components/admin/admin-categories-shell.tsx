@@ -51,6 +51,7 @@ export function AdminCategoriesShell({
       name: form.get("name"),
       slug: form.get("slug"),
       description: form.get("description"),
+      parentId: form.get("parentId"),
       sortOrder: form.get("sortOrder"),
     };
     const parsed = categoryInputSchema.safeParse(input);
@@ -105,7 +106,12 @@ export function AdminCategoriesShell({
             <tr key={category.id} className="hover:bg-muted/30">
               <AdminTd>
                 <div>
-                  <p className="font-medium">{category.name}</p>
+                  <p className="font-medium">
+                    {category.parentId
+                      ? `${rows.find((row) => row.id === category.parentId)?.name ?? "?"} › `
+                      : ""}
+                    {category.name}
+                  </p>
                   {category.description ? (
                     <p className="line-clamp-1 text-xs text-muted-foreground">
                       {category.description}
@@ -198,6 +204,23 @@ export function AdminCategoriesShell({
               defaultValue={editing?.slug ?? ""}
               className={fieldClassName()}
             />
+          </AdminField>
+          <AdminField id="admin-category-parent" label="Parent category">
+            <select
+              id="admin-category-parent"
+              name="parentId"
+              defaultValue={editing?.parentId ?? ""}
+              className={fieldClassName()}
+            >
+              <option value="">None (top-level)</option>
+              {rows
+                .filter((row) => !row.parentId && row.id !== editing?.id)
+                .map((row) => (
+                  <option key={row.id} value={row.id}>
+                    {row.name}
+                  </option>
+                ))}
+            </select>
           </AdminField>
           <AdminField id="admin-category-sort" label="Sort order">
             <input

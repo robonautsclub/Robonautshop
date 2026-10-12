@@ -231,10 +231,55 @@ export async function setCatalogStatus(
 
 // -------------------------------------------------------------- categories
 
+/**
+ * One nesting level only (task 138): a parent must exist, must itself be
+ * top-level, can't be the category itself, and a category that already has
+ * subcategories can't become a subcategory.
+ */
+async function checkCategoryParent(
+  db: Database,
+  id: string | null,
+  parentId: string | null,
+): Promise<string | null> {
+  if (!parentId) {
+    return null;
+  }
+  if (parentId === id) {
+    return "A category can't be its own parent.";
+  }
+  const parent = (
+    await db
+      .select({ parentId: categories.parentId })
+      .from(categories)
+      .where(eq(categories.id, parentId))
+      .limit(1)
+  )[0];
+  if (!parent) {
+    return "That parent category no longer exists.";
+  }
+  if (parent.parentId) {
+    return "Subcategories can only be one level deep. Choose a top-level parent.";
+  }
+  if (id) {
+    const [children] = await db
+      .select({ value: count() })
+      .from(categories)
+      .where(eq(categories.parentId, id));
+    if ((children?.value ?? 0) > 0) {
+      return "This category has subcategories, so it can't become a subcategory itself.";
+    }
+  }
+  return null;
+}
+
 export async function createCategory(
   db: Database,
   data: CategoryData,
 ): Promise<CatalogWriteResult> {
+  const parentError = await checkCategoryParent(db, null, data.parentId);
+  if (parentError) {
+    return { ok: false, error: parentError };
+  }
   const id = newId();
   try {
     await db.insert(categories).values({
@@ -242,6 +287,7 @@ export async function createCategory(
       name: data.name,
       slug: data.slug || slugify(data.name),
       description: data.description,
+      parentId: data.parentId,
       sortOrder: data.sortOrder,
     });
   } catch (error) {
@@ -255,6 +301,10 @@ export async function updateCategory(
   id: string,
   data: CategoryData,
 ): Promise<CatalogWriteResult> {
+  const parentError = await checkCategoryParent(db, id, data.parentId);
+  if (parentError) {
+    return { ok: false, error: parentError };
+  }
   try {
     const updated = await db
       .update(categories)
@@ -262,6 +312,7 @@ export async function updateCategory(
         name: data.name,
         slug: data.slug || slugify(data.name),
         description: data.description,
+        parentId: data.parentId,
         sortOrder: data.sortOrder,
         updatedAt: now(),
       })
@@ -276,8 +327,18 @@ export async function updateCategory(
   return { ok: true, id };
 }
 
-/** Refuses while any product (of any status) still uses the category. */
+/** Refuses while any product (of any status) uses the category or it still has subcategories. */
 export async function deleteCategory(db: Database, id: string): Promise<CatalogWriteResult> {
+  const [children] = await db
+    .select({ value: count() })
+    .from(categories)
+    .where(eq(categories.parentId, id));
+  if ((children?.value ?? 0) > 0) {
+    return {
+      ok: false,
+      error: "This category has subcategories. Move or delete them first.",
+    };
+  }
   const [usage] = await db
     .select({ value: count() })
     .from(products)

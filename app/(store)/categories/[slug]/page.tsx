@@ -10,9 +10,11 @@ import {
   ProductPagination,
 } from "@/components/product";
 import {
+  getCategoryById,
   getCategoryBySlug,
   getProductCardModels,
   getProductsPage,
+  getSubcategories,
 } from "@/lib/catalog";
 import { buildListHref, parsePageParam } from "@/lib/catalog/list-url";
 import { getRequestDb } from "@/lib/db/request";
@@ -59,6 +61,10 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     page: pageNumber,
   });
   const cards = await getProductCardModels(db, result.products);
+  const [parent, subcategories] = await Promise.all([
+    category.parentId ? getCategoryById(db, category.parentId) : Promise.resolve(null),
+    getSubcategories(db, category.id),
+  ]);
 
   return (
     <PageContainer as="section" className="py-10">
@@ -70,6 +76,16 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
             </Link>
           </li>
           <li aria-hidden>/</li>
+          {parent ? (
+            <>
+              <li>
+                <Link href={`/categories/${parent.slug}`} className="hover:text-foreground">
+                  {parent.name}
+                </Link>
+              </li>
+              <li aria-hidden>/</li>
+            </>
+          ) : null}
           <li className="text-foreground">{category.name}</li>
         </ol>
       </nav>
@@ -84,6 +100,23 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
           </p>
         ) : null}
       </div>
+
+      {subcategories.length > 0 ? (
+        <nav aria-label="Subcategories" className="mb-8">
+          <ul className="flex flex-wrap gap-2">
+            {subcategories.map((child) => (
+              <li key={child.id}>
+                <Link
+                  href={`/categories/${child.slug}`}
+                  className="inline-flex rounded-full border px-3 py-1 text-sm hover:border-foreground/30 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  {child.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
 
       {cards.length === 0 ? (
         <CatalogEmptyState

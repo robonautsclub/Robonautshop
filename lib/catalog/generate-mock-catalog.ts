@@ -42,7 +42,7 @@ type ProductSeed = {
   variantNames?: string[];
 };
 
-const CATEGORY_SEEDS: Omit<Category, "id" | "createdAt" | "updatedAt">[] = [
+const CATEGORY_SEEDS: Omit<Category, "id" | "parentId" | "createdAt" | "updatedAt">[] = [
   {
     name: "Microcontrollers",
     slug: "microcontrollers",
@@ -393,6 +393,7 @@ export function generateMockCatalog(seed = MOCK_CATALOG_SEED): CatalogBundle {
   const categories: Category[] = CATEGORY_SEEDS.map((seedCategory) => ({
     id: faker.string.uuid(),
     ...seedCategory,
+    parentId: null,
     createdAt: isoDaysAgo(60),
     updatedAt: now,
   }));

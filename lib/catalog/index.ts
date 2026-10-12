@@ -34,6 +34,7 @@ export type {
 
 export {
   getCategories,
+  getCategoryById,
   getCategoryBySlug,
   getImagesForProduct,
   getInventoryForProduct,
@@ -59,6 +60,7 @@ export {
   getProjectRequirementLines,
   getProjects,
   getRelatedProducts,
+  getSubcategories,
   getVariantsForProduct,
   searchProducts,
   sumRequirementLineTotals,
