@@ -292,7 +292,7 @@ Browse, discovery and trust pages.
 - [x] 138 [Subcategories](phase-21-storefront/138-subcategories.md)
 - [x] 139 [Product compare](phase-21-storefront/139-product-compare.md)
 - [x] 140 [Product questions and answers](phase-21-storefront/140-product-qa.md)
-- [ ] 141 [Back-in-stock notifications](phase-21-storefront/141-back-in-stock.md)
+- [x] 141 [Back-in-stock notifications](phase-21-storefront/141-back-in-stock.md)
 - [ ] 142 [Policy, About and FAQ pages](phase-21-storefront/142-policy-pages.md)
 - [ ] 143 [Homepage: new arrivals and bestsellers](phase-21-storefront/143-homepage-new-bestsellers.md)
 

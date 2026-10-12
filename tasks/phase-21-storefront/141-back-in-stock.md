@@ -1,6 +1,6 @@
 # Task 141 — Back-in-stock notifications
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

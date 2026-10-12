@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import { useCart } from "@/components/cart/cart-provider";
+import { NotifyBackInStock } from "@/components/product/notify-back-in-stock";
 import { PriceDisplay } from "@/components/product/price-display";
 import { StockBadge } from "@/components/product/stock-badge";
 import { Button } from "@/components/ui/button";
@@ -124,6 +125,14 @@ export function ProductPurchasePanel({
           </p>
         ) : null}
       </div>
+
+      {canAdd ? null : (
+        <NotifyBackInStock
+          key={selectedVariant?.id ?? "product"}
+          productId={product.id}
+          variantId={selectedVariant?.id ?? null}
+        />
+      )}
     </div>
   );
 }

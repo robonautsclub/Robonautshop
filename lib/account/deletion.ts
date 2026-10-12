@@ -2,6 +2,7 @@ import { and, eq, notInArray, or } from "drizzle-orm";
 
 import type { Database } from "@/lib/db";
 import { runBatch } from "@/lib/db/batch";
+import { backInStockSubscriptions } from "@/lib/db/schema/back-in-stock";
 import { bkashPendingPayments } from "@/lib/db/schema/bkash-pending-payments";
 import { cartItems } from "@/lib/db/schema/cart-items";
 import { cartReminders } from "@/lib/db/schema/cart-reminders";
@@ -29,7 +30,7 @@ export type DeleteAccountResult = { ok: true } | { ok: false; error: string };
  * phone, street address, postcode, coordinates and delivery notes.
  * DELETED: sessions, linked login accounts (so nobody can sign in again),
  * verification/reset tokens, saved addresses, wishlist, cart, cart
- * reminders, reviews, questions and pending bKash attempts.
+ * reminders, reviews, questions, back-in-stock sign-ups and pending bKash attempts.
  *
  * Blocked while any order is still in progress. All writes are one atomic
  * D1 batch. Callers must already have re-authenticated the user.
@@ -74,6 +75,7 @@ export async function deleteCustomerAccount(
     db.delete(cartItems).where(eq(cartItems.userId, userId)),
     db.delete(cartReminders).where(eq(cartReminders.userId, userId)),
     db.delete(productReviews).where(eq(productReviews.userId, userId)),
+    db.delete(backInStockSubscriptions).where(eq(backInStockSubscriptions.email, user.email.toLowerCase())),
     db.delete(productQuestions).where(eq(productQuestions.userId, userId)),
     db.delete(bkashPendingPayments).where(eq(bkashPendingPayments.userId, userId)),
     db
