@@ -5,6 +5,7 @@ import { type FormEvent, useMemo, useState } from "react";
 
 import { AdminDialog } from "@/components/admin/admin-dialog";
 import { AdminField, fieldClassName } from "@/components/admin/admin-form-dialog";
+import { AdminExportLink } from "@/components/admin/admin-export-link";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import {
   AdminPagination,
@@ -124,6 +125,7 @@ export function AdminInventoryShell({ rows }: AdminInventoryShellProps) {
       <AdminPageHeader
         title="Inventory"
         description={`${rows.length} SKUs · ${lowCount} low · available = stock − reserved for open orders.`}
+        actions={<AdminExportLink href="/admin/inventory/export" params={{ q: query.trim() }} />}
         toolbar={
           <>
             <input
