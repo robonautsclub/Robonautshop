@@ -74,6 +74,7 @@ export async function updateOrderStatus(
     if (nextStockState === "DEDUCTED") {
       await deductStockForOrderLines(db, lines, {
         consumeReservation: order.stockState === "RESERVED",
+        orderId,
       });
     } else {
       await releaseStockForOrderLines(db, lines);

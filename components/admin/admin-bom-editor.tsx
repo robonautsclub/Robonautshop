@@ -14,6 +14,8 @@ import { cn } from "@/lib/utils";
 export type AdminBomLine = {
   productId: string;
   quantity: number;
+  /** Robot projects only — a nice-to-have part, not required to build. */
+  optional?: boolean;
 };
 
 type AdminBomEditorProps = {
@@ -24,6 +26,8 @@ type AdminBomEditorProps = {
   title?: string;
   emptyLabel?: string;
   searchInputId?: string;
+  /** Show an "Optional" checkbox per line (robot projects). */
+  showOptional?: boolean;
 };
 
 export function AdminBomEditor({
@@ -33,6 +37,7 @@ export function AdminBomEditor({
   title = "Components (from stock products)",
   emptyLabel = "Box is empty. Search a product from stock and add it.",
   searchInputId = "admin-bom-product-search",
+  showOptional = false,
 }: AdminBomEditorProps) {
   const [productQuery, setProductQuery] = useState("");
 
@@ -189,6 +194,24 @@ export function AdminBomEditor({
                     className={`${fieldClassName()} w-20`}
                   />
                 </label>
+                {showOptional ? (
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={line.optional ?? false}
+                      onChange={(event) =>
+                        onChange(
+                          lines.map((item) =>
+                            item.productId === line.productId
+                              ? { ...item, optional: event.target.checked }
+                              : item,
+                          ),
+                        )
+                      }
+                    />
+                    Optional
+                  </label>
+                ) : null}
                 <AdminDeleteTrigger
                   itemLabel={`“${product.name}” from this list`}
                   title="Remove component?"

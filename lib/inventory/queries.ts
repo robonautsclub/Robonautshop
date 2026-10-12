@@ -3,6 +3,7 @@ import { and, eq, gte, sql } from "drizzle-orm";
 import { getAvailableQuantity } from "@/lib/catalog/types";
 import type { Database } from "@/lib/db";
 import { inventory } from "@/lib/db/schema/inventory";
+import { recordStockMovement } from "@/lib/inventory/adjustments";
 import { pickInventoryRow } from "@/lib/inventory/rules";
 
 export type LowStockAlert = {
@@ -151,19 +152,20 @@ export async function releaseStockForOrderLines(
 /**
  * On ship (tasks/phase-18-hardening/109): units physically leave stock.
  * When the order held a reservation it is consumed at the same time;
- * otherwise only `stockQuantity` drops. Neither goes below 0.
+ * otherwise only `stockQuantity` drops. Neither goes below 0. Each change
+ * is written to the stock movement history (tasks/phase-19-admin-catalog/122).
  */
 export async function deductStockForOrderLines(
   db: Database,
   lines: StockLine[],
-  { consumeReservation }: { consumeReservation: boolean },
+  { consumeReservation, orderId = null }: { consumeReservation: boolean; orderId?: string | null },
 ): Promise<void> {
   for (const line of lines) {
     const row = await findInventoryRow(db, line);
     if (!row) {
       continue;
     }
-    await db
+    const updated = await db
       .update(inventory)
       .set({
         stockQuantity: sql`max(0, ${inventory.stockQuantity} - ${line.quantity})`,
@@ -174,6 +176,20 @@ export async function deductStockForOrderLines(
           : {}),
         updatedAt: new Date().toISOString(),
       })
-      .where(eq(inventory.id, row.id));
+      .where(eq(inventory.id, row.id))
+      .returning();
+    const after = updated[0];
+    if (after && after.stockQuantity !== row.stockQuantity) {
+      await recordStockMovement(db, {
+        inventoryId: row.id,
+        sku: row.sku,
+        delta: after.stockQuantity - row.stockQuantity,
+        stockAfter: after.stockQuantity,
+        reason: "ORDER_SHIPPED",
+        note: null,
+        actorUserId: null,
+        orderId,
+      });
+    }
   }
 }
