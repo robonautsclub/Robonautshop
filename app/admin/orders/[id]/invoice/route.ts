@@ -3,12 +3,8 @@ import { NextResponse } from "next/server";
 import { getAdminOrderById } from "@/lib/admin";
 import { requireAdminSession } from "@/lib/auth/session";
 import { getRequestDb } from "@/lib/db/request";
-import {
-  invoicePdfFilename,
-  orderInvoiceFromAdminOrder,
-  orderInvoiceFromOrder,
-} from "@/lib/invoice/from-order";
-import { renderOrderInvoicePdf } from "@/lib/invoice/pdf";
+import { orderInvoiceFromAdminOrder, orderInvoiceFromOrder } from "@/lib/invoice/from-order";
+import { invoicePdfResponse } from "@/lib/invoice/pdf-response";
 import type { OrderInvoice } from "@/lib/invoice/types";
 import { getOrderForAdmin } from "@/lib/server-cart/order-queries";
 
@@ -41,19 +37,5 @@ export async function GET(_request: Request, { params }: InvoiceRouteProps) {
     return new NextResponse("Invoice not found", { status: 404 });
   }
 
-  const pdfBytes = await renderOrderInvoicePdf(invoice);
-  const filename = invoicePdfFilename(invoice.orderId);
-
-  // Copy into a fresh ArrayBuffer-backed view for BodyInit typing (pdf-lib's
-  // Uint8Array can be ArrayBufferLike / SharedArrayBuffer under TS 5).
-  const body = Uint8Array.from(pdfBytes);
-
-  return new NextResponse(body, {
-    status: 200,
-    headers: {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="${filename}"`,
-      "Cache-Control": "no-store",
-    },
-  });
+  return invoicePdfResponse(invoice);
 }

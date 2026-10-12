@@ -1,6 +1,6 @@
 # Task 131 — Customer invoice download
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

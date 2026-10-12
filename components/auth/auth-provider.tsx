@@ -9,6 +9,8 @@ export type SessionUser = {
   name: string;
   email: string;
   image: string | null;
+  emailVerified: boolean;
+  phone: string | null;
   /** CUSTOMER | ADMIN — see lib/db/schema/users.ts. Authorization must still be checked server-side. */
   role: "CUSTOMER" | "ADMIN";
 };
@@ -56,12 +58,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const user = data?.user ?? null;
     // The generic authClient isn't typed against our server's additional
     // `role` field (see lib/auth/server.ts), but the API always returns it.
-    const role = (user as { role?: "CUSTOMER" | "ADMIN" } | null)?.role ?? "CUSTOMER";
+    const extra = user as { role?: "CUSTOMER" | "ADMIN"; phone?: string | null } | null;
+    const role = extra?.role ?? "CUSTOMER";
 
     return {
       hydrated: !isPending,
       user: user
-        ? { id: user.id, name: user.name, email: user.email, image: user.image ?? null, role }
+        ? { id: user.id, name: user.name, email: user.email, image: user.image ?? null, emailVerified: user.emailVerified, phone: extra?.phone ?? null, role }
         : null,
       isSignedIn: Boolean(user),
       signIn,

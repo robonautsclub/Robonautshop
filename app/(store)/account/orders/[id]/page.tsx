@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AccountOrderItems } from "@/components/account/account-order-items";
+import { CancelOrderButton } from "@/components/account/cancel-order-button";
 import { RepayBkashButton } from "@/components/account/repay-bkash-button";
 import { PageContainer } from "@/components/layout/page-container";
 import { buttonVariants } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { formatBdt } from "@/lib/catalog";
 import { getPaymentMethodLabel } from "@/lib/checkout/types";
 import { getRequestDb } from "@/lib/db/request";
 import { canRepayWithBkash } from "@/lib/orders/repay-rules";
+import { canCustomerCancelOrder } from "@/lib/orders/status-rules";
 import { getOrderForCustomer } from "@/lib/server-cart/order-queries";
 import { cn } from "@/lib/utils";
 
@@ -59,12 +61,22 @@ export default async function AccountOrderDetailPage({
             Order {order.id.slice(0, 8)}…
           </h1>
         </div>
-        <Link
-          href="/account/orders"
-          className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
-        >
-          Back to orders
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <a
+            href={`/account/orders/${order.id}/invoice`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(buttonVariants({ size: "sm" }))}
+          >
+            Download invoice
+          </a>
+          <Link
+            href="/account/orders"
+            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+          >
+            Back to orders
+          </Link>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -88,6 +100,16 @@ export default async function AccountOrderDetailPage({
               </div>
             ) : null}
           </dl>
+          {order.status === "CANCELLED" && order.paymentStatus === "PAID" ? (
+            <p className="border-t pt-3 text-sm text-muted-foreground">
+              This order was cancelled. Your bKash payment will be refunded manually by our team.
+            </p>
+          ) : null}
+          {canCustomerCancelOrder(order.status) ? (
+            <div className="border-t pt-3">
+              <CancelOrderButton orderId={order.id} isPaid={order.paymentStatus === "PAID"} />
+            </div>
+          ) : null}
           {canRepayWithBkash(order) ? (
             <div className="border-t pt-3">
               <RepayBkashButton orderId={order.id} />

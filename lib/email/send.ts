@@ -126,6 +126,70 @@ export async function sendWelcomeEmail(args: {
   });
 }
 
+export async function sendPasswordResetEmail(args: {
+  to: string;
+  name: string;
+  url: string;
+}): Promise<boolean> {
+  const safeName = escapeHtml(args.name.trim() || "there");
+
+  return sendEmail({
+    to: args.to,
+    subject: "Reset your Robonautsshop password",
+    html: `
+      <p>Hi ${safeName},</p>
+      <p>We received a request to reset your Robonautsshop password. This link expires in 1 hour and can be used once.</p>
+      <p><a href="${escapeHtml(args.url)}">Choose a new password</a></p>
+      <p>If you didn’t ask for this, you can ignore this email — your password won’t change.</p>
+      <p>— Robonautsshop</p>
+    `,
+  });
+}
+
+export async function sendVerificationEmail(args: {
+  to: string;
+  name: string;
+  url: string;
+}): Promise<boolean> {
+  const safeName = escapeHtml(args.name.trim() || "there");
+
+  return sendEmail({
+    to: args.to,
+    subject: "Verify your Robonautsshop email",
+    html: `
+      <p>Hi ${safeName},</p>
+      <p>Please confirm your email address to finish setting up your Robonautsshop account. You need a verified email to place orders.</p>
+      <p><a href="${escapeHtml(args.url)}">Verify my email</a></p>
+      <p>If you didn’t create this account, you can ignore this email.</p>
+      <p>— Robonautsshop</p>
+    `,
+  });
+}
+
+export async function sendOrderCancelledEmail(args: {
+  to: string;
+  name: string;
+  orderId: string;
+  refundPending: boolean;
+}): Promise<boolean> {
+  const safeName = escapeHtml(args.name.trim() || "there");
+
+  return sendEmail({
+    to: args.to,
+    subject: `Order cancelled · ${shortOrderId(args.orderId)}`,
+    html: `
+      <p>Hi ${safeName},</p>
+      <p>Your order ${escapeHtml(shortOrderId(args.orderId))} has been cancelled as you requested.</p>
+      ${
+        args.refundPending
+          ? "<p>Since you had already paid with bKash, our team will refund the amount manually. We’ll be in touch if we need anything from you.</p>"
+          : ""
+      }
+      <p>— Robonautsshop</p>
+    `,
+  });
+}
+
 export async function sendOrderConfirmationEmail(
   payload: OrderEmailPayload,
 ): Promise<boolean> {

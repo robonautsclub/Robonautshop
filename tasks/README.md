@@ -273,13 +273,13 @@ Replace preview-only admin dialogs with real, ADMIN-guarded saves.
 
 Account recovery and self-service. bKash stays the only payment method.
 
-- [ ] 127 [Forgot and reset password](phase-20-accounts/127-forgot-reset-password.md)
-- [ ] 128 [Email verification](phase-20-accounts/128-email-verification.md)
-- [ ] 129 [Customer profile edit](phase-20-accounts/129-profile-edit.md)
-- [ ] 130 [Customer cancels an order before it ships](phase-20-accounts/130-customer-cancel-order.md)
-- [ ] 131 [Customer invoice download](phase-20-accounts/131-customer-invoice-download.md)
-- [ ] 132 [Active sessions list and revoke](phase-20-accounts/132-active-sessions.md)
-- [ ] 133 [Account deletion request](phase-20-accounts/133-account-deletion.md)
+- [x] 127 [Forgot and reset password](phase-20-accounts/127-forgot-reset-password.md)
+- [x] 128 [Email verification](phase-20-accounts/128-email-verification.md)
+- [x] 129 [Customer profile edit](phase-20-accounts/129-profile-edit.md)
+- [x] 130 [Customer cancels an order before it ships](phase-20-accounts/130-customer-cancel-order.md)
+- [x] 131 [Customer invoice download](phase-20-accounts/131-customer-invoice-download.md)
+- [x] 132 [Active sessions list and revoke](phase-20-accounts/132-active-sessions.md)
+- [x] 133 [Account deletion request](phase-20-accounts/133-account-deletion.md)
 
 ## Phase 21 — Storefront gaps
 

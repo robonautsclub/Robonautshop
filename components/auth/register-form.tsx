@@ -53,6 +53,7 @@ export function RegisterForm() {
       name: parsed.data.name,
       email: parsed.data.email,
       password: parsed.data.password,
+      callbackURL: "/user/verify-email",
     });
 
     if (error) {
@@ -63,7 +64,7 @@ export function RegisterForm() {
       return;
     }
 
-    setStatus("Account created.");
+    setStatus("Account created. Check your email to verify your address.");
     router.push("/account");
   }
 

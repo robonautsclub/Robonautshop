@@ -1,6 +1,6 @@
 # Task 130 — Customer cancels an order before it ships
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

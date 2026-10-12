@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+/** Single source of truth for Bangladesh mobile numbers (addresses and profile). */
+export const bangladeshPhoneSchema = z
+  .string()
+  .trim()
+  .regex(/^01[3-9]\d{8}$/, "Enter a valid Bangladesh mobile number.");
+
 export const registerSchema = z
   .object({
     name: z
@@ -27,16 +33,30 @@ export const loginSchema = z.object({
     .max(128, "Password is too long."),
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z.email("Enter a valid email address."),
+});
+
+export const resetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters.")
+      .max(128, "Password is too long."),
+    confirmPassword: z.string(),
+  })
+  .refine((value) => value.password === value.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });
+
 export const addressSchema = z.object({
   fullName: z
     .string()
     .trim()
     .min(2, "Name must be at least 2 characters.")
     .max(80, "Name is too long."),
-  phone: z
-    .string()
-    .trim()
-    .regex(/^01[3-9]\d{8}$/, "Enter a valid Bangladesh mobile number."),
+  phone: bangladeshPhoneSchema,
   addressLine1: z
     .string()
     .trim()
@@ -56,6 +76,16 @@ export const addressSchema = z.object({
     .or(z.literal("")),
 });
 
+export const profileSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, "Name must be at least 2 characters.")
+    .max(80, "Name is too long."),
+  phone: bangladeshPhoneSchema.or(z.literal("")),
+});
+
+export type ProfileInput = z.infer<typeof profileSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type AddressInput = z.infer<typeof addressSchema>;

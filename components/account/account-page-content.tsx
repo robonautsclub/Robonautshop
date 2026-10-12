@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 
 import { AccountNav } from "@/components/account/account-nav";
 import { useAuth } from "@/components/auth/auth-provider";
+import { ActiveSessions } from "@/components/account/active-sessions";
+import { DeleteAccountSection } from "@/components/account/delete-account-section";
+import { ProfileForm } from "@/components/account/profile-form";
+import { ResendVerificationNotice } from "@/components/account/resend-verification-notice";
 import { PageContainer } from "@/components/layout/page-container";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -56,25 +60,14 @@ export function AccountPageContent() {
           </Button>
         </div>
         <AccountNav pathname="/account" />
+        {user.emailVerified ? null : <ResendVerificationNotice email={user.email} />}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
         <div className="rounded-xl border p-5">
           <h2 className="text-lg font-semibold tracking-tight">Profile</h2>
-          <dl className="mt-4 space-y-3 text-sm">
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted-foreground">Name</dt>
-              <dd className="font-medium">{user.name}</dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted-foreground">Email</dt>
-              <dd className="font-medium">{user.email}</dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted-foreground">Role</dt>
-              <dd className="font-medium">Customer</dd>
-            </div>
-          </dl>
+          <p className="mt-1 text-sm text-muted-foreground">{user.email}</p>
+          <ProfileForm initialName={user.name} initialPhone={user.phone ?? ""} />
         </div>
 
         <div className="space-y-3">
@@ -97,6 +90,14 @@ export function AccountPageContent() {
             </p>
           </Link>
         </div>
+      </div>
+
+      <div className="mt-6">
+        <ActiveSessions />
+      </div>
+
+      <div className="mt-6">
+        <DeleteAccountSection />
       </div>
     </PageContainer>
   );

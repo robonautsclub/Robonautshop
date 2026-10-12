@@ -41,3 +41,19 @@ export function canTransitionOrder(
 ): boolean {
   return getNextOrderStatuses(from, paymentStatus).includes(to);
 }
+
+/**
+ * Statuses a customer may cancel from themselves (task 130): anything before
+ * the order is packed. The one rule the cancel button (UI) and
+ * cancelOrderForCustomer (server, authoritative) both use.
+ */
+const CUSTOMER_CANCELLABLE: readonly OrderStatus[] = [
+  "PENDING",
+  "PAYMENT_PENDING",
+  "PAID",
+  "PROCESSING",
+];
+
+export function canCustomerCancelOrder(status: OrderStatus): boolean {
+  return CUSTOMER_CANCELLABLE.includes(status);
+}

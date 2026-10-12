@@ -1,6 +1,6 @@
 # Task 133 — Account deletion request
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

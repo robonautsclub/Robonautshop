@@ -1,6 +1,6 @@
 # Task 132 — Active sessions list and revoke
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 
