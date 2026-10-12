@@ -9,6 +9,7 @@ export type SessionUser = {
   name: string;
   email: string;
   image: string | null;
+  emailVerified: boolean;
   /** CUSTOMER | ADMIN — see lib/db/schema/users.ts. Authorization must still be checked server-side. */
   role: "CUSTOMER" | "ADMIN";
 };
@@ -61,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return {
       hydrated: !isPending,
       user: user
-        ? { id: user.id, name: user.name, email: user.email, image: user.image ?? null, role }
+        ? { id: user.id, name: user.name, email: user.email, image: user.image ?? null, emailVerified: user.emailVerified, role }
         : null,
       isSignedIn: Boolean(user),
       signIn,

@@ -146,6 +146,26 @@ export async function sendPasswordResetEmail(args: {
   });
 }
 
+export async function sendVerificationEmail(args: {
+  to: string;
+  name: string;
+  url: string;
+}): Promise<boolean> {
+  const safeName = escapeHtml(args.name.trim() || "there");
+
+  return sendEmail({
+    to: args.to,
+    subject: "Verify your Robonautsshop email",
+    html: `
+      <p>Hi ${safeName},</p>
+      <p>Please confirm your email address to finish setting up your Robonautsshop account. You need a verified email to place orders.</p>
+      <p><a href="${escapeHtml(args.url)}">Verify my email</a></p>
+      <p>If you didn’t create this account, you can ignore this email.</p>
+      <p>— Robonautsshop</p>
+    `,
+  });
+}
+
 export async function sendOrderConfirmationEmail(
   payload: OrderEmailPayload,
 ): Promise<boolean> {

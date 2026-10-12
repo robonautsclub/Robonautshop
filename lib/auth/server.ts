@@ -6,7 +6,7 @@ import { nextCookies } from "better-auth/next-js";
 import type { Database } from "@/lib/db";
 import { getRequestDb } from "@/lib/db/request";
 import * as schema from "@/lib/db/schema";
-import { sendPasswordResetEmail, sendWelcomeEmail } from "@/lib/email/send";
+import { sendPasswordResetEmail, sendVerificationEmail, sendWelcomeEmail } from "@/lib/email/send";
 
 /**
  * Social providers are registered only when their env vars are actually
@@ -81,6 +81,15 @@ export function buildAuth(db: Database, options: { withNextCookies: boolean }) {
         void sendPasswordResetEmail({ to: user.email, name: user.name, url });
       },
     },
+    // Social sign-ins arrive already verified by the provider. Unverified
+    // users cannot place orders — enforced in lib/server-cart/actions.ts.
+    emailVerification: {
+      sendOnSignUp: true,
+      autoSignInAfterVerification: true,
+      sendVerificationEmail: async ({ user, url }) => {
+        void sendVerificationEmail({ to: user.email, name: user.name, url });
+      },
+    },
     user: {
       additionalFields: {
         role: {
@@ -116,6 +125,7 @@ export function buildAuth(db: Database, options: { withNextCookies: boolean }) {
         "/sign-in/email": { window: 60, max: 5 },
         "/sign-up/email": { window: 60, max: 3 },
         "/request-password-reset": { window: 60, max: 3 },
+        "/send-verification-email": { window: 60, max: 3 },
       },
     },
     plugins: [dash(), sentinel(), ...(options.withNextCookies ? [nextCookies()] : [])],

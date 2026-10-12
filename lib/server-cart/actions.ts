@@ -71,10 +71,18 @@ export async function mergeGuestCartAction(
 }
 
 export async function placeOrderAction(input: PlaceOrderInput): Promise<PlaceOrderResult> {
-  const userId = await requireUserId();
-  if (!userId) {
+  const session = await getServerSession();
+  if (!session) {
     return { ok: false, error: "You must be signed in to place an order." };
   }
+  // Decision (task 128): unverified email/password accounts cannot place orders.
+  if (!session.user.emailVerified) {
+    return {
+      ok: false,
+      error: "Please verify your email address before placing an order. You can resend the link from your account page.",
+    };
+  }
+  const userId = session.user.id;
 
   const limited = await limitAction("place-order", PLACE_ORDER_LIMIT, userId);
   if (limited) {

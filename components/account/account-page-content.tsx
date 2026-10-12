@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { AccountNav } from "@/components/account/account-nav";
 import { useAuth } from "@/components/auth/auth-provider";
+import { ResendVerificationNotice } from "@/components/account/resend-verification-notice";
 import { PageContainer } from "@/components/layout/page-container";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -56,6 +57,7 @@ export function AccountPageContent() {
           </Button>
         </div>
         <AccountNav pathname="/account" />
+        {user.emailVerified ? null : <ResendVerificationNotice email={user.email} />}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">

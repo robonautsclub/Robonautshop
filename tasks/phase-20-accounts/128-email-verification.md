@@ -1,6 +1,6 @@
 # Task 128 — Email verification
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 
