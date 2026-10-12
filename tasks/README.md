@@ -279,7 +279,7 @@ Account recovery and self-service. bKash stays the only payment method.
 - [x] 130 [Customer cancels an order before it ships](phase-20-accounts/130-customer-cancel-order.md)
 - [x] 131 [Customer invoice download](phase-20-accounts/131-customer-invoice-download.md)
 - [x] 132 [Active sessions list and revoke](phase-20-accounts/132-active-sessions.md)
-- [ ] 133 [Account deletion request](phase-20-accounts/133-account-deletion.md)
+- [x] 133 [Account deletion request](phase-20-accounts/133-account-deletion.md)
 
 ## Phase 21 — Storefront gaps
 
