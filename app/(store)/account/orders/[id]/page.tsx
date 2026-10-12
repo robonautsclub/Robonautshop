@@ -61,12 +61,22 @@ export default async function AccountOrderDetailPage({
             Order {order.id.slice(0, 8)}…
           </h1>
         </div>
-        <Link
-          href="/account/orders"
-          className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
-        >
-          Back to orders
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <a
+            href={`/account/orders/${order.id}/invoice`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(buttonVariants({ size: "sm" }))}
+          >
+            Download invoice
+          </a>
+          <Link
+            href="/account/orders"
+            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+          >
+            Back to orders
+          </Link>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
