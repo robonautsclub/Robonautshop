@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getServerSession } from "@/lib/auth/session";
 import { getRequestDb } from "@/lib/db/request";
 import { getProductBySlug } from "@/lib/catalog/queries";
+import { limitAction } from "@/lib/rate-limit/action";
 import { reviewSchema, type ReviewInput } from "@/lib/reviews/schemas";
 import {
   deleteReview,
@@ -30,6 +31,11 @@ export async function submitReviewAction(
   const userId = await requireUserId();
   if (!userId) {
     return { ok: false, error: "You must be signed in to leave a review." };
+  }
+
+  const limited = await limitAction("review", { limit: 5, windowMs: 10 * 60 * 1000 }, userId);
+  if (limited) {
+    return { ok: false, error: limited };
   }
 
   const parsed = reviewSchema.safeParse(input);

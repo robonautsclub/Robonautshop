@@ -1,14 +1,13 @@
 import Link from "next/link";
 
 import { CatalogCoverImage } from "@/components/catalog/catalog-cover-image";
-import { SiteLogo } from "@/components/brand/site-logo";
+import { HomeHero } from "@/components/home/home-hero";
 import { PageContainer } from "@/components/layout/page-container";
 import {
   CatalogEmptyState,
   ProductCard,
   ProductGrid,
 } from "@/components/product";
-import { buttonVariants } from "@/components/ui/button";
 import {
   getCategories,
   getKits,
@@ -17,7 +16,6 @@ import {
   getProjects,
 } from "@/lib/catalog";
 import { getRequestDb } from "@/lib/db/request";
-import { cn } from "@/lib/utils";
 
 export default async function HomePage() {
   const db = await getRequestDb();
@@ -38,39 +36,7 @@ export default async function HomePage() {
 
   return (
     <div>
-      <section className="relative overflow-hidden border-b">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,oklch(0.92_0.02_250),transparent_55%),linear-gradient(180deg,oklch(0.97_0.01_240),transparent)]"
-        />
-        <PageContainer className="relative flex min-h-[70vh] flex-col justify-end gap-6 py-16 sm:py-24">
-          <SiteLogo href={null} size="xl" priority />
-          <h1 className="max-w-2xl text-xl font-medium tracking-tight text-foreground/90 sm:text-2xl">
-            Robotics parts for builders who ship robots, not shopping carts.
-          </h1>
-          <p className="max-w-xl text-muted-foreground">
-            Microcontrollers, motors, sensors, and kits for STEM labs and
-            competition teams across Bangladesh.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/products" className={cn(buttonVariants({ size: "lg" }))}>
-              Browse products
-            </Link>
-            <Link
-              href="/kits"
-              className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
-            >
-              View kits
-            </Link>
-            <Link
-              href="/builder"
-              className={cn(buttonVariants({ variant: "ghost", size: "lg" }))}
-            >
-              Robot Builder
-            </Link>
-          </div>
-        </PageContainer>
-      </section>
+      <HomeHero />
 
       <PageContainer as="section" className="py-14">
         <div className="mb-6 flex items-end justify-between gap-4">

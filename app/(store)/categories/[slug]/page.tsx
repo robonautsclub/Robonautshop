@@ -14,6 +14,7 @@ import {
   getProducts,
 } from "@/lib/catalog";
 import { getRequestDb } from "@/lib/db/request";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
 type CategoryPageProps = {
   params: Promise<{ slug: string }>;
@@ -30,10 +31,11 @@ export async function generateMetadata({
     return { title: "Category not found" };
   }
 
-  return {
+  return buildPageMetadata({
     title: category.name,
     description: category.description ?? undefined,
-  };
+    path: `/categories/${category.slug}`,
+  });
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {

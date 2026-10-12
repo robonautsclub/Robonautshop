@@ -7,6 +7,7 @@ import { CatalogCoverImage } from "@/components/catalog/catalog-cover-image";
 import { ComponentRequirementsList } from "@/components/catalog/component-requirements-list";
 import { KitCustomQuantities } from "@/components/kit/kit-custom-quantities";
 import { PageContainer } from "@/components/layout/page-container";
+import { JsonLd } from "@/components/shared/json-ld";
 import { PriceDisplay } from "@/components/product/price-display";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -15,6 +16,8 @@ import {
   getKitRequirementLines,
 } from "@/lib/catalog";
 import { getRequestDb } from "@/lib/db/request";
+import { breadcrumbJsonLd } from "@/lib/seo/structured-data";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 import { cn } from "@/lib/utils";
 
 type KitDetailPageProps = {
@@ -32,10 +35,12 @@ export async function generateMetadata({
     return { title: "Kit not found" };
   }
 
-  return {
+  return buildPageMetadata({
     title: kit.name,
     description: kit.shortDescription,
-  };
+    path: `/kits/${kit.slug}`,
+    image: kit.imageUrl ? { url: kit.imageUrl, alt: kit.imageAlt || kit.name } : null,
+  });
 }
 
 export default async function KitDetailPage({ params }: KitDetailPageProps) {
@@ -52,6 +57,12 @@ export default async function KitDetailPage({ params }: KitDetailPageProps) {
 
   return (
     <PageContainer as="section" className="py-10">
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Kits", path: "/kits" },
+          { name: kit.name, path: `/kits/${kit.slug}` },
+        ])}
+      />
       <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
         <ol className="flex flex-wrap items-center gap-1">
           <li>

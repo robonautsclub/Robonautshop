@@ -659,7 +659,9 @@ Do not combine these into one field.
 
 # 17. PAYMENTS
 
-The architecture should support:
+**Current scope: bKash is the only supported payment method.** Do not build Cash on Delivery, Nagad, SSLCOMMERZ, or other providers unless explicitly requested. They are future work.
+
+Longer term, the architecture should support:
 
 * Cash on Delivery
 * bKash
@@ -682,6 +684,8 @@ Never trust payment status supplied by the browser.
 ---
 
 # 18. SHIPPING
+
+**Current scope: no courier integrations.** Shipping is a flat/estimated delivery charge calculated server-side. Courier APIs are deferred until the store registers with a courier — do not build them unless explicitly requested.
 
 The architecture should eventually support multiple courier providers.
 
@@ -970,7 +974,7 @@ R2_ACCESS_KEY_ID=
 R2_SECRET_ACCESS_KEY=
 R2_BUCKET=
 RESEND_API_KEY=
-PAYMENT_API_KEY=
+BKASH_CHECKOUT_URL_APP_KEY=
 ```
 
 Maintain:
@@ -1330,13 +1334,16 @@ However, avoid architectural decisions that would make future expansion impossib
 
 The initial target market is Bangladesh.
 
-Eventually support:
+Currently supported:
 
 * BDT (৳)
 * Bangladesh addresses
 * Local phone numbers
+* bKash (only payment method for now)
+
+Future (not in current scope):
+
 * Cash on Delivery
-* bKash
 * Nagad
 * SSLCOMMERZ
 * Local courier services

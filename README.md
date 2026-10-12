@@ -1,6 +1,6 @@
 # Robonautsshop
 
-Robotics parts, kits, and project guides for builders in Bangladesh. Catalog, cart, auth, checkout, and orders are wired to a real Cloudflare D1 database. **bKash Checkout (URL)** is integrated for online payment; Nagad and other providers are not yet. The admin dashboard is still UI shells over real catalog data (see "Admin" below).
+Robotics parts, kits, and project guides for builders in Bangladesh. Catalog, cart, auth, checkout, and orders are wired to a real Cloudflare D1 database. **bKash Checkout (URL)** is the only payment method for now; other providers and courier integrations are deferred (AGENTS.md §17–18). Admin orders can be moved through fulfilment; customers, users, finances, and learning content are still realistic mock fixtures.
 
 ## Run locally
 
@@ -16,7 +16,10 @@ Open [http://localhost:3000](http://localhost:3000).
 ```bash
 pnpm lint
 pnpm typecheck
+pnpm test
 ```
+
+`pnpm test` runs Vitest (`lib/**/*.test.ts`). Business-rule tests that need a database (coupons, stock reservation, order status) run against a real in-memory local D1 from wrangler's `getPlatformProxy` with every migration applied (`lib/test/d1.ts`) — nothing touches `.wrangler/state`.
 
 Copy `.env.example` to `.env` and fill in `BETTER_AUTH_SECRET`/`BETTER_AUTH_URL` before running auth-dependent features locally. For bKash Checkout, also set the `BKASH_CHECKOUT_URL_*` variables. For transactional email (welcome + order confirmation), set `RESEND_API_KEY` to your real Resend API key (replace any `re_xxxxxxxxx` placeholder) and optionally `RESEND_FROM_EMAIL`. Do not commit `.env` or `.env.local`.
 
@@ -68,7 +71,11 @@ pnpm db:seed:remote      # same, against the deployed D1 — development data on
 - On customer sign-in, any guest cart lines are merged into the server cart (same quantities-sum rule either way — `mergeCartLines()` in `lib/cart/calculations.ts`); admin sessions never get a cart of their own.
 - Placing an order (`placeOrderAction`) re-reads the server cart and re-validates every line's price and stock straight from D1 — nothing from the client is trusted for money or availability. Orders (`orders` + `order_items`) have separate `status` and `paymentStatus` columns. Shipping addresses used at checkout are upserted into `user_addresses`; `/account/orders` lists the customer's real orders.
 - **bKash Checkout (URL)** (`lib/payments/bkash/`): when the customer chooses bKash, the server validates the cart and calls Create Payment (`mode: "0011"`). Checkout details are staged in `bkash_pending_payments` until the callback. Success runs Execute Payment and writes a `PAID` order. Failure/cancel persists an unpaid order (`paymentStatus` `FAILED` / `CANCELLED`) so the customer can **Pay again with bKash** from `/account/orders` (prices/stock re-validated server-side).
-- COD and Nagad still create orders immediately without a live payment redirect (Nagad remains a placeholder). Order confirmation email (and welcome email on signup) send via Resend when `RESEND_API_KEY` is set (`lib/email/`).
+- **Stock** (`lib/inventory/`): a paid order reserves stock with a guarded `stock - reserved >= qty` update, so two orders can never claim the same units. Unpaid (failed/cancelled) bKash attempts hold no stock; repaying reserves it again. `orders.stock_state` (`NONE` / `RESERVED` / `DEDUCTED`) makes every reserve/release/deduct happen once per order.
+- **Fulfilment** (`lib/orders/`): admins move real orders PAID → PROCESSING → PACKED → SHIPPED → DELIVERED (or CANCELLED before shipping) from `/admin/orders/[id]`. Shipping deducts stock; cancelling releases the reservation. Payment status is never changed there.
+- Customers see each order at `/account/orders/[id]`.
+- Order confirmation email (and welcome email on signup) send via Resend when `RESEND_API_KEY` is set (`lib/email/`).
+- Rate limits: placing/repaying orders, reviews, and coupon checks are throttled per user/IP (`lib/rate-limit/`), and Better Auth limits sign-in/sign-up in production. Both are in-memory per Worker isolate — best-effort only.
 
 ### Object storage (R2)
 

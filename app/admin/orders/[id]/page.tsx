@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 
 import { AdminOrderDetailShell } from "@/components/admin/admin-order-detail-shell";
+import { AdminOrderStatusControl } from "@/components/admin/admin-order-status-control";
 import { getAdminOrderById } from "@/lib/admin";
 import { mapRealOrderToAdminOrder } from "@/lib/admin/map-real-order";
 import { getRequestDb } from "@/lib/db/request";
+import { getNextOrderStatuses } from "@/lib/orders/status-rules";
 import { getOrderForAdmin } from "@/lib/server-cart/order-queries";
 
 type AdminOrderDetailPageProps = {
@@ -30,5 +32,16 @@ export default async function AdminOrderDetailPage({
     notFound();
   }
 
-  return <AdminOrderDetailShell order={mapRealOrderToAdminOrder(real)} />;
+  return (
+    <AdminOrderDetailShell
+      order={mapRealOrderToAdminOrder(real)}
+      statusControl={
+        <AdminOrderStatusControl
+          key={real.order.status}
+          orderId={real.order.id}
+          nextStatuses={getNextOrderStatuses(real.order.status, real.order.paymentStatus)}
+        />
+      }
+    />
+  );
 }

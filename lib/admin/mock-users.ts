@@ -1,6 +1,12 @@
 /**
- * Static demo users for the admin Users shell.
+ * Development fixture users for the admin Users shell
+ * (tasks/phase-18-hardening/115). Not real accounts.
+ *
+ * Staff are listed here; shoppers are the same people as the mock
+ * customers (mock-people.ts), so the Users and Customers tabs agree.
  */
+
+import { MOCK_CUSTOMER_PROFILES } from "@/lib/admin/mock-people";
 
 export type AdminUserRole =
   | "SUPER_ADMIN"
@@ -44,47 +50,61 @@ export const ADMIN_ROLE_MATRIX: Array<{
   },
 ];
 
-export const mockAdminUsers: AdminUser[] = [
+const MOCK_STAFF: AdminUser[] = [
   {
     id: "USR-1",
-    name: "Fuad Super",
-    email: "super@robonautsshop.local",
+    name: "Mahfuz Rahman",
+    email: "mahfuz.owner@example.com",
     role: "SUPER_ADMIN",
     status: "ACTIVE",
-    createdAt: "2026-01-01T00:00:00.000Z",
+    createdAt: "2026-04-01T04:00:00.000Z",
   },
   {
     id: "USR-2",
-    name: "Nadia Admin",
-    email: "admin@robonautsshop.local",
+    name: "Nadia Karim",
+    email: "nadia.admin@example.com",
     role: "ADMIN",
     status: "ACTIVE",
-    createdAt: "2026-01-15T00:00:00.000Z",
+    createdAt: "2026-04-15T05:30:00.000Z",
   },
   {
     id: "USR-3",
-    name: "Karim Manager",
-    email: "manager@robonautsshop.local",
+    name: "Kamrul Islam",
+    email: "kamrul.store@example.com",
     role: "STORE_MANAGER",
     status: "ACTIVE",
-    createdAt: "2026-02-01T00:00:00.000Z",
+    createdAt: "2026-05-02T06:15:00.000Z",
   },
   {
     id: "USR-4",
-    name: "Ayesha Rahman",
-    email: "ayesha@example.com",
-    role: "SHOPPER",
-    status: "ACTIVE",
-    createdAt: "2026-02-12T00:00:00.000Z",
+    name: "Sumaiya Haque",
+    email: "sumaiya.store@example.com",
+    role: "STORE_MANAGER",
+    status: "INVITED",
+    createdAt: "2026-09-28T09:00:00.000Z",
   },
   {
     id: "USR-5",
-    name: "Rafiul Islam",
-    email: "rafiul@example.com",
-    role: "SHOPPER",
-    status: "INVITED",
-    createdAt: "2026-03-01T00:00:00.000Z",
+    name: "Rashed Mia",
+    email: "rashed.store@example.com",
+    role: "STORE_MANAGER",
+    status: "DISABLED",
+    createdAt: "2026-05-20T07:45:00.000Z",
   },
+];
+
+export const mockAdminUsers: AdminUser[] = [
+  ...MOCK_STAFF,
+  ...MOCK_CUSTOMER_PROFILES.map(
+    (profile): AdminUser => ({
+      id: profile.id.replace("CUS-", "USR-"),
+      name: profile.name,
+      email: profile.email,
+      role: "SHOPPER",
+      status: "ACTIVE",
+      createdAt: profile.joinedAt,
+    }),
+  ),
 ];
 
 export function listAdminUsers(): AdminUser[] {

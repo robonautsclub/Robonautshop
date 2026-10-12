@@ -13,6 +13,7 @@ import {
   type CouponRecord,
 } from "@/lib/coupons/queries";
 import { couponSchema, type CouponInput } from "@/lib/coupons/schemas";
+import { limitAction } from "@/lib/rate-limit/action";
 
 export type AdminCouponResult =
   | { ok: true; coupon: CouponRecord }
@@ -69,6 +70,13 @@ export async function previewCouponAction(
   code: string,
   subtotal: number,
 ): Promise<PreviewCouponResult> {
+  // Throttle code guessing; keyed by IP since checkout preview may run before
+  // the session is read here.
+  const limited = await limitAction("coupon-preview", { limit: 10, windowMs: 60 * 1000 });
+  if (limited) {
+    return { ok: false, error: limited };
+  }
+
   const db = await getRequestDb();
   const result = await validateCoupon(db, code, subtotal);
   if (!result.ok) {

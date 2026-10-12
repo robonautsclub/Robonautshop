@@ -37,6 +37,7 @@ export {
 export {
   getAdminFinanceSummary,
   type AdminFinanceSummary,
+  type AdminMonthlyFinance,
 } from "@/lib/admin/finances";
 export {
   bookOrderLines,

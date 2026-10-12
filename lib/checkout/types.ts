@@ -13,6 +13,10 @@ export const PAYMENT_METHODS: Array<{
   },
 ];
 
+export function getPaymentMethodLabel(paymentMethod: string): string {
+  return PAYMENT_METHODS.find((method) => method.id === paymentMethod)?.label ?? paymentMethod;
+}
+
 export type ShippingEstimate = {
   method: string;
   amount: number;

@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { CodeExampleBlocks } from "@/components/content/code-example-blocks";
 import { ProductDatasheets } from "@/components/content/product-datasheets";
 import { PageContainer } from "@/components/layout/page-container";
+import { JsonLd } from "@/components/shared/json-ld";
 import {
   CatalogEmptyState,
   ProductCard,
@@ -26,6 +27,8 @@ import {
   getDatasheetsForProductSlug,
 } from "@/lib/content";
 import { getRequestDb } from "@/lib/db/request";
+import { breadcrumbJsonLd, productJsonLd } from "@/lib/seo/structured-data";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 import { recordAnalyticsEvent } from "@/lib/analytics/queries";
 import { getFrequentlyBoughtWith } from "@/lib/recommendations/queries";
 import { getMyReviewForProduct, getReviewsForProduct, getReviewSummaryForProduct } from "@/lib/reviews/queries";
@@ -46,10 +49,13 @@ export async function generateMetadata({
     return { title: "Product not found" };
   }
 
-  return {
+  const image = product.images[0];
+  return buildPageMetadata({
     title: product.name,
     description: product.shortDescription,
-  };
+    path: `/products/${product.slug}`,
+    image: image ? { url: image.url, alt: image.alt || product.name } : null,
+  });
 }
 
 export default async function ProductDetailPage({
@@ -84,6 +90,18 @@ export default async function ProductDetailPage({
 
   return (
     <PageContainer as="section" className="py-10">
+      <JsonLd
+        data={[
+          productJsonLd(product),
+          breadcrumbJsonLd([
+            { name: "Products", path: "/products" },
+            ...(product.category
+              ? [{ name: product.category.name, path: `/categories/${product.category.slug}` }]
+              : []),
+            { name: product.name, path: `/products/${product.slug}` },
+          ]),
+        ]}
+      />
       <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
         <ol className="flex flex-wrap items-center gap-1">
           <li>

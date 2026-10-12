@@ -234,3 +234,24 @@ Next.js special files for loading, errors, auth status pages, and sitemap. UI sh
 ## Phase 17 — Customer account & post-purchase
 
 - [x] 102 [Orders, addresses, bKash repay & emails](phase-17-customer-account/102-orders-addresses-repay-emails.md)
+
+## Phase 18 — Hardening & realistic mocks
+
+Payments: bKash only. No courier integrations for now. Admin and content mock data stay, but become realistic.
+
+- [x] 103 [Scope: bKash only, couriers deferred](phase-18-hardening/103-scope-bkash-only.md)
+- [x] 104 [Atomic stock reservation (prevent overselling)](phase-18-hardening/104-atomic-stock-reservation.md)
+- [x] 105 [Release reserved stock on failed or cancelled payment](phase-18-hardening/105-release-reservation.md)
+- [x] 106 [Test runner (Vitest) and first pricing tests](phase-18-hardening/106-vitest-setup.md)
+- [x] 107 [Tests for coupons and stock reservation](phase-18-hardening/107-tests-coupons-inventory.md)
+- [x] 108 [Admin order status updates (real D1 orders)](phase-18-hardening/108-admin-order-status.md)
+- [x] 109 [Turn reserved stock into a stock decrease on ship; release on cancel](phase-18-hardening/109-deduct-stock-on-ship.md)
+- [x] 110 [Customer order detail page `/account/orders/[id]`](phase-18-hardening/110-account-order-detail.md)
+- [x] 111 [Open Graph and canonical URLs](phase-18-hardening/111-seo-og-canonical.md)
+- [x] 112 [Product and Breadcrumb structured data](phase-18-hardening/112-seo-json-ld.md)
+- [x] 113 [Rate limit login, register, orders, reviews and coupons](phase-18-hardening/113-rate-limit-auth-orders.md)
+- [x] 114 [Realistic mock admin orders](phase-18-hardening/114-realistic-mock-orders.md)
+- [x] 115 [Realistic mock customers and users](phase-18-hardening/115-realistic-mock-customers-users.md)
+- [x] 116 [Finances calculated from the mock orders](phase-18-hardening/116-realistic-mock-finances.md)
+- [x] 117 [Realistic mock tutorials, guides, docs and code examples](phase-18-hardening/117-realistic-mock-content.md)
+- [x] 118 [Honest message for mock-backed admin saves](phase-18-hardening/118-honest-admin-save-message.md)

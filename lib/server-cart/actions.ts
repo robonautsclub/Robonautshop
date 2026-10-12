@@ -3,6 +3,7 @@
 import { getServerSession } from "@/lib/auth/session";
 import type { CartLineInput } from "@/lib/cart/types";
 import { getRequestDb } from "@/lib/db/request";
+import { limitAction } from "@/lib/rate-limit/action";
 import {
   getServerCartLines,
   mergeGuestCartIntoServerCart,
@@ -31,6 +32,9 @@ async function requireUserId(): Promise<string | null> {
   const session = await getServerSession();
   return session?.user.id ?? null;
 }
+
+/** Orders and bKash repay attempts per user (tasks/phase-18-hardening/113). */
+const PLACE_ORDER_LIMIT = { limit: 5, windowMs: 60 * 1000 };
 
 export async function getMyCartAction(): Promise<CartLineInput[]> {
   const userId = await requireUserId();
@@ -72,6 +76,11 @@ export async function placeOrderAction(input: PlaceOrderInput): Promise<PlaceOrd
     return { ok: false, error: "You must be signed in to place an order." };
   }
 
+  const limited = await limitAction("place-order", PLACE_ORDER_LIMIT, userId);
+  if (limited) {
+    return { ok: false, error: limited };
+  }
+
   const db = await getRequestDb();
   return placeOrderFromServerCart(db, userId, input);
 }
@@ -104,6 +113,11 @@ export async function repayBkashOrderAction(
   const userId = await requireUserId();
   if (!userId) {
     return { ok: false, error: "You must be signed in to repay an order." };
+  }
+
+  const limited = await limitAction("repay-order", PLACE_ORDER_LIMIT, userId);
+  if (limited) {
+    return { ok: false, error: limited };
   }
 
   const db = await getRequestDb();
