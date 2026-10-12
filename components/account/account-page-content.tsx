@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { AccountNav } from "@/components/account/account-nav";
 import { useAuth } from "@/components/auth/auth-provider";
+import { ActiveSessions } from "@/components/account/active-sessions";
 import { ProfileForm } from "@/components/account/profile-form";
 import { ResendVerificationNotice } from "@/components/account/resend-verification-notice";
 import { PageContainer } from "@/components/layout/page-container";
@@ -88,6 +89,10 @@ export function AccountPageContent() {
             </p>
           </Link>
         </div>
+      </div>
+
+      <div className="mt-6">
+        <ActiveSessions />
       </div>
     </PageContainer>
   );
