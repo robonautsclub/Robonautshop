@@ -8,6 +8,7 @@ import {
   FolderTree,
   LayoutDashboard,
   MessageCircleQuestion,
+  ScrollText,
   Star,
   Undo2,
   Package,
@@ -37,6 +38,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   "/admin/projects": Bot,
   "/admin/questions": MessageCircleQuestion,
   "/admin/reviews": Star,
+  "/admin/audit": ScrollText,
   "/admin/returns": Undo2,
 };
 

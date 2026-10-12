@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import { recordAudit } from "@/lib/audit/log";
+import { orderStatusSnapshot } from "@/lib/audit/snapshots";
 import { requirePermission } from "@/lib/auth/session";
 import { getRequestDb } from "@/lib/db/request";
 import { ORDER_STATUS_VALUES } from "@/lib/db/schema/shared";
@@ -25,7 +27,7 @@ export async function updateOrderStatusAction(
   orderId: string,
   status: string,
 ): Promise<UpdateOrderStatusResult> {
-  await requirePermission("orders.manage");
+  const session = await requirePermission("orders.manage");
 
   const parsed = updateOrderStatusSchema.safeParse({ orderId, status });
   if (!parsed.success) {
@@ -33,8 +35,17 @@ export async function updateOrderStatusAction(
   }
 
   const db = await getRequestDb();
+  const before = await orderStatusSnapshot(db, parsed.data.orderId);
   const result = await updateOrderStatus(db, parsed.data.orderId, parsed.data.status);
   if (result.ok) {
+    await recordAudit(db, {
+      actor: session.user,
+      action: "order.status",
+      entityType: "order",
+      entityId: parsed.data.orderId,
+      before: before ? { status: before.status } : null,
+      after: { status: result.status },
+    });
     revalidatePath("/admin/orders");
     revalidatePath(`/admin/orders/${parsed.data.orderId}`);
     revalidatePath("/admin/inventory");

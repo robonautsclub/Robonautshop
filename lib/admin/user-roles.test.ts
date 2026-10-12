@@ -37,7 +37,11 @@ afterAll(async () => {
 
 describe("assignUserRole", () => {
   it("promotes a verified password account and is case-insensitive on email", async () => {
-    expect(await assignUserRole(db, "admin", " CUST@example.com ", "ORDER_MANAGER")).toEqual({ ok: true, role: "ORDER_MANAGER" });
+    expect(await assignUserRole(db, "admin", " CUST@example.com ", "ORDER_MANAGER")).toMatchObject({
+      ok: true,
+      role: "ORDER_MANAGER",
+      previousRole: "CUSTOMER",
+    });
     expect(await role("cust")).toBe("ORDER_MANAGER");
   });
 

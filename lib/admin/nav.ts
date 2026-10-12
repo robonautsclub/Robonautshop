@@ -47,6 +47,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     items: [
       { permission: "customers.view", href: "/admin/customers", label: "Customers" },
       { permission: "users.manage", href: "/admin/users", label: "Users" },
+      { permission: "audit.view", href: "/admin/audit", label: "Audit log" },
     ],
   },
   {

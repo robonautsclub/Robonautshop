@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { assignUserRole, type AssignRoleResult } from "@/lib/admin/user-roles";
+import { recordAudit } from "@/lib/audit/log";
 import { requirePermission } from "@/lib/auth/session";
 import { getRequestDb } from "@/lib/db/request";
 import { USER_ROLE_VALUES } from "@/lib/db/schema/shared";
@@ -23,6 +24,16 @@ export async function assignUserRoleAction(input: unknown): Promise<AssignRoleRe
 
   const db = await getRequestDb();
   const result = await assignUserRole(db, session.user.id, parsed.data.email, parsed.data.role);
-  if (result.ok) revalidatePath("/admin/users");
+  if (result.ok) {
+    revalidatePath("/admin/users");
+    await recordAudit(db, {
+      actor: session.user,
+      action: "user.role",
+      entityType: "user",
+      entityId: result.userId,
+      before: { role: result.previousRole },
+      after: { role: result.role },
+    });
+  }
   return result;
 }

@@ -12,7 +12,9 @@ export type BackOfficeUser = {
   createdAt: Date;
 };
 
-export type AssignRoleResult = { ok: true; role: UserRole } | { ok: false; error: string };
+export type AssignRoleResult =
+  | { ok: true; role: UserRole; userId: string; previousRole: UserRole }
+  | { ok: false; error: string };
 
 export async function listBackOfficeUsers(db: Database): Promise<BackOfficeUser[]> {
   return db
@@ -78,5 +80,5 @@ export async function assignUserRole(
   }
 
   await db.update(users).set({ role, updatedAt: new Date() }).where(eq(users.id, target.id));
-  return { ok: true, role };
+  return { ok: true, role, userId: target.id, previousRole: target.role };
 }

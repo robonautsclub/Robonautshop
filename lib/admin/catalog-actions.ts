@@ -28,6 +28,8 @@ import {
   moveProductImage,
   updateProductImageAlt,
 } from "@/lib/admin/product-images";
+import { recordAudit } from "@/lib/audit/log";
+import { catalogStatusSnapshot, productSnapshot } from "@/lib/audit/snapshots";
 import { requirePermission } from "@/lib/auth/session";
 import type { ProductStatus } from "@/lib/catalog/types";
 import { getRequestDb } from "@/lib/db/request";
@@ -64,16 +66,27 @@ export async function saveProductAction(
   productId: string | null,
   input: unknown,
 ): Promise<CatalogWriteResult> {
-  await requirePermission("catalog.manage");
+  const session = await requirePermission("catalog.manage");
   const parsed = productInputSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
   }
   const db = await getRequestDb();
+  const before = productId ? await productSnapshot(db, productId) : null;
   const result = productId
     ? await updateProduct(db, productId, parsed.data)
     : await createProduct(db, parsed.data);
-  if (result.ok) revalidateCatalog("/admin/products");
+  if (result.ok) {
+    revalidateCatalog("/admin/products");
+    await recordAudit(db, {
+      actor: session.user,
+      action: productId ? "product.update" : "product.create",
+      entityType: "product",
+      entityId: result.id,
+      before,
+      after: await productSnapshot(db, result.id),
+    });
+  }
   return result;
 }
 
@@ -83,14 +96,25 @@ async function setStatus(
   id: string,
   status: ProductStatus,
 ): Promise<CatalogWriteResult> {
-  await requirePermission("catalog.manage");
+  const session = await requirePermission("catalog.manage");
   const parsed = productStatusInputSchema.safeParse({ productId: id, status });
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
   }
   const db = await getRequestDb();
+  const before = await catalogStatusSnapshot(db, table, parsed.data.productId);
   const result = await setCatalogStatus(db, table, parsed.data.productId, parsed.data.status);
-  if (result.ok) revalidateCatalog(adminPath);
+  if (result.ok) {
+    revalidateCatalog(adminPath);
+    await recordAudit(db, {
+      actor: session.user,
+      action: `${table === "robot_projects" ? "project" : table.slice(0, -1)}.status`,
+      entityType: table === "robot_projects" ? "project" : table.slice(0, -1),
+      entityId: parsed.data.productId,
+      before,
+      after: { status: parsed.data.status },
+    });
+  }
   return result;
 }
 
@@ -110,7 +134,7 @@ export async function saveCategoryAction(
   categoryId: string | null,
   input: unknown,
 ): Promise<CatalogWriteResult> {
-  await requirePermission("catalog.manage");
+  const session = await requirePermission("catalog.manage");
   const parsed = categoryInputSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
@@ -119,15 +143,27 @@ export async function saveCategoryAction(
   const result = categoryId
     ? await updateCategory(db, categoryId, parsed.data)
     : await createCategory(db, parsed.data);
-  if (result.ok) revalidateCatalog("/admin/categories");
+  if (result.ok) {
+    revalidateCatalog("/admin/categories");
+    await recordAudit(db, {
+      actor: session.user,
+      action: categoryId ? "category.update" : "category.create",
+      entityType: "category",
+      entityId: result.id,
+      after: { name: parsed.data.name, parentId: parsed.data.parentId },
+    });
+  }
   return result;
 }
 
 export async function deleteCategoryAction(categoryId: string): Promise<CatalogWriteResult> {
-  await requirePermission("catalog.manage");
+  const session = await requirePermission("catalog.manage");
   const db = await getRequestDb();
   const result = await deleteCategory(db, categoryId);
-  if (result.ok) revalidateCatalog("/admin/categories");
+  if (result.ok) {
+    revalidateCatalog("/admin/categories");
+    await recordAudit(db, { actor: session.user, action: "category.delete", entityType: "category", entityId: categoryId });
+  }
   return result;
 }
 
@@ -135,14 +171,23 @@ export async function saveKitAction(
   kitId: string | null,
   input: unknown,
 ): Promise<CatalogWriteResult> {
-  await requirePermission("catalog.manage");
+  const session = await requirePermission("catalog.manage");
   const parsed = kitInputSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
   }
   const db = await getRequestDb();
   const result = await saveKit(db, kitId, parsed.data);
-  if (result.ok) revalidateCatalog("/admin/kits");
+  if (result.ok) {
+    revalidateCatalog("/admin/kits");
+    await recordAudit(db, {
+      actor: session.user,
+      action: kitId ? "kit.update" : "kit.create",
+      entityType: "kit",
+      entityId: result.id,
+      after: { name: parsed.data.name },
+    });
+  }
   return result;
 }
 
@@ -150,14 +195,23 @@ export async function saveProjectAction(
   projectId: string | null,
   input: unknown,
 ): Promise<CatalogWriteResult> {
-  await requirePermission("catalog.manage");
+  const session = await requirePermission("catalog.manage");
   const parsed = projectInputSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
   }
   const db = await getRequestDb();
   const result = await saveProject(db, projectId, parsed.data);
-  if (result.ok) revalidateCatalog("/admin/projects");
+  if (result.ok) {
+    revalidateCatalog("/admin/projects");
+    await recordAudit(db, {
+      actor: session.user,
+      action: projectId ? "project.update" : "project.create",
+      entityType: "project",
+      entityId: result.id,
+      after: { name: parsed.data.name },
+    });
+  }
   return result;
 }
 
@@ -171,7 +225,17 @@ export async function adjustStockAction(
   }
   const db = await getRequestDb();
   const result = await adjustStock(db, { ...parsed.data, actorUserId: session.user.id });
-  if (result.ok) revalidateCatalog("/admin/inventory");
+  if (result.ok) {
+    revalidateCatalog("/admin/inventory");
+    await recordAudit(db, {
+      actor: session.user,
+      action: "stock.adjust",
+      entityType: "inventory",
+      entityId: parsed.data.inventoryId,
+      before: { stock: result.stockAfter - parsed.data.delta },
+      after: { stock: result.stockAfter, reason: parsed.data.reason },
+    });
+  }
   return result;
 }
 

@@ -303,7 +303,7 @@ Moderation, returns, staff permissions, audit and exports.
 - [x] 144 [Review moderation and verified purchase](phase-22-ops/144-review-moderation.md)
 - [x] 145 [Return and warranty requests](phase-22-ops/145-return-warranty-requests.md)
 - [x] 146 [Staff roles and permissions](phase-22-ops/146-staff-roles.md)
-- [ ] 147 [Admin audit log](phase-22-ops/147-admin-audit-log.md)
+- [x] 147 [Admin audit log](phase-22-ops/147-admin-audit-log.md)
 - [ ] 148 [Admin two-factor authentication](phase-22-ops/148-admin-2fa.md)
 - [ ] 149 [CSV export for orders, products and inventory](phase-22-ops/149-csv-export.md)
 - [ ] 150 [Server error logging](phase-22-ops/150-error-logging.md)

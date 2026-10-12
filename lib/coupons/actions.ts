@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { recordAudit } from "@/lib/audit/log";
 import { requirePermission } from "@/lib/auth/session";
 import { getRequestDb } from "@/lib/db/request";
 import {
@@ -27,7 +28,7 @@ export async function listCouponsAction(): Promise<CouponRecord[]> {
 
 /** Admin-only — requirePermission("coupons.manage") redirects/403s non-admins itself. */
 export async function createCouponAction(input: CouponInput): Promise<AdminCouponResult> {
-  await requirePermission("coupons.manage");
+  const session = await requirePermission("coupons.manage");
 
   const parsed = couponSchema.safeParse(input);
   if (!parsed.success) {
@@ -36,6 +37,13 @@ export async function createCouponAction(input: CouponInput): Promise<AdminCoupo
 
   const db = await getRequestDb();
   const coupon = await createCoupon(db, parsed.data);
+  await recordAudit(db, {
+    actor: session.user,
+    action: "coupon.create",
+    entityType: "coupon",
+    entityId: coupon.id,
+    after: { code: coupon.code, type: coupon.type, value: coupon.value },
+  });
   revalidatePath("/admin/coupons");
   return { ok: true, coupon };
 }
@@ -44,9 +52,10 @@ export async function toggleCouponActiveAction(
   id: string,
   active: boolean,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
-  await requirePermission("coupons.manage");
+  const session = await requirePermission("coupons.manage");
   const db = await getRequestDb();
   await setCouponActive(db, id, active);
+  await recordAudit(db, { actor: session.user, action: "coupon.toggle", entityType: "coupon", entityId: id, after: { active } });
   revalidatePath("/admin/coupons");
   return { ok: true };
 }
@@ -54,9 +63,10 @@ export async function toggleCouponActiveAction(
 export async function deleteCouponAction(
   id: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
-  await requirePermission("coupons.manage");
+  const session = await requirePermission("coupons.manage");
   const db = await getRequestDb();
   await deleteCoupon(db, id);
+  await recordAudit(db, { actor: session.user, action: "coupon.delete", entityType: "coupon", entityId: id });
   revalidatePath("/admin/coupons");
   return { ok: true };
 }

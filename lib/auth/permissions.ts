@@ -18,6 +18,7 @@ export const PERMISSIONS = [
   "reviews.moderate",
   "questions.answer",
   "users.manage",
+  "audit.view",
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];
 
