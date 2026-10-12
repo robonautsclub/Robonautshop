@@ -5,6 +5,7 @@ import { Lock, Mail, MapPin, Phone } from "lucide-react";
 import { SiteLogo } from "@/components/brand/site-logo";
 import { PageContainer } from "@/components/layout/page-container";
 import { storeNavLinks } from "@/components/layout/nav-links";
+import { POLICY_LINKS } from "@/lib/content/policy-pages";
 import { cn } from "@/lib/utils";
 
 const helpLinks = [
@@ -122,6 +123,17 @@ export function Footer() {
             </nav>
           </div>
         </div>
+
+        <nav
+          aria-label="Store policies"
+          className="flex flex-wrap gap-x-5 gap-y-1.5 border-t pt-4"
+        >
+          {POLICY_LINKS.map((link) => (
+            <FooterLink key={link.href} href={link.href}>
+              {link.label}
+            </FooterLink>
+          ))}
+        </nav>
 
         <div className="flex flex-col gap-2 border-t pt-4 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">

@@ -1,6 +1,6 @@
 # Task 142 — Policy, About and FAQ pages
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

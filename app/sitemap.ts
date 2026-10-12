@@ -11,6 +11,7 @@ import {
   getRobotGuides,
   getTutorials,
 } from "@/lib/content";
+import { POLICY_LINKS } from "@/lib/content/policy-pages";
 import { getRequestDb } from "@/lib/db/request";
 import { getSiteUrl } from "@/lib/site-url";
 
@@ -33,6 +34,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/guides",
     "/docs",
     "/builder",
+    ...POLICY_LINKS.map((link) => link.href),
   ].map((path) => ({
     url: `${base}${path}`,
     lastModified: now,
