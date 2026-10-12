@@ -9,7 +9,7 @@ type ProductReviewsSectionProps = {
   reviews: ProductReviewWithAuthor[];
   summary: { count: number; averageRating: number };
   isSignedIn: boolean;
-  myReview: { rating: number; title: string | null; body: string } | null;
+  myReview: { rating: number; title: string | null; body: string; status: string } | null;
 };
 
 /** Server-rendered reviews list + summary; the form itself is a small client island. */
@@ -35,7 +35,16 @@ export function ProductReviewsSection({
 
       <div className="mt-6">
         {isSignedIn ? (
-          <ReviewFormClient productSlug={productSlug} initial={myReview} />
+          <div className="space-y-3">
+            {myReview && myReview.status !== "APPROVED" ? (
+              <p className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm" role="status">
+                {myReview.status === "PENDING"
+                  ? "Your review is waiting for approval and isn’t public yet."
+                  : "Your review is not currently shown on this page."}
+              </p>
+            ) : null}
+            <ReviewFormClient productSlug={productSlug} initial={myReview} />
+          </div>
         ) : (
           <p className="rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground">
             <Link href="/user/login" className="font-medium underline-offset-4 hover:underline">
@@ -55,6 +64,11 @@ export function ProductReviewsSection({
                   <StarRating value={review.rating} />
                   {review.title ? (
                     <span className="text-sm font-medium">{review.title}</span>
+                  ) : null}
+                  {review.verifiedPurchase ? (
+                    <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                      Verified purchase
+                    </span>
                   ) : null}
                 </div>
                 <span className="text-xs text-muted-foreground">

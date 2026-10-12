@@ -1,13 +1,18 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, exists, sql } from "drizzle-orm";
 
 import type { Database } from "@/lib/db";
-import { productReviews } from "@/lib/db/schema/product-reviews";
+import { orderItems } from "@/lib/db/schema/order-items";
+import { orders } from "@/lib/db/schema/orders";
+import { productReviews, type ReviewStatus } from "@/lib/db/schema/product-reviews";
+import { products } from "@/lib/db/schema/products";
 import { users } from "@/lib/db/schema/users";
 
 export type ProductReviewRecord = typeof productReviews.$inferSelect;
 
 export type ProductReviewWithAuthor = ProductReviewRecord & {
   authorName: string;
+  /** The author has a delivered order containing this product (computed server-side). */
+  verifiedPurchase: boolean;
 };
 
 export type ProductReviewSummary = {
@@ -15,11 +20,22 @@ export type ProductReviewSummary = {
   averageRating: number;
 };
 
+/** True when `userId` has a DELIVERED order containing the review's product. */
+function hasDeliveredPurchase() {
+  return exists(
+    sql`(select 1 from ${orderItems} inner join ${orders} on ${orders.id} = ${orderItems.orderId}
+         where ${orderItems.productId} = ${productReviews.productId}
+         and ${orders.userId} = ${productReviews.userId}
+         and ${orders.status} = 'DELIVERED')`,
+  );
+}
+
+/** Public reviews only: moderation status must be APPROVED. */
 export async function getReviewsForProduct(
   db: Database,
   productId: string,
 ): Promise<ProductReviewWithAuthor[]> {
-  const rows = await db
+  return db
     .select({
       id: productReviews.id,
       productId: productReviews.productId,
@@ -27,16 +43,16 @@ export async function getReviewsForProduct(
       rating: productReviews.rating,
       title: productReviews.title,
       body: productReviews.body,
+      status: productReviews.status,
       createdAt: productReviews.createdAt,
       updatedAt: productReviews.updatedAt,
       authorName: users.name,
+      verifiedPurchase: sql<boolean>`${hasDeliveredPurchase()}`.mapWith(Boolean),
     })
     .from(productReviews)
     .innerJoin(users, eq(users.id, productReviews.userId))
-    .where(eq(productReviews.productId, productId))
+    .where(and(eq(productReviews.productId, productId), eq(productReviews.status, "APPROVED")))
     .orderBy(desc(productReviews.createdAt));
-
-  return rows;
 }
 
 export async function getReviewSummaryForProduct(
@@ -46,7 +62,7 @@ export async function getReviewSummaryForProduct(
   const rows = await db
     .select({ rating: productReviews.rating })
     .from(productReviews)
-    .where(eq(productReviews.productId, productId));
+    .where(and(eq(productReviews.productId, productId), eq(productReviews.status, "APPROVED")));
 
   if (rows.length === 0) {
     return { count: 0, averageRating: 0 };
@@ -68,7 +84,8 @@ export async function getReviewSummariesForProducts(
 
   const rows = await db
     .select({ productId: productReviews.productId, rating: productReviews.rating })
-    .from(productReviews);
+    .from(productReviews)
+    .where(eq(productReviews.status, "APPROVED"));
 
   const idSet = new Set(productIds);
   for (const row of rows) {
@@ -110,10 +127,19 @@ export async function upsertReview(
         rating: args.rating,
         title: args.title?.trim() || null,
         body: args.body,
+        // An edited review goes back through moderation.
+        status: "PENDING",
         updatedAt: now,
       })
       .where(eq(productReviews.id, existing.id));
-    return { ...existing, rating: args.rating, title: args.title?.trim() || null, body: args.body, updatedAt: now };
+    return {
+      ...existing,
+      rating: args.rating,
+      title: args.title?.trim() || null,
+      body: args.body,
+      status: "PENDING",
+      updatedAt: now,
+    };
   }
 
   const id = crypto.randomUUID();
@@ -149,4 +175,59 @@ export async function deleteReview(
     .delete(productReviews)
     .where(and(eq(productReviews.id, reviewId), eq(productReviews.userId, userId)));
   return true;
+}
+
+export type AdminReview = {
+  id: string;
+  productName: string;
+  productSlug: string;
+  authorName: string;
+  rating: number;
+  title: string | null;
+  body: string;
+  status: ReviewStatus;
+  createdAt: string;
+};
+
+export async function listReviewsForAdmin(db: Database): Promise<AdminReview[]> {
+  return db
+    .select({
+      id: productReviews.id,
+      productName: products.name,
+      productSlug: products.slug,
+      authorName: users.name,
+      rating: productReviews.rating,
+      title: productReviews.title,
+      body: productReviews.body,
+      status: productReviews.status,
+      createdAt: productReviews.createdAt,
+    })
+    .from(productReviews)
+    .innerJoin(products, eq(products.id, productReviews.productId))
+    .innerJoin(users, eq(users.id, productReviews.userId))
+    .orderBy(desc(productReviews.createdAt));
+}
+
+/** Moderation decision; returns the product slug so callers can revalidate its page. */
+export async function setReviewStatus(
+  db: Database,
+  reviewId: string,
+  status: ReviewStatus,
+): Promise<{ ok: true; productSlug: string } | { ok: false; error: string }> {
+  const updated = await db
+    .update(productReviews)
+    .set({ status, updatedAt: new Date().toISOString() })
+    .where(eq(productReviews.id, reviewId))
+    .returning({ productId: productReviews.productId });
+  if (!updated[0]) {
+    return { ok: false, error: "Review not found." };
+  }
+  const product = (
+    await db
+      .select({ slug: products.slug })
+      .from(products)
+      .where(eq(products.id, updated[0].productId))
+      .limit(1)
+  )[0];
+  return { ok: true, productSlug: product?.slug ?? "" };
 }

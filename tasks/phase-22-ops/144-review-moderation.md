@@ -1,6 +1,6 @@
 # Task 144 — Review moderation and verified purchase
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 
