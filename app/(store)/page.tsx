@@ -2,15 +2,16 @@ import Link from "next/link";
 
 import { CatalogCoverImage } from "@/components/catalog/catalog-cover-image";
 import { HomeHero } from "@/components/home/home-hero";
+import { ProductShowcaseSection } from "@/components/home/product-showcase-section";
 import { PageContainer } from "@/components/layout/page-container";
 import {
   CatalogEmptyState,
-  ProductCard,
-  ProductGrid,
 } from "@/components/product";
 import {
   getCategories,
+  getBestsellers,
   getKits,
+  getNewArrivals,
   getProductCardModels,
   getProducts,
   getProjects,
@@ -28,6 +29,10 @@ export default async function HomePage() {
     db,
     featuredProductsRaw.slice(0, 6),
   );
+  const [newArrivals, bestsellers] = await Promise.all([
+    getNewArrivals(db, 6).then((rows) => getProductCardModels(db, rows)),
+    getBestsellers(db, 6).then((rows) => getProductCardModels(db, rows)),
+  ]);
   const categoriesAll = await getCategories(db);
   const categories = categoriesAll.slice(0, 6);
   const featuredKitsAll = await getKits(db, { featured: true });
@@ -39,44 +44,31 @@ export default async function HomePage() {
     <div>
       <HomeHero />
 
-      <PageContainer as="section" className="py-14">
-        <div className="mb-6 flex items-end justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight">
-              Featured products
-            </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Popular parts.
-            </p>
-          </div>
-          <Link
-            href="/products"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground"
-          >
-            View all
-          </Link>
-        </div>
-        {featuredProducts.length === 0 ? (
-          <CatalogEmptyState
-            title="No featured products yet"
-            description="Featured items will show here once they are marked in the catalog."
-            actionHref="/products"
-            actionLabel="Browse all products"
-          />
-        ) : (
-          <ProductGrid>
-            {featuredProducts.map((card) => (
-              <ProductCard
-                key={card.product.id}
-                product={card.product}
-                imageUrl={card.imageUrl}
-                imageAlt={card.imageAlt}
-                availableQuantity={card.availableQuantity}
-              />
-            ))}
-          </ProductGrid>
-        )}
-      </PageContainer>
+      <ProductShowcaseSection
+        title="Featured products"
+        subtitle="Popular parts."
+        cards={featuredProducts}
+        emptyTitle="No featured products yet"
+        emptyDescription="Featured items will show here once they are marked in the catalog."
+      />
+
+      <ProductShowcaseSection
+        title="New arrivals"
+        subtitle="The latest additions to the catalog."
+        cards={newArrivals}
+        emptyTitle="No products yet"
+        emptyDescription="New products will appear here as they are added."
+        className="pb-14"
+      />
+
+      <ProductShowcaseSection
+        title="Bestsellers"
+        subtitle="Most ordered by our customers."
+        cards={bestsellers}
+        emptyTitle="No bestsellers yet"
+        emptyDescription="Bestsellers appear here once customers have placed orders."
+        className="pb-14"
+      />
 
       <PageContainer>
         <RecentlyViewed />

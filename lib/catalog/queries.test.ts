@@ -122,3 +122,59 @@ describe("getProductSuggestions", () => {
     expect((await getProductSuggestions(db, "part")).length).toBeLessThanOrEqual(6);
   });
 });
+
+describe("homepage rankings", () => {
+  it("lists new arrivals newest first, published only", async () => {
+    const { getNewArrivals } = await import("@/lib/catalog/queries");
+    expect((await getNewArrivals(db, 3)).map((p) => p.id)).toEqual(["p06", "p05", "p04"]);
+  });
+
+  it("ranks bestsellers by units on paid, non-cancelled orders and is empty with no sales", async () => {
+    const { getBestsellers } = await import("@/lib/catalog/queries");
+    const { orders } = await import("@/lib/db/schema/orders");
+    const { orderItems } = await import("@/lib/db/schema/order-items");
+    const { users } = await import("@/lib/db/schema/users");
+
+    expect(await getBestsellers(db)).toEqual([]);
+
+    const now = new Date();
+    await db.insert(users).values({ id: "u1", name: "T", email: "t@example.com", createdAt: now, updatedAt: now });
+    const base = {
+      userId: "u1",
+      paymentMethod: "BKASH",
+      subtotal: 100,
+      shippingTotal: 60,
+      total: 160,
+      shippingFullName: "T",
+      shippingPhone: "01700000000",
+      shippingAddressLine1: "House 1",
+      shippingCity: "Dhaka",
+    };
+    await db.insert(orders).values([
+      { ...base, id: "o1", status: "DELIVERED", paymentStatus: "PAID" },
+      { ...base, id: "o2", status: "PAID", paymentStatus: "PAID" },
+      { ...base, id: "o3", status: "CANCELLED", paymentStatus: "PAID" },
+      { ...base, id: "o4", status: "PENDING", paymentStatus: "PENDING" },
+    ]);
+    const line = (id: string, orderId: string, productId: string, quantity: number) => ({
+      id,
+      orderId,
+      productId,
+      variantId: null,
+      productName: productId,
+      sku: productId,
+      quantity,
+      unitPrice: 100,
+      lineTotal: 100 * quantity,
+    });
+    await db.insert(orderItems).values([
+      line("l1", "o1", "p02", 2),
+      line("l2", "o2", "p02", 1),
+      line("l3", "o1", "p05", 2),
+      line("l4", "o3", "p06", 50), // cancelled — ignored
+      line("l5", "o4", "p06", 50), // unpaid — ignored
+    ]);
+
+    expect((await getBestsellers(db, 5)).map((p) => p.id)).toEqual(["p02", "p05"]);
+  });
+});

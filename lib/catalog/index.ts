@@ -33,6 +33,7 @@ export type {
 } from "@/lib/catalog/queries";
 
 export {
+  getBestsellers,
   getCategories,
   getCategoryById,
   getCategoryBySlug,
@@ -46,6 +47,7 @@ export {
   getKitRequirementLines,
   getKits,
   getProductById,
+  getNewArrivals,
   getProductBrands,
   getProductBySlug,
   getProductCardModels,

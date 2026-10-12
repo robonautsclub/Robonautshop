@@ -15,9 +15,11 @@
  * tasks/phase-12-wire-up/78-real-cart-orders.md.
  */
 
-import { and, asc, count, desc, eq, exists, inArray, ne, or, sql, type AnyColumn, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, exists, inArray, ne, notInArray, or, sql, type AnyColumn, type SQL } from "drizzle-orm";
 
 import type { Database } from "@/lib/db";
+import { orderItems } from "@/lib/db/schema/order-items";
+import { orders } from "@/lib/db/schema/orders";
 import { categories } from "@/lib/db/schema/categories";
 import { inventory } from "@/lib/db/schema/inventory";
 import { kitComponents } from "@/lib/db/schema/kit-components";
@@ -350,6 +352,51 @@ export async function getProductsPage(
     .offset((page - 1) * pageSize);
 
   return { products: rows, total, page, pageSize, totalPages };
+}
+
+/** Newest published products by creation date (task 143). */
+export async function getNewArrivals(db: Database, limit = 6): Promise<Product[]> {
+  return db
+    .select()
+    .from(products)
+    .where(eq(products.status, "PUBLISHED"))
+    .orderBy(...productOrderBy("newest"))
+    .limit(limit);
+}
+
+/**
+ * Published products ranked by units sold on real, paid, not-cancelled
+ * orders (task 143). Returns fewer than `limit` — or none — when there are
+ * not enough sales yet; nothing is padded or hard-coded.
+ */
+export async function getBestsellers(db: Database, limit = 6): Promise<Product[]> {
+  const units = sql<number>`sum(${orderItems.quantity})`;
+  const ranked = await db
+    .select({ productId: orderItems.productId })
+    .from(orderItems)
+    .innerJoin(orders, eq(orders.id, orderItems.orderId))
+    .innerJoin(products, eq(products.id, orderItems.productId))
+    .where(
+      and(
+        eq(orders.paymentStatus, "PAID"),
+        notInArray(orders.status, ["CANCELLED", "REFUNDED"]),
+        eq(products.status, "PUBLISHED"),
+      ),
+    )
+    .groupBy(orderItems.productId)
+    .orderBy(desc(units), asc(orderItems.productId))
+    .limit(limit);
+
+  const ids = ranked.flatMap((row) => (row.productId ? [row.productId] : []));
+  if (ids.length === 0) {
+    return [];
+  }
+  const rows = await db.select().from(products).where(inArray(products.id, ids));
+  const byId = new Map(rows.map((product) => [product.id, product]));
+  return ids.flatMap((id) => {
+    const product = byId.get(id);
+    return product ? [product] : [];
+  });
 }
 
 /** Published products for the given slugs, in the order requested (missing ones are skipped). */
