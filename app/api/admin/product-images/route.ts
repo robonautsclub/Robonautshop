@@ -5,6 +5,7 @@ import { z } from "zod";
 import { addProductImage, productExists } from "@/lib/admin/product-images";
 import { hasPermission } from "@/lib/auth/permissions";
 import { getServerSession } from "@/lib/auth/session";
+import { twoFactorRequired } from "@/lib/auth/two-factor";
 import { getRequestDb } from "@/lib/db/request";
 import {
   buildProductImageKey,
@@ -34,7 +35,9 @@ function jsonError(message: string, status: number) {
 export async function POST(request: Request) {
   const session = await getServerSession();
   if (!session) return jsonError("Please sign in.", 401);
-  if (!hasPermission(session.user.role, "catalog.manage")) return jsonError("Not allowed.", 403);
+  if (!hasPermission(session.user.role, "catalog.manage") || twoFactorRequired(session.user)) {
+    return jsonError("Not allowed.", 403);
+  }
 
   const declaredLength = Number(request.headers.get("content-length") ?? 0);
   if (declaredLength > MAX_IMAGE_BYTES + 64 * 1024) {

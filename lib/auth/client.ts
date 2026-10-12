@@ -1,4 +1,5 @@
 import { sentinelClient } from "@better-auth/infra/client";
+import { twoFactorClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 
 /**
@@ -8,5 +9,5 @@ import { createAuthClient } from "better-auth/react";
  * components/auth/auth-provider.tsx.
  */
 export const authClient = createAuthClient({
-  plugins: [sentinelClient()],
+  plugins: [sentinelClient(), twoFactorClient()],
 });

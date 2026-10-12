@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 
 import { hasPermission, isBackOfficeRole, type Permission } from "@/lib/auth/permissions";
 import { getAuth } from "@/lib/auth/server";
+import { TWO_FACTOR_SETUP_PATH, twoFactorRequired } from "@/lib/auth/two-factor";
 
 /**
  * The one authoritative way to read the current request's session
@@ -65,6 +66,11 @@ export async function requireStaffSession() {
 
   if (!isBackOfficeRole(session.user.role)) {
     forbidden();
+  }
+
+  // Back-office accounts must finish two-factor enrollment before any admin access.
+  if (twoFactorRequired(session.user)) {
+    redirect(TWO_FACTOR_SETUP_PATH);
   }
 
   return session;

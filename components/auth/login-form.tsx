@@ -6,6 +6,7 @@ import { type FormEvent, useState } from "react";
 
 import { useAuth } from "@/components/auth/auth-provider";
 import { fieldClassName } from "@/components/auth/auth-form-shell";
+import { TwoFactorCodeForm } from "@/components/auth/two-factor-code-form";
 import { Button } from "@/components/ui/button";
 import { loginSchema } from "@/lib/auth/schemas";
 
@@ -30,6 +31,12 @@ export function LoginForm({ redirectTo, forgotPasswordHref }: LoginFormProps) {
   const { signIn } = useAuth();
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<string | null>(null);
+  const [needsTwoFactor, setNeedsTwoFactor] = useState(false);
+
+  function finishSignIn() {
+    setStatus("Signed in successfully.");
+    router.push(searchParams.get("callbackUrl") || redirectTo);
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -63,8 +70,17 @@ export function LoginForm({ redirectTo, forgotPasswordHref }: LoginFormProps) {
       return;
     }
 
-    setStatus("Signed in successfully.");
-    router.push(searchParams.get("callbackUrl") || redirectTo);
+    if (result.twoFactorRequired) {
+      setStatus(null);
+      setNeedsTwoFactor(true);
+      return;
+    }
+
+    finishSignIn();
+  }
+
+  if (needsTwoFactor) {
+    return <TwoFactorCodeForm onVerified={finishSignIn} />;
   }
 
   return (

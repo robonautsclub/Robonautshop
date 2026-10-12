@@ -2,6 +2,7 @@ import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { dash, sentinel } from "@better-auth/infra";
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
+import { twoFactor } from "better-auth/plugins";
 
 import type { Database } from "@/lib/db";
 import { getRequestDb } from "@/lib/db/request";
@@ -128,9 +129,11 @@ export function buildAuth(db: Database, options: { withNextCookies: boolean }) {
         "/sign-up/email": { window: 60, max: 3 },
         "/request-password-reset": { window: 60, max: 3 },
         "/send-verification-email": { window: 60, max: 3 },
+        "/two-factor/verify-totp": { window: 60, max: 5 },
+        "/two-factor/verify-backup-code": { window: 60, max: 5 },
       },
     },
-    plugins: [dash(), sentinel(), ...(options.withNextCookies ? [nextCookies()] : [])],
+    plugins: [dash(), sentinel(), twoFactor({ issuer: "Robonautsshop" }), ...(options.withNextCookies ? [nextCookies()] : [])],
   });
 }
 

@@ -1,6 +1,6 @@
 # Task 148 — Admin two-factor authentication
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

@@ -16,7 +16,8 @@ export type SessionUser = {
   role: UserRole;
 };
 
-export type SignInResult = { ok: true } | { ok: false; error: string };
+/** `twoFactorRequired` means the password was right and a TOTP / backup code is still needed. */
+export type SignInResult = { ok: true; twoFactorRequired?: boolean } | { ok: false; error: string };
 
 type AuthContextValue = {
   /** False until the first session check (local or server) has resolved. */
@@ -34,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(
     async (input: { email: string; password: string }): Promise<SignInResult> => {
-      const { error } = await authClient.signIn.email({
+      const { data, error } = await authClient.signIn.email({
         email: input.email,
         password: input.password,
       });
@@ -44,6 +45,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           ok: false,
           error: error.message ?? "Could not sign in with that email and password.",
         };
+      }
+
+      if ((data as { twoFactorRedirect?: boolean } | null)?.twoFactorRedirect) {
+        return { ok: true, twoFactorRequired: true };
       }
 
       return { ok: true };
