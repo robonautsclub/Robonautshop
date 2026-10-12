@@ -287,7 +287,7 @@ Browse, discovery and trust pages.
 
 - [x] 134 [Product listing pagination](phase-21-storefront/134-product-pagination.md)
 - [x] 135 [Brand filter](phase-21-storefront/135-brand-filter.md)
-- [ ] 136 [Search autocomplete](phase-21-storefront/136-search-autocomplete.md)
+- [x] 136 [Search autocomplete](phase-21-storefront/136-search-autocomplete.md)
 - [ ] 137 [Recently viewed products](phase-21-storefront/137-recently-viewed.md)
 - [ ] 138 [Subcategories](phase-21-storefront/138-subcategories.md)
 - [ ] 139 [Product compare](phase-21-storefront/139-product-compare.md)

@@ -113,3 +113,12 @@ describe("getProducts", () => {
     expect(await getProducts(db)).toHaveLength(6);
   });
 });
+
+describe("getProductSuggestions", () => {
+  it("suggests matching products and ignores too-short queries", async () => {
+    const { getProductSuggestions } = await import("@/lib/catalog/suggestions");
+    expect((await getProductSuggestions(db, "nano")).map((s) => s.slug)).toEqual(["part-01"]);
+    expect(await getProductSuggestions(db, "n")).toEqual([]);
+    expect((await getProductSuggestions(db, "part")).length).toBeLessThanOrEqual(6);
+  });
+});
