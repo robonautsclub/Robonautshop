@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   MessageCircleQuestion,
   Star,
+  Undo2,
   Package,
   ShoppingBag,
   Users,
@@ -34,6 +35,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   "/admin/projects": Bot,
   "/admin/questions": MessageCircleQuestion,
   "/admin/reviews": Star,
+  "/admin/returns": Undo2,
 };
 
 function isNavActive(pathname: string, href: string) {

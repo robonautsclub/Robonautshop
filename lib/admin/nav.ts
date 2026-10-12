@@ -33,6 +33,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     label: "Fulfillment",
     items: [
       { href: "/admin/orders", label: "Orders" },
+      { href: "/admin/returns", label: "Returns" },
       { href: "/admin/coupons", label: "Coupons" },
     ],
   },
