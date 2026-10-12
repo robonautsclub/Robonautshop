@@ -1,6 +1,6 @@
 # Task 139 — Product compare
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

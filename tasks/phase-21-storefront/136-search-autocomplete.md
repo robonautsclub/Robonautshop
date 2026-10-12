@@ -1,6 +1,6 @@
 # Task 136 — Search autocomplete
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

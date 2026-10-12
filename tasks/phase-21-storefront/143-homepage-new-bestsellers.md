@@ -1,6 +1,6 @@
 # Task 143 — Homepage: new arrivals and bestsellers
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

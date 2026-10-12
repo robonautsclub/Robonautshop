@@ -190,6 +190,27 @@ export async function sendOrderCancelledEmail(args: {
   });
 }
 
+export async function sendBackInStockEmail(args: {
+  to: string;
+  productName: string;
+  variantName: string | null;
+  productSlug: string;
+}): Promise<boolean> {
+  const site = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "";
+  const label = args.variantName ? `${args.productName} (${args.variantName})` : args.productName;
+
+  return sendEmail({
+    to: args.to,
+    subject: `Back in stock: ${label}`,
+    html: `
+      <p>Good news — <strong>${escapeHtml(label)}</strong> is back in stock at Robonautsshop.</p>
+      ${site ? `<p><a href="${escapeHtml(site)}/products/${escapeHtml(args.productSlug)}">View the product</a></p>` : ""}
+      <p>Stock is limited, so order soon. You’ll only get this email once.</p>
+      <p>— Robonautsshop</p>
+    `,
+  });
+}
+
 export async function sendOrderConfirmationEmail(
   payload: OrderEmailPayload,
 ): Promise<boolean> {

@@ -1,6 +1,6 @@
 # Task 134 — Product listing pagination
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

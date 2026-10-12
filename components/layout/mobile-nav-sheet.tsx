@@ -6,6 +6,7 @@ import { Menu } from "lucide-react";
 
 import { useAuth } from "@/components/auth/auth-provider";
 import { SiteLogo } from "@/components/brand/site-logo";
+import { ProductSearchBox } from "@/components/layout/product-search-box";
 import { storeNavLinks } from "@/components/layout/nav-links";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,6 +35,7 @@ type MobileNavSheetProps = {
 export function MobileNavSheet({ pathname }: MobileNavSheetProps) {
   const { hydrated: authHydrated, isSignedIn } = useAuth();
   const [mounted, setMounted] = useState(false);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     queueMicrotask(() => setMounted(true));
@@ -55,7 +57,7 @@ export function MobileNavSheet({ pathname }: MobileNavSheetProps) {
   }
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
         render={
           <Button
@@ -108,29 +110,16 @@ export function MobileNavSheet({ pathname }: MobileNavSheetProps) {
             </SheetClose>
           ) : null}
         </nav>
-        <form
-          action="/products"
-          method="get"
-          className="mt-4 space-y-2 px-4"
-          role="search"
-        >
-          <label htmlFor="mobile-search" className="text-xs font-medium">
-            Search products
-          </label>
-          <input
-            id="mobile-search"
-            name="q"
-            type="search"
+        <div className="mt-4 space-y-2 px-4">
+          <p className="text-xs font-medium">Search products</p>
+          <ProductSearchBox
+            inputId="mobile-search"
+            label="Search products"
             placeholder="Name, SKU…"
-            className="h-9 w-full rounded-lg border bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            inputClassName="h-9"
+            onNavigate={() => setOpen(false)}
           />
-          <button
-            type="submit"
-            className="inline-flex h-9 w-full items-center justify-center rounded-lg bg-primary text-sm font-medium text-primary-foreground"
-          >
-            Search
-          </button>
-        </form>
+        </div>
       </SheetContent>
     </Sheet>
   );

@@ -7,23 +7,30 @@ import {
   CatalogEmptyState,
   ProductCard,
   ProductGrid,
+  ProductPagination,
 } from "@/components/product";
 import {
+  getCategoryById,
   getCategoryBySlug,
   getProductCardModels,
-  getProducts,
+  getProductsPage,
+  getSubcategories,
 } from "@/lib/catalog";
+import { buildListHref, parsePageParam } from "@/lib/catalog/list-url";
 import { getRequestDb } from "@/lib/db/request";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 type CategoryPageProps = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string }>;
 };
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const page = parsePageParam((await searchParams).page);
   const db = await getRequestDb();
   const category = await getCategoryBySlug(db, slug);
 
@@ -32,14 +39,15 @@ export async function generateMetadata({
   }
 
   return buildPageMetadata({
-    title: category.name,
+    title: page > 1 ? `${category.name} · Page ${page}` : category.name,
     description: category.description ?? undefined,
-    path: `/categories/${category.slug}`,
+    path: buildListHref(`/categories/${category.slug}`, {}, page),
   });
 }
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
+export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
   const { slug } = await params;
+  const pageNumber = parsePageParam((await searchParams).page);
   const db = await getRequestDb();
   const category = await getCategoryBySlug(db, slug);
 
@@ -47,11 +55,16 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     notFound();
   }
 
-  const products = await getProducts(db, {
+  const result = await getProductsPage(db, {
     categorySlug: category.slug,
     sort: "name-asc",
+    page: pageNumber,
   });
-  const cards = await getProductCardModels(db, products);
+  const cards = await getProductCardModels(db, result.products);
+  const [parent, subcategories] = await Promise.all([
+    category.parentId ? getCategoryById(db, category.parentId) : Promise.resolve(null),
+    getSubcategories(db, category.id),
+  ]);
 
   return (
     <PageContainer as="section" className="py-10">
@@ -63,6 +76,16 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             </Link>
           </li>
           <li aria-hidden>/</li>
+          {parent ? (
+            <>
+              <li>
+                <Link href={`/categories/${parent.slug}`} className="hover:text-foreground">
+                  {parent.name}
+                </Link>
+              </li>
+              <li aria-hidden>/</li>
+            </>
+          ) : null}
           <li className="text-foreground">{category.name}</li>
         </ol>
       </nav>
@@ -77,6 +100,23 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           </p>
         ) : null}
       </div>
+
+      {subcategories.length > 0 ? (
+        <nav aria-label="Subcategories" className="mb-8">
+          <ul className="flex flex-wrap gap-2">
+            {subcategories.map((child) => (
+              <li key={child.id}>
+                <Link
+                  href={`/categories/${child.slug}`}
+                  className="inline-flex rounded-full border px-3 py-1 text-sm hover:border-foreground/30 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  {child.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
 
       {cards.length === 0 ? (
         <CatalogEmptyState
@@ -98,6 +138,13 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           ))}
         </ProductGrid>
       )}
+
+      <ProductPagination
+        basePath={`/categories/${category.slug}`}
+        params={{}}
+        page={result.page}
+        totalPages={result.totalPages}
+      />
     </PageContainer>
   );
 }

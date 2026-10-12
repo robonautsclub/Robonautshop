@@ -15,9 +15,11 @@
  * tasks/phase-12-wire-up/78-real-cart-orders.md.
  */
 
-import { and, eq, inArray, ne } from "drizzle-orm";
+import { and, asc, count, desc, eq, exists, inArray, ne, notInArray, or, sql, type AnyColumn, type SQL } from "drizzle-orm";
 
 import type { Database } from "@/lib/db";
+import { orderItems } from "@/lib/db/schema/order-items";
+import { orders } from "@/lib/db/schema/orders";
 import { categories } from "@/lib/db/schema/categories";
 import { inventory } from "@/lib/db/schema/inventory";
 import { kitComponents } from "@/lib/db/schema/kit-components";
@@ -52,7 +54,19 @@ export type GetProductsOptions = {
   query?: string;
   featured?: boolean;
   inStock?: boolean;
+  /** Match any of these brand names exactly. */
+  brands?: string[];
   sort?: ProductSort;
+};
+
+export const PRODUCTS_PAGE_SIZE = 12;
+
+export type ProductsPage = {
+  products: Product[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
 };
 
 export type ProductWithRelations = Product & {
@@ -109,25 +123,97 @@ function scoreQueryMatch(product: Product, query: string): number {
   return score;
 }
 
-function sortProducts(rows: Product[], sort: ProductSort = "newest"): Product[] {
-  const copy = [...rows];
-
+/** SQL ordering for a sort option; `id` breaks ties so pages never overlap. */
+function productOrderBy(sort: ProductSort = "newest"): SQL[] {
   switch (sort) {
     case "name-asc":
-      return copy.sort((a, b) => a.name.localeCompare(b.name));
+      return [asc(sql`lower(${products.name})`), asc(products.id)];
     case "name-desc":
-      return copy.sort((a, b) => b.name.localeCompare(a.name));
+      return [desc(sql`lower(${products.name})`), asc(products.id)];
     case "price-asc":
-      return copy.sort((a, b) => a.price - b.price);
+      return [asc(products.price), asc(products.id)];
     case "price-desc":
-      return copy.sort((a, b) => b.price - a.price);
+      return [desc(products.price), asc(products.id)];
     case "newest":
     default:
-      return copy.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
+      return [desc(products.createdAt), asc(products.id)];
   }
+}
+
+/** Escapes LIKE wildcards so user text is matched literally. */
+function likeContains(column: AnyColumn, term: string): SQL {
+  const escaped = term.replace(/[\\%_]/g, (char) => `\\${char}`);
+  return sql`${column} LIKE ${`%${escaped}%`} ESCAPE '\\'`;
+}
+
+/**
+ * The one place product list filters become SQL (used by getProducts and
+ * getProductsPage). Returns null when the filters can match nothing (e.g.
+ * an unknown category slug). Search requires every term to appear in some
+ * searchable column — the same AND rule scoreQueryMatch ranks by.
+ */
+async function buildProductConditions(
+  db: Database,
+  options: GetProductsOptions,
+): Promise<SQL | null> {
+  const category = options.categorySlug
+    ? await getCategoryBySlug(db, options.categorySlug)
+    : null;
+
+  if (options.categorySlug && !category) {
+    return null;
+  }
+
+  const conditions: SQL[] = [eq(products.status, "PUBLISHED")];
+  if (category) {
+    // A parent category also lists its subcategories' products (task 138).
+    const children = await getSubcategories(db, category.id);
+    conditions.push(
+      inArray(products.categoryId, [category.id, ...children.map((child) => child.id)]),
+    );
+  }
+  if (options.featured === true) {
+    conditions.push(eq(products.featured, true));
+  }
+  if (options.brands && options.brands.length > 0) {
+    conditions.push(inArray(products.brand, options.brands));
+  }
+  if (options.inStock === true) {
+    conditions.push(
+      exists(
+        db
+          .select({ one: sql`1` })
+          .from(inventory)
+          .where(
+            and(
+              eq(inventory.productId, products.id),
+              sql`${inventory.stockQuantity} - ${inventory.reservedQuantity} > 0`,
+            ),
+          ),
+      ),
+    );
+  }
+
+  const terms = (options.query ?? "").trim().toLowerCase().split(/\s+/).filter(Boolean);
+  for (const term of terms) {
+    const termMatch = or(
+      likeContains(products.name, term),
+      likeContains(products.sku, term),
+      likeContains(products.slug, term),
+      likeContains(products.brand, term),
+      likeContains(products.shortDescription, term),
+      likeContains(products.description, term),
+    );
+    if (termMatch) {
+      conditions.push(termMatch);
+    }
+  }
+
+  return and(...conditions) ?? null;
+}
+
+function usesRelevanceOrder(options: GetProductsOptions): boolean {
+  return Boolean(options.query?.trim()) && (!options.sort || options.sort === "newest");
 }
 
 async function attachProductRelations(
@@ -160,6 +246,30 @@ export async function getCategories(db: Database): Promise<Category[]> {
   return db.select().from(categories).orderBy(categories.sortOrder);
 }
 
+/** Distinct brands of published products, for the brand filter (task 135). */
+export async function getProductBrands(db: Database): Promise<string[]> {
+  const rows = await db
+    .selectDistinct({ brand: products.brand })
+    .from(products)
+    .where(and(eq(products.status, "PUBLISHED"), sql`${products.brand} IS NOT NULL AND ${products.brand} <> ''`))
+    .orderBy(asc(sql`lower(${products.brand})`));
+  return rows.flatMap((row) => (row.brand ? [row.brand] : []));
+}
+
+/** Direct children of a category (one level only). */
+export async function getSubcategories(db: Database, parentId: string): Promise<Category[]> {
+  return db
+    .select()
+    .from(categories)
+    .where(eq(categories.parentId, parentId))
+    .orderBy(categories.sortOrder, categories.name);
+}
+
+export async function getCategoryById(db: Database, id: string): Promise<Category | null> {
+  const rows = await db.select().from(categories).where(eq(categories.id, id)).limit(1);
+  return rows[0] ?? null;
+}
+
 export async function getCategoryBySlug(
   db: Database,
   slug: string,
@@ -175,60 +285,134 @@ export async function getProducts(
   db: Database,
   options: GetProductsOptions = {},
 ): Promise<Product[]> {
-  const category = options.categorySlug
-    ? await getCategoryBySlug(db, options.categorySlug)
-    : null;
-
-  if (options.categorySlug && !category) {
+  const where = await buildProductConditions(db, options);
+  if (!where) {
     return [];
   }
 
-  const conditions = [eq(products.status, "PUBLISHED")];
-  if (category) {
-    conditions.push(eq(products.categoryId, category.id));
-  }
-  if (options.featured === true) {
-    conditions.push(eq(products.featured, true));
-  }
-
-  let results = await db
+  const rows = await db
     .select()
     .from(products)
-    .where(and(...conditions));
-
-  let relevanceScores: Map<string, number> | null = null;
-  if (options.query) {
-    const scored = results
-      .map((product) => ({ product, score: scoreQueryMatch(product, options.query!) }))
-      .filter((row) => row.score > 0);
-    relevanceScores = new Map(scored.map((row) => [row.product.id, row.score]));
-    results = scored.map((row) => row.product);
-  }
-
-  if (options.inStock === true) {
-    const ids = results.map((product) => product.id);
-    const inventoryRows = ids.length
-      ? await db.select().from(inventory).where(inArray(inventory.productId, ids))
-      : [];
-    const availableByProduct = new Map<string, number>();
-    for (const row of inventoryRows) {
-      availableByProduct.set(
-        row.productId,
-        (availableByProduct.get(row.productId) ?? 0) + getAvailableQuantity(row),
-      );
-    }
-    results = results.filter((product) => (availableByProduct.get(product.id) ?? 0) > 0);
-  }
+    .where(where)
+    .orderBy(...productOrderBy(options.sort));
 
   // A search ranks by relevance instead of recency, unless the caller picked
-  // a specific sort (price/name) — "newest" is also the unset default, so a
-  // search with no sort chosen lands here too.
-  if (relevanceScores && (!options.sort || options.sort === "newest")) {
-    const scores = relevanceScores;
-    return [...results].sort((a, b) => (scores.get(b.id) ?? 0) - (scores.get(a.id) ?? 0));
+  // a specific sort (price/name) — "newest" is also the unset default.
+  if (usesRelevanceOrder(options)) {
+    const query = options.query!;
+    return rows
+      .map((product) => ({ product, score: scoreQueryMatch(product, query) }))
+      .filter((row) => row.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map((row) => row.product);
   }
 
-  return sortProducts(results, options.sort);
+  return rows;
+}
+
+/**
+ * One page of products with the total count (task 134). LIMIT/OFFSET runs in
+ * D1 except for relevance-ranked searches, whose ordering is computed in JS
+ * over the (already SQL-filtered) matches before slicing.
+ */
+export async function getProductsPage(
+  db: Database,
+  options: GetProductsOptions & { page?: number; pageSize?: number } = {},
+): Promise<ProductsPage> {
+  const pageSize = options.pageSize ?? PRODUCTS_PAGE_SIZE;
+  const requestedPage = Math.max(1, Math.floor(options.page ?? 1));
+
+  const where = await buildProductConditions(db, options);
+  if (!where) {
+    return { products: [], total: 0, page: 1, pageSize, totalPages: 1 };
+  }
+
+  if (usesRelevanceOrder(options)) {
+    const all = await getProducts(db, options);
+    const totalPages = Math.max(1, Math.ceil(all.length / pageSize));
+    const page = Math.min(requestedPage, totalPages);
+    return {
+      products: all.slice((page - 1) * pageSize, page * pageSize),
+      total: all.length,
+      page,
+      pageSize,
+      totalPages,
+    };
+  }
+
+  const [{ total }] = await db.select({ total: count() }).from(products).where(where);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const page = Math.min(requestedPage, totalPages);
+  const rows = await db
+    .select()
+    .from(products)
+    .where(where)
+    .orderBy(...productOrderBy(options.sort))
+    .limit(pageSize)
+    .offset((page - 1) * pageSize);
+
+  return { products: rows, total, page, pageSize, totalPages };
+}
+
+/** Newest published products by creation date (task 143). */
+export async function getNewArrivals(db: Database, limit = 6): Promise<Product[]> {
+  return db
+    .select()
+    .from(products)
+    .where(eq(products.status, "PUBLISHED"))
+    .orderBy(...productOrderBy("newest"))
+    .limit(limit);
+}
+
+/**
+ * Published products ranked by units sold on real, paid, not-cancelled
+ * orders (task 143). Returns fewer than `limit` — or none — when there are
+ * not enough sales yet; nothing is padded or hard-coded.
+ */
+export async function getBestsellers(db: Database, limit = 6): Promise<Product[]> {
+  const units = sql<number>`sum(${orderItems.quantity})`;
+  const ranked = await db
+    .select({ productId: orderItems.productId })
+    .from(orderItems)
+    .innerJoin(orders, eq(orders.id, orderItems.orderId))
+    .innerJoin(products, eq(products.id, orderItems.productId))
+    .where(
+      and(
+        eq(orders.paymentStatus, "PAID"),
+        notInArray(orders.status, ["CANCELLED", "REFUNDED"]),
+        eq(products.status, "PUBLISHED"),
+      ),
+    )
+    .groupBy(orderItems.productId)
+    .orderBy(desc(units), asc(orderItems.productId))
+    .limit(limit);
+
+  const ids = ranked.flatMap((row) => (row.productId ? [row.productId] : []));
+  if (ids.length === 0) {
+    return [];
+  }
+  const rows = await db.select().from(products).where(inArray(products.id, ids));
+  const byId = new Map(rows.map((product) => [product.id, product]));
+  return ids.flatMap((id) => {
+    const product = byId.get(id);
+    return product ? [product] : [];
+  });
+}
+
+/** Published products for the given slugs, in the order requested (missing ones are skipped). */
+export async function getProductsBySlugs(db: Database, slugs: string[]): Promise<Product[]> {
+  if (slugs.length === 0) {
+    return [];
+  }
+  const rows = await db
+    .select()
+    .from(products)
+    .where(and(eq(products.status, "PUBLISHED"), inArray(products.slug, slugs)));
+  const bySlug = new Map(rows.map((product) => [product.slug, product]));
+  return slugs.flatMap((slug) => {
+    const product = bySlug.get(slug);
+    return product ? [product] : [];
+  });
 }
 
 export async function getProductBySlug(

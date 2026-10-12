@@ -285,16 +285,16 @@ Account recovery and self-service. bKash stays the only payment method.
 
 Browse, discovery and trust pages.
 
-- [ ] 134 [Product listing pagination](phase-21-storefront/134-product-pagination.md)
-- [ ] 135 [Brand filter](phase-21-storefront/135-brand-filter.md)
-- [ ] 136 [Search autocomplete](phase-21-storefront/136-search-autocomplete.md)
-- [ ] 137 [Recently viewed products](phase-21-storefront/137-recently-viewed.md)
-- [ ] 138 [Subcategories](phase-21-storefront/138-subcategories.md)
-- [ ] 139 [Product compare](phase-21-storefront/139-product-compare.md)
-- [ ] 140 [Product questions and answers](phase-21-storefront/140-product-qa.md)
-- [ ] 141 [Back-in-stock notifications](phase-21-storefront/141-back-in-stock.md)
-- [ ] 142 [Policy, About and FAQ pages](phase-21-storefront/142-policy-pages.md)
-- [ ] 143 [Homepage: new arrivals and bestsellers](phase-21-storefront/143-homepage-new-bestsellers.md)
+- [x] 134 [Product listing pagination](phase-21-storefront/134-product-pagination.md)
+- [x] 135 [Brand filter](phase-21-storefront/135-brand-filter.md)
+- [x] 136 [Search autocomplete](phase-21-storefront/136-search-autocomplete.md)
+- [x] 137 [Recently viewed products](phase-21-storefront/137-recently-viewed.md)
+- [x] 138 [Subcategories](phase-21-storefront/138-subcategories.md)
+- [x] 139 [Product compare](phase-21-storefront/139-product-compare.md)
+- [x] 140 [Product questions and answers](phase-21-storefront/140-product-qa.md)
+- [x] 141 [Back-in-stock notifications](phase-21-storefront/141-back-in-stock.md)
+- [x] 142 [Policy, About and FAQ pages](phase-21-storefront/142-policy-pages.md)
+- [x] 143 [Homepage: new arrivals and bestsellers](phase-21-storefront/143-homepage-new-bestsellers.md)
 
 ## Phase 22 — Trust, staff & ops
 

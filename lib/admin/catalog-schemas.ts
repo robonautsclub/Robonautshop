@@ -123,6 +123,8 @@ export const categoryInputSchema = z.object({
   name: nameField,
   slug: optionalSlugField,
   description: z.string().trim().max(1000).optional().transform((value) => value || null),
+  /** Blank = top-level category. */
+  parentId: z.string().trim().optional().transform((value) => value || null),
   sortOrder: z.coerce.number().int("Use a whole number.").min(0).max(10_000).default(0),
 });
 

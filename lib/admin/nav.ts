@@ -50,6 +50,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     items: [
       { href: "/admin/kits", label: "Kits" },
       { href: "/admin/projects", label: "Projects" },
+      { href: "/admin/questions", label: "Questions" },
     ],
   },
 ];

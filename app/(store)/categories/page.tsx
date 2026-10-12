@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default async function CategoriesPage() {
   const db = await getRequestDb();
-  const categories = await getCategories(db);
+  const categories = (await getCategories(db)).filter((category) => !category.parentId);
   const counts = await Promise.all(
     categories.map((category) =>
       getProducts(db, { categorySlug: category.slug }).then((products) => products.length),

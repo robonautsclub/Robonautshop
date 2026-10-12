@@ -4,3 +4,4 @@ export { ProductCard } from "@/components/product/product-card";
 export type { ProductCardProps } from "@/components/product/product-card";
 export { ProductGrid } from "@/components/product/product-grid";
 export { StockBadge } from "@/components/product/stock-badge";
+export { ProductPagination } from "@/components/product/product-pagination";

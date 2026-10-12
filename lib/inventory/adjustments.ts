@@ -5,6 +5,7 @@ import { inventory } from "@/lib/db/schema/inventory";
 import type { StockMovementReason } from "@/lib/db/schema/shared";
 import { stockMovements } from "@/lib/db/schema/stock-movements";
 import { users } from "@/lib/db/schema/users";
+import { notifyBackInStock } from "@/lib/stock-alerts/queries";
 
 /**
  * Manual stock changes with a recorded reason
@@ -84,6 +85,14 @@ export async function adjustStock(
   }
 
   await recordStockMovement(db, { ...adjustment, sku: row.sku, stockAfter: row.stockQuantity });
+  if (adjustment.delta > 0) {
+    // Best-effort: a mail problem must never fail the stock change itself.
+    try {
+      await notifyBackInStock(db, adjustment.inventoryId);
+    } catch (error) {
+      console.error("[stock-alerts] back-in-stock notification failed:", error);
+    }
+  }
   return { ok: true, stockAfter: row.stockQuantity };
 }
 
