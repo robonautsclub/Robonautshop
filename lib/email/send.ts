@@ -126,6 +126,26 @@ export async function sendWelcomeEmail(args: {
   });
 }
 
+export async function sendPasswordResetEmail(args: {
+  to: string;
+  name: string;
+  url: string;
+}): Promise<boolean> {
+  const safeName = escapeHtml(args.name.trim() || "there");
+
+  return sendEmail({
+    to: args.to,
+    subject: "Reset your Robonautsshop password",
+    html: `
+      <p>Hi ${safeName},</p>
+      <p>We received a request to reset your Robonautsshop password. This link expires in 1 hour and can be used once.</p>
+      <p><a href="${escapeHtml(args.url)}">Choose a new password</a></p>
+      <p>If you didn’t ask for this, you can ignore this email — your password won’t change.</p>
+      <p>— Robonautsshop</p>
+    `,
+  });
+}
+
 export async function sendOrderConfirmationEmail(
   payload: OrderEmailPayload,
 ): Promise<boolean> {

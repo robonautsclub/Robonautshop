@@ -1,6 +1,6 @@
 # Task 127 — Forgot and reset password
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

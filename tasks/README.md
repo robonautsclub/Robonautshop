@@ -273,7 +273,7 @@ Replace preview-only admin dialogs with real, ADMIN-guarded saves.
 
 Account recovery and self-service. bKash stays the only payment method.
 
-- [ ] 127 [Forgot and reset password](phase-20-accounts/127-forgot-reset-password.md)
+- [x] 127 [Forgot and reset password](phase-20-accounts/127-forgot-reset-password.md)
 - [ ] 128 [Email verification](phase-20-accounts/128-email-verification.md)
 - [ ] 129 [Customer profile edit](phase-20-accounts/129-profile-edit.md)
 - [ ] 130 [Customer cancels an order before it ships](phase-20-accounts/130-customer-cancel-order.md)

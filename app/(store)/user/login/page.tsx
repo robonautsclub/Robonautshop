@@ -23,7 +23,7 @@ export default function CustomerLoginPage() {
     >
       <Suspense>
         <div className="space-y-5">
-          <LoginForm redirectTo="/account" />
+          <LoginForm redirectTo="/account" forgotPasswordHref="/user/forgot-password" />
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="h-px flex-1 bg-border" aria-hidden />
             or

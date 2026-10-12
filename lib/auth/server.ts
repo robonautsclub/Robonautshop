@@ -6,7 +6,7 @@ import { nextCookies } from "better-auth/next-js";
 import type { Database } from "@/lib/db";
 import { getRequestDb } from "@/lib/db/request";
 import * as schema from "@/lib/db/schema";
-import { sendWelcomeEmail } from "@/lib/email/send";
+import { sendPasswordResetEmail, sendWelcomeEmail } from "@/lib/email/send";
 
 /**
  * Social providers are registered only when their env vars are actually
@@ -74,6 +74,12 @@ export function buildAuth(db: Database, options: { withNextCookies: boolean }) {
     }),
     emailAndPassword: {
       enabled: true,
+      resetPasswordTokenExpiresIn: 60 * 60,
+      // Better Auth already hides whether the email exists and the token is
+      // single-use. Mail is best-effort and not awaited (timing side channel).
+      sendResetPassword: async ({ user, url }) => {
+        void sendPasswordResetEmail({ to: user.email, name: user.name, url });
+      },
     },
     user: {
       additionalFields: {

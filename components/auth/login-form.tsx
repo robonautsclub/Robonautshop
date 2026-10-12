@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { type FormEvent, useState } from "react";
 
@@ -13,6 +14,8 @@ type FieldErrors = Partial<Record<"email" | "password" | "form", string>>;
 type LoginFormProps = {
   /** Where to send the user after a successful sign-in, unless ?callbackUrl= overrides it. */
   redirectTo: string;
+  /** Shows a "Forgot password?" link when set (customer login only; admins use the bootstrap flow). */
+  forgotPasswordHref?: string;
 };
 
 /**
@@ -21,7 +24,7 @@ type LoginFormProps = {
  * tasks/phase-12-wire-up/77d-split-login-uis.md) — kept provider-agnostic so
  * it never grows an admin-only or customer-only assumption.
  */
-export function LoginForm({ redirectTo }: LoginFormProps) {
+export function LoginForm({ redirectTo, forgotPasswordHref }: LoginFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { signIn } = useAuth();
@@ -84,9 +87,19 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
       </div>
 
       <div className="space-y-1.5">
-        <label htmlFor="login-password" className="text-sm font-medium">
-          Password
-        </label>
+        <div className="flex items-center justify-between">
+          <label htmlFor="login-password" className="text-sm font-medium">
+            Password
+          </label>
+          {forgotPasswordHref ? (
+            <Link
+              href={forgotPasswordHref}
+              className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            >
+              Forgot password?
+            </Link>
+          ) : null}
+        </div>
         <input
           id="login-password"
           name="password"
