@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getAdminOrderById } from "@/lib/admin";
-import { requireAdminSession } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
 import { getRequestDb } from "@/lib/db/request";
 import { orderInvoiceFromAdminOrder, orderInvoiceFromOrder } from "@/lib/invoice/from-order";
 import { invoicePdfResponse } from "@/lib/invoice/pdf-response";
@@ -17,7 +17,7 @@ type InvoiceRouteProps = {
  * Bytes are generated in memory — never stored in R2.
  */
 export async function GET(_request: Request, { params }: InvoiceRouteProps) {
-  await requireAdminSession();
+  await requirePermission("orders.manage");
 
   const { id } = await params;
   let invoice: OrderInvoice | null = null;

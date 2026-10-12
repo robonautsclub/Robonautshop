@@ -19,7 +19,9 @@ import {
   Wallet,
 } from "lucide-react";
 
+import { useAuth } from "@/components/auth/auth-provider";
 import { ADMIN_NAV_GROUPS } from "@/lib/admin";
+import { hasPermission } from "@/lib/auth/permissions";
 import { cn } from "@/lib/utils";
 
 const NAV_ICONS: Record<string, LucideIcon> = {
@@ -52,10 +54,18 @@ type AdminNavProps = {
 
 export function AdminNav({ onNavigate, className }: AdminNavProps) {
   const pathname = usePathname();
+  const { user } = useAuth();
+  // Hiding links is cosmetic; every page and action re-checks on the server.
+  const groups = ADMIN_NAV_GROUPS.map((group) => ({
+    ...group,
+    items: group.items.filter(
+      (item) => !item.permission || hasPermission(user?.role, item.permission),
+    ),
+  })).filter((group) => group.items.length > 0);
 
   return (
     <nav aria-label="Admin" className={cn("space-y-5", className)}>
-      {ADMIN_NAV_GROUPS.map((group) => (
+      {groups.map((group) => (
         <div key={group.id}>
           <p className="mb-1.5 px-3 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
             {group.label}

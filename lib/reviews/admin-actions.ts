@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { requireAdminSession } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
 import { getRequestDb } from "@/lib/db/request";
 import { REVIEW_STATUS_VALUES } from "@/lib/db/schema/product-reviews";
 import { setReviewStatus } from "@/lib/reviews/queries";
@@ -20,7 +20,7 @@ export async function moderateReviewAction(
   reviewId: string,
   status: string,
 ): Promise<ModerateReviewResult> {
-  await requireAdminSession();
+  await requirePermission("reviews.moderate");
   const parsed = moderationSchema.safeParse({ reviewId, status });
   if (!parsed.success) {
     return { ok: false, error: "Invalid moderation request." };

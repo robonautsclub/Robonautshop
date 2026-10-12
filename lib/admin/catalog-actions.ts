@@ -28,7 +28,7 @@ import {
   moveProductImage,
   updateProductImageAlt,
 } from "@/lib/admin/product-images";
-import { requireAdminSession } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
 import type { ProductStatus } from "@/lib/catalog/types";
 import { getRequestDb } from "@/lib/db/request";
 import {
@@ -43,7 +43,7 @@ import { getProductImagesBucket } from "@/lib/media/r2";
 
 /**
  * Admin catalog server actions (tasks/phase-19-admin-catalog/119–125).
- * Every action calls requireAdminSession() first — it redirects signed-out
+ * Every action calls requirePermission("catalog.manage") first — it redirects signed-out
  * users and 403s non-admins — and re-validates input with Zod; nothing
  * from the browser is trusted, so inputs are typed `unknown` on purpose.
  */
@@ -64,7 +64,7 @@ export async function saveProductAction(
   productId: string | null,
   input: unknown,
 ): Promise<CatalogWriteResult> {
-  await requireAdminSession();
+  await requirePermission("catalog.manage");
   const parsed = productInputSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
@@ -83,7 +83,7 @@ async function setStatus(
   id: string,
   status: ProductStatus,
 ): Promise<CatalogWriteResult> {
-  await requireAdminSession();
+  await requirePermission("catalog.manage");
   const parsed = productStatusInputSchema.safeParse({ productId: id, status });
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
@@ -110,7 +110,7 @@ export async function saveCategoryAction(
   categoryId: string | null,
   input: unknown,
 ): Promise<CatalogWriteResult> {
-  await requireAdminSession();
+  await requirePermission("catalog.manage");
   const parsed = categoryInputSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
@@ -124,7 +124,7 @@ export async function saveCategoryAction(
 }
 
 export async function deleteCategoryAction(categoryId: string): Promise<CatalogWriteResult> {
-  await requireAdminSession();
+  await requirePermission("catalog.manage");
   const db = await getRequestDb();
   const result = await deleteCategory(db, categoryId);
   if (result.ok) revalidateCatalog("/admin/categories");
@@ -135,7 +135,7 @@ export async function saveKitAction(
   kitId: string | null,
   input: unknown,
 ): Promise<CatalogWriteResult> {
-  await requireAdminSession();
+  await requirePermission("catalog.manage");
   const parsed = kitInputSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
@@ -150,7 +150,7 @@ export async function saveProjectAction(
   projectId: string | null,
   input: unknown,
 ): Promise<CatalogWriteResult> {
-  await requireAdminSession();
+  await requirePermission("catalog.manage");
   const parsed = projectInputSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
@@ -164,7 +164,7 @@ export async function saveProjectAction(
 export async function adjustStockAction(
   input: unknown,
 ): Promise<StockAdjustmentResult> {
-  const session = await requireAdminSession();
+  const session = await requirePermission("inventory.manage");
   const parsed = stockAdjustmentInputSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
@@ -179,7 +179,7 @@ export async function setLowStockThresholdAction(
   inventoryId: string,
   lowStockThreshold: number,
 ): Promise<SimpleResult> {
-  await requireAdminSession();
+  await requirePermission("inventory.manage");
   const parsed = lowStockThresholdInputSchema.safeParse({ inventoryId, lowStockThreshold });
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
@@ -191,7 +191,7 @@ export async function setLowStockThresholdAction(
 }
 
 export async function listStockMovementsAction(inventoryId: string): Promise<StockMovementRow[]> {
-  await requireAdminSession();
+  await requirePermission("inventory.manage");
   const db = await getRequestDb();
   return listStockMovements(db, inventoryId);
 }
@@ -204,7 +204,7 @@ const imageAltSchema = z.object({
 });
 
 export async function updateProductImageAltAction(imageId: string, alt: string): Promise<SimpleResult> {
-  await requireAdminSession();
+  await requirePermission("catalog.manage");
   const parsed = imageAltSchema.safeParse({ imageId, alt });
   if (!parsed.success) {
     return { ok: false, error: firstIssue(parsed.error) };
@@ -220,7 +220,7 @@ export async function moveProductImageAction(
   imageId: string,
   direction: "up" | "down",
 ): Promise<SimpleResult> {
-  await requireAdminSession();
+  await requirePermission("catalog.manage");
   if (direction !== "up" && direction !== "down") {
     return { ok: false, error: "Invalid direction." };
   }
@@ -233,7 +233,7 @@ export async function moveProductImageAction(
 
 /** Removes the row, then the R2 object when the image was uploaded here (seed URLs live elsewhere). */
 export async function deleteProductImageAction(imageId: string): Promise<SimpleResult> {
-  await requireAdminSession();
+  await requirePermission("catalog.manage");
   const db = await getRequestDb();
   const url = await deleteProductImage(db, imageId);
   if (url === null) return { ok: false, error: "Image not found." };

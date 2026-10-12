@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { getServerSession, requireAdminSession } from "@/lib/auth/session";
+import { getServerSession, requirePermission } from "@/lib/auth/session";
 import { getRequestDb } from "@/lib/db/request";
 import { limitAction } from "@/lib/rate-limit/action";
 import {
@@ -40,7 +40,7 @@ export async function requestReturnAction(input: unknown): Promise<CreateReturnR
 
 /** Admin-only decision. */
 export async function decideReturnAction(input: unknown): Promise<DecideReturnResult> {
-  const session = await requireAdminSession();
+  const session = await requirePermission("returns.manage");
   const parsed = returnDecisionSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid decision." };

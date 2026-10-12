@@ -14,12 +14,14 @@
  * account, and the guest bucket stays whatever it was.
  */
 
+import type { UserRole } from "@/lib/db/schema/shared";
+
 export type CartIdentity = { kind: "guest" } | { kind: "user"; userId: string };
 
 export const GUEST_CART_STORAGE_KEY = "robonautsshop.cart.guest.v1";
 
 export function resolveCartIdentity(
-  user: { id: string; role: "CUSTOMER" | "ADMIN" } | null,
+  user: { id: string; role: UserRole } | null,
 ): CartIdentity {
   if (user && user.role === "CUSTOMER") {
     return { kind: "user", userId: user.id };

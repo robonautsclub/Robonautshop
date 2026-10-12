@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requireAdminSession } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
 import { getRequestDb } from "@/lib/db/request";
 import {
   createCoupon,
@@ -20,14 +20,14 @@ export type AdminCouponResult =
   | { ok: false; error: string };
 
 export async function listCouponsAction(): Promise<CouponRecord[]> {
-  await requireAdminSession();
+  await requirePermission("coupons.manage");
   const db = await getRequestDb();
   return listCoupons(db);
 }
 
-/** Admin-only — requireAdminSession() redirects/403s non-admins itself. */
+/** Admin-only — requirePermission("coupons.manage") redirects/403s non-admins itself. */
 export async function createCouponAction(input: CouponInput): Promise<AdminCouponResult> {
-  await requireAdminSession();
+  await requirePermission("coupons.manage");
 
   const parsed = couponSchema.safeParse(input);
   if (!parsed.success) {
@@ -44,7 +44,7 @@ export async function toggleCouponActiveAction(
   id: string,
   active: boolean,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
-  await requireAdminSession();
+  await requirePermission("coupons.manage");
   const db = await getRequestDb();
   await setCouponActive(db, id, active);
   revalidatePath("/admin/coupons");
@@ -54,7 +54,7 @@ export async function toggleCouponActiveAction(
 export async function deleteCouponAction(
   id: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
-  await requireAdminSession();
+  await requirePermission("coupons.manage");
   const db = await getRequestDb();
   await deleteCoupon(db, id);
   revalidatePath("/admin/coupons");

@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useMemo, type ReactNode } from "react";
 
 import { authClient } from "@/lib/auth/client";
+import type { UserRole } from "@/lib/db/schema/shared";
 
 export type SessionUser = {
   id: string;
@@ -12,7 +13,7 @@ export type SessionUser = {
   emailVerified: boolean;
   phone: string | null;
   /** CUSTOMER | ADMIN — see lib/db/schema/users.ts. Authorization must still be checked server-side. */
-  role: "CUSTOMER" | "ADMIN";
+  role: UserRole;
 };
 
 export type SignInResult = { ok: true } | { ok: false; error: string };
@@ -58,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const user = data?.user ?? null;
     // The generic authClient isn't typed against our server's additional
     // `role` field (see lib/auth/server.ts), but the API always returns it.
-    const extra = user as { role?: "CUSTOMER" | "ADMIN"; phone?: string | null } | null;
+    const extra = user as { role?: UserRole; phone?: string | null } | null;
     const role = extra?.role ?? "CUSTOMER";
 
     return {

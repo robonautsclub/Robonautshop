@@ -1,3 +1,4 @@
+import { requirePermission } from "@/lib/auth/session";
 import { AdminProductsShell } from "@/components/admin/admin-products-shell";
 import {
   listAdminCategories,
@@ -10,6 +11,7 @@ import { getRequestDb } from "@/lib/db/request";
 export const dynamic = "force-dynamic";
 
 export default async function AdminProductsPage() {
+  await requirePermission("catalog.manage");
   const db = await getRequestDb();
   const [productRows, categoryRows, variants, images] = await Promise.all([
     listAdminProducts(db),

@@ -1,3 +1,4 @@
+import { requirePermission } from "@/lib/auth/session";
 import { notFound } from "next/navigation";
 
 import { AdminOrderDetailShell } from "@/components/admin/admin-order-detail-shell";
@@ -15,6 +16,7 @@ type AdminOrderDetailPageProps = {
 export default async function AdminOrderDetailPage({
   params,
 }: AdminOrderDetailPageProps) {
+  await requirePermission("orders.manage");
   const { id } = await params;
   const mockOrder = getAdminOrderById(id);
 

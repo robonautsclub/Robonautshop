@@ -1,6 +1,6 @@
 # Task 146 — Staff roles and permissions
 
-- [ ] Implemented
+- [x] Implemented
 
 ## Goal
 

@@ -1,5 +1,7 @@
 import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
+import { USER_ROLE_VALUES } from "@/lib/db/schema/shared";
+
 /**
  * Users and auth tables, shaped to match what Better Auth needs
  * (https://better-auth.com/docs/concepts/database): a `user`, `session`,
@@ -37,7 +39,7 @@ export const users = sqliteTable("users", {
   image: text("image"),
   /** Optional Bangladesh mobile number, edited on /account (task 129). */
   phone: text("phone"),
-  role: text("role", { enum: ["CUSTOMER", "ADMIN"] })
+  role: text("role", { enum: USER_ROLE_VALUES })
     .notNull()
     .default("CUSTOMER"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),

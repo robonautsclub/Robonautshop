@@ -1,9 +1,11 @@
+import { requirePermission } from "@/lib/auth/session";
 import { AdminProjectsShell } from "@/components/admin/admin-projects-shell";
 import { listAdminProductOptions, listAdminProjects } from "@/lib/admin";
 import { getProjectComponentsForProjects } from "@/lib/catalog";
 import { getRequestDb } from "@/lib/db/request";
 
 export default async function AdminProjectsPage() {
+  await requirePermission("catalog.manage");
   const db = await getRequestDb();
   const projects = await listAdminProjects(db);
   const [productOptions, projectComponents] = await Promise.all([
