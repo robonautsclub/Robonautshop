@@ -13,6 +13,7 @@ import {
   ProductGrid,
 } from "@/components/product";
 import { RecentlyViewed } from "@/components/product/recently-viewed";
+import { CompareToggle } from "@/components/compare/compare-toggle";
 import { ProductPurchasePanel } from "@/components/product/product-purchase-panel";
 import { WishlistButton } from "@/components/product/wishlist-button";
 import { FrequentlyBoughtTogether } from "@/components/recommendations/frequently-bought-together";
@@ -167,11 +168,14 @@ export default async function ProductDetailPage({
             inventory={product.inventory}
           />
 
-          <WishlistButton
-            productId={product.id}
-            initialWishlisted={wishlisted}
-            isSignedIn={Boolean(session)}
-          />
+          <div className="flex flex-wrap items-start gap-3">
+            <WishlistButton
+              productId={product.id}
+              initialWishlisted={wishlisted}
+              isSignedIn={Boolean(session)}
+            />
+            <CompareToggle slug={product.slug} productName={product.name} />
+          </div>
         </div>
       </div>
 

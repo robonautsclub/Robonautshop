@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { CompareToggle } from "@/components/compare/compare-toggle";
 import { ProductCardAddButton } from "@/components/product/product-card-add-button";
 import { PriceDisplay } from "@/components/product/price-display";
 import { StockBadge } from "@/components/product/stock-badge";
@@ -66,11 +67,14 @@ export function ProductCard({
             compareAtPrice={product.compareAtPrice}
             size="sm"
           />
-          <ProductCardAddButton
-            productId={product.id}
-            productName={product.name}
-            availableQuantity={availableQuantity}
-          />
+          <div className="flex items-center gap-1.5">
+            <CompareToggle slug={product.slug} productName={product.name} compact />
+            <ProductCardAddButton
+              productId={product.id}
+              productName={product.name}
+              availableQuantity={availableQuantity}
+            />
+          </div>
         </div>
       </div>
     </li>
