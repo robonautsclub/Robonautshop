@@ -1,8 +1,12 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import { getServerSession } from "@/lib/auth/session";
 import type { CartLineInput } from "@/lib/cart/types";
 import { getRequestDb } from "@/lib/db/request";
+import { sendOrderCancelledEmail } from "@/lib/email/send";
+import { cancelOrderForCustomer } from "@/lib/orders/customer-cancel";
 import { limitAction } from "@/lib/rate-limit/action";
 import {
   getServerCartLines,
@@ -130,4 +134,33 @@ export async function repayBkashOrderAction(
 
   const db = await getRequestDb();
   return repayBkashOrder(db, userId, orderId);
+}
+
+export type CancelMyOrderResult =
+  | { ok: true; refundPending: boolean }
+  | { ok: false; error: string };
+
+export async function cancelMyOrderAction(orderId: string): Promise<CancelMyOrderResult> {
+  const session = await getServerSession();
+  if (!session) {
+    return { ok: false, error: "You must be signed in to cancel an order." };
+  }
+
+  const db = await getRequestDb();
+  const result = await cancelOrderForCustomer(db, session.user.id, orderId);
+  if (!result.ok) {
+    return result;
+  }
+
+  void sendOrderCancelledEmail({
+    to: session.user.email,
+    name: session.user.name,
+    orderId: result.orderId,
+    refundPending: result.refundPending,
+  });
+  revalidatePath("/account/orders");
+  revalidatePath(`/account/orders/${orderId}`);
+  revalidatePath("/admin/orders");
+  revalidatePath("/admin/inventory");
+  return { ok: true, refundPending: result.refundPending };
 }

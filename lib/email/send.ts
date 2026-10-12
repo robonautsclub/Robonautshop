@@ -166,6 +166,30 @@ export async function sendVerificationEmail(args: {
   });
 }
 
+export async function sendOrderCancelledEmail(args: {
+  to: string;
+  name: string;
+  orderId: string;
+  refundPending: boolean;
+}): Promise<boolean> {
+  const safeName = escapeHtml(args.name.trim() || "there");
+
+  return sendEmail({
+    to: args.to,
+    subject: `Order cancelled · ${shortOrderId(args.orderId)}`,
+    html: `
+      <p>Hi ${safeName},</p>
+      <p>Your order ${escapeHtml(shortOrderId(args.orderId))} has been cancelled as you requested.</p>
+      ${
+        args.refundPending
+          ? "<p>Since you had already paid with bKash, our team will refund the amount manually. We’ll be in touch if we need anything from you.</p>"
+          : ""
+      }
+      <p>— Robonautsshop</p>
+    `,
+  });
+}
+
 export async function sendOrderConfirmationEmail(
   payload: OrderEmailPayload,
 ): Promise<boolean> {
