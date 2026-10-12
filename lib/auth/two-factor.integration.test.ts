@@ -30,7 +30,9 @@ function totp(secret: string, now = Date.now()): string {
   counter.writeBigUInt64BE(BigInt(Math.floor(now / 1000 / 30)));
   const hmac = createHmac("sha1", Buffer.from(secret, "utf8")).update(counter).digest();
   const offset = hmac[hmac.length - 1] & 0xf;
-  const value = (hmac.readUInt32BE(offset) & 0x7fffffff) % 1_000_000;
+  const truncated =
+    ((hmac[offset] & 0x7f) << 24) | (hmac[offset + 1] << 16) | (hmac[offset + 2] << 8) | hmac[offset + 3];
+  const value = truncated % 1_000_000;
   return String(value).padStart(6, "0");
 }
 
